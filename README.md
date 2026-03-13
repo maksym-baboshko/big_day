@@ -1,36 +1,110 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 💍 Big Day — Wedding Invitation
+
+> Personal wedding invitation website for **Maksym & Diana**
+> June 28, 2026 · Grand Hotel Terminus · Bergen, Norway
+
+---
+
+## Stack
+
+| | |
+|---|---|
+| **Framework** | Next.js 16 (App Router) |
+| **Language** | TypeScript 5 · strict mode |
+| **Styling** | Tailwind CSS v4 + CSS variables |
+| **Animation** | Framer Motion 12 |
+| **i18n** | next-intl 4 · Ukrainian (default) + English |
+| **Forms** | react-hook-form + zod |
+| **Architecture** | Feature-Sliced Design (FSD-lite) |
+
+---
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Other commands:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm build          # production build
+pnpm start          # serve production build
+npx tsc --noEmit    # type-check without building
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+├── app/
+│   ├── [locale]/         # App Router layout + main page
+│   └── api/rsvp/         # RSVP API route
+├── features/             # Interactive UI features
+│   ├── countdown/        # Live countdown (useSyncExternalStore)
+│   ├── language-switcher/ # uk/en toggle
+│   └── theme-switcher/   # Dark/light mode
+├── shared/
+│   ├── config/           # Wedding data — single source of truth
+│   ├── i18n/             # next-intl config + translation messages
+│   ├── lib/              # cn(), fonts
+│   └── ui/               # Primitive components
+└── widgets/              # Full-page sections
+    ├── splash/            # Envelope intro screen
+    ├── navbar/            # Sticky navigation
+    ├── hero/              # Names + countdown
+    ├── our-story/         # Couple portraits + narrative
+    ├── timeline/          # Day schedule
+    ├── location/          # Venue + Google Maps
+    ├── dress-code/        # Color palette guide
+    ├── gifts/             # Gift preferences
+    ├── rsvp/              # RSVP form
+    └── footer/            # Back-to-top + copyright
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+All layers export via `index.ts` barrels — always import from the barrel.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Internationalization
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Locale | URL | File |
+|---|---|---|
+| Ukrainian (default) | `/` | `src/shared/i18n/messages/uk.json` |
+| English | `/en` | `src/shared/i18n/messages/en.json` |
+
+Both files must stay in sync — every key must exist in both.
+
+---
+
+## Wedding Data
+
+All static content lives in `src/shared/config/`:
+
+- **`WEDDING_DATE`** — `new Date("2026-06-28T12:00:00+02:00")` — import this, never hardcode
+- **`VENUE`** — name, address, Google Maps embed URL, coordinates
+- **`COUPLE`** — names in `{ uk, en }` format
+- **`DRESS_CODE`** — color palettes with hex values + bilingual names
+- **`guests`** — list with vocative case, seat count, slug + `getGuestBySlug()` / `getAllGuestSlugs()` helpers
+
+---
+
+## Key Conventions
+
+- **Colors** — only via CSS variables (`bg-accent`, `text-text-primary`), never hardcoded hex
+- **Tailwind** — v4 canonical classes: `bg-linear-to-b`, `font-cinzel`, `aspect-3/4`, etc.
+- **`"use client"`** — only where interactivity or hooks are required; default to server components
+- **Images with `fill`** — always include the `sizes` prop; decorative images use `alt=""`
+- **Easing** — `[0.22, 1, 0.36, 1]` for all Framer Motion transitions
+
+---
+
+## What's Not Built Yet
+
+- **RSVP backend** — form is complete, `src/app/api/rsvp/route.ts` is a stub
+- **Guest-specific pages** — `/[locale]/invite/[slug]` (helpers are ready in config)
