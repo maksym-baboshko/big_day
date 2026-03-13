@@ -1,31 +1,74 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { useTranslations, useLocale } from "next-intl";
 import { SectionWrapper, SectionHeading, Ornament } from "@/shared/ui";
 import { DRESS_CODE } from "@/shared/config";
 import { useLiteMotion } from "@/shared/lib";
 
 const ease = [0.22, 1, 0.36, 1] as const;
+const swatchGridVariants: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.04,
+    },
+  },
+};
+
+const desktopSwatchVariants: Variants = {
+  hidden: {
+    opacity: 0.001,
+    y: 48,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.8,
+      ease,
+    },
+  },
+};
+
+const mobileSwatchVariants: Variants = {
+  hidden: {
+    opacity: 0.001,
+    y: 20,
+    scale: 0.985,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.5,
+      ease,
+    },
+  },
+};
 
 function ColorSwatch({
   hex,
   name,
-  index,
-  groupOffset,
   liteMotion,
 }: {
   hex: string;
   name: string;
-  index: number;
-  groupOffset: number;
   liteMotion: boolean;
 }) {
   const content = (
     <>
-      <div className="relative aspect-3/4 rounded-2xl md:rounded-3xl overflow-hidden cursor-pointer shadow-md transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-2xl">
+      <div
+        className={
+          liteMotion
+            ? "relative aspect-3/4 overflow-hidden rounded-2xl border border-white/8 shadow-[0_18px_38px_-24px_rgba(0,0,0,0.38)]"
+            : "relative aspect-3/4 cursor-pointer overflow-hidden rounded-2xl shadow-md transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-2xl md:rounded-3xl"
+        }
+      >
         <div
-          className="absolute inset-0 transition-transform duration-700 group-hover:scale-105"
+          className={liteMotion ? "absolute inset-0" : "absolute inset-0 transition-transform duration-700 group-hover:scale-105"}
           style={{ backgroundColor: hex }}
         />
         <div
@@ -35,17 +78,41 @@ function ColorSwatch({
               "linear-gradient(145deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 55%)",
           }}
         />
-        <div className="absolute inset-x-0 bottom-0 flex flex-col items-center justify-end pb-4 pt-10 bg-linear-to-t from-black/50 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-500">
-          <span className="text-white/80 text-[10px] uppercase tracking-[0.2em] font-mono">
-            {hex}
-          </span>
-        </div>
-        <div
-          className="absolute inset-0 rounded-2xl md:rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-          style={{ boxShadow: `inset 0 0 0 1px ${hex}80, 0 20px 60px ${hex}40` }}
-        />
+        {liteMotion ? (
+          <>
+            <motion.div
+              initial={{ opacity: 0, x: "-115%" }}
+              whileInView={{ opacity: [0, 0.16, 0], x: ["-115%", "20%", "135%"] }}
+              viewport={{ once: true, amount: 0.8 }}
+              transition={{ duration: 0.9, delay: 0.12, ease }}
+              className="pointer-events-none absolute inset-y-0 left-0 w-[34%]"
+              style={{
+                background:
+                  "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 52%, rgba(255,255,255,0) 100%)",
+              }}
+            />
+          </>
+        ) : (
+          <>
+            <div className="absolute inset-x-0 bottom-0 flex flex-col items-center justify-end pb-4 pt-10 bg-linear-to-t from-black/50 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+              <span className="text-white/80 text-[10px] uppercase tracking-[0.2em] font-mono">
+                {hex}
+              </span>
+            </div>
+            <div
+              className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-500 pointer-events-none group-hover:opacity-100 md:rounded-3xl"
+              style={{ boxShadow: `inset 0 0 0 1px ${hex}80, 0 20px 60px ${hex}40` }}
+            />
+          </>
+        )}
       </div>
-      <p className="mt-3 text-center text-xs md:text-sm text-text-secondary/70 font-medium group-hover:text-accent transition-colors duration-300 leading-tight px-1">
+      <p
+        className={
+          liteMotion
+            ? "mt-3 px-1 text-center text-xs font-medium leading-tight text-text-secondary/72"
+            : "mt-3 px-1 text-center text-xs font-medium leading-tight text-text-secondary/70 transition-colors duration-300 group-hover:text-accent md:text-sm"
+        }
+      >
         {name}
       </p>
     </>
@@ -53,15 +120,9 @@ function ColorSwatch({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: liteMotion ? 18 : 48 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{
-        duration: liteMotion ? 0.42 : 0.8,
-        delay: liteMotion ? (index + groupOffset) * 0.035 : (index + groupOffset) * 0.09,
-        ease,
-      }}
-      className="group flex flex-col"
+      variants={liteMotion ? mobileSwatchVariants : desktopSwatchVariants}
+      className="group flex flex-col transform-gpu"
+      style={{ willChange: "transform, opacity" }}
     >
       {content}
     </motion.div>
@@ -150,18 +211,22 @@ export function DressCode() {
               delay={0.2}
               liteMotion={liteMotion}
             />
-            <div className="grid grid-cols-2 gap-4 md:gap-5">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.18, margin: "-40px" }}
+              variants={swatchGridVariants}
+              className="grid grid-cols-2 gap-4 md:gap-5"
+            >
               {DRESS_CODE.ladies.colors.map((color, i) => (
                 <ColorSwatch
                   key={i}
                   hex={color.hex}
                   name={color.name[locale]}
-                  index={i}
-                  groupOffset={0}
                   liteMotion={liteMotion}
                 />
               ))}
-            </div>
+            </motion.div>
           </div>
 
           {/* Gentlemen */}
@@ -173,18 +238,22 @@ export function DressCode() {
               delay={0.35}
               liteMotion={liteMotion}
             />
-            <div className="grid grid-cols-2 gap-4 md:gap-5">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.18, margin: "-40px" }}
+              variants={swatchGridVariants}
+              className="grid grid-cols-2 gap-4 md:gap-5"
+            >
               {DRESS_CODE.gentlemen.colors.map((color, i) => (
                 <ColorSwatch
                   key={i}
                   hex={color.hex}
                   name={color.name[locale]}
-                  index={i}
-                  groupOffset={4}
                   liteMotion={liteMotion}
                 />
               ))}
-            </div>
+            </motion.div>
           </div>
 
         </div>

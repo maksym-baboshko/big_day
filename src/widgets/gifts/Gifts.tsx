@@ -1,13 +1,65 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { SectionWrapper, SectionHeading, Ornament } from "@/shared/ui";
 import { cn, useLiteMotion } from "@/shared/lib";
 
 const ease = [0.22, 1, 0.36, 1] as const;
+const giftCards = [
+  { currency: "nok", amount: "1300", label: "NOK" },
+  { currency: "eur", amount: "120", label: "EUR" },
+] as const;
 
-function EnvelopeIllustration({ liteMotion }: { liteMotion: boolean }) {
+const cardListVariants: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.08,
+    },
+  },
+};
+
+const desktopCardVariants: Variants = {
+  hidden: {
+    opacity: 0.001,
+    y: 28,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.75,
+      ease,
+    },
+  },
+};
+
+const mobileCardVariants: Variants = {
+  hidden: {
+    opacity: 0.001,
+    y: 24,
+    scale: 0.985,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.52,
+      ease,
+    },
+  },
+};
+
+function EnvelopeIllustration({
+  liteMotion,
+  reduceMotion,
+}: {
+  liteMotion: boolean;
+  reduceMotion: boolean;
+}) {
   const envelope = (
     <svg
       width="120"
@@ -57,14 +109,34 @@ function EnvelopeIllustration({ liteMotion }: { liteMotion: boolean }) {
         fill="none"
       />
       {liteMotion ? (
-        <>
+        <motion.g
+          animate={
+            reduceMotion
+              ? undefined
+              : {
+                  y: [0, -4, 0],
+                  scale: [1, 1.06, 1],
+                  opacity: [0.5, 0.8, 0.5],
+                }
+          }
+          transition={
+            reduceMotion
+              ? undefined
+              : {
+                  duration: 2.8,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }
+          }
+          style={{ transformOrigin: "60px 14px", willChange: reduceMotion ? "auto" : "transform, opacity" }}
+        >
           <circle cx="60" cy="14" r="12" fill="currentColor" fillOpacity="0.08" />
           <path
             d="M60 20 C60 20 54 14 51 14 C48 14 46 16.5 46 19 C46 24 54 30 60 34 C66 30 74 24 74 19 C74 16.5 72 14 69 14 C66 14 60 20 60 20Z"
             fill="currentColor"
             fillOpacity="0.6"
           />
-        </>
+        </motion.g>
       ) : (
         <motion.g
           animate={{ scale: [1, 1.12, 1], opacity: [0.5, 0.8, 0.5] }}
@@ -82,7 +154,29 @@ function EnvelopeIllustration({ liteMotion }: { liteMotion: boolean }) {
   );
 
   if (liteMotion) {
-    return <div className="relative flex items-center justify-center">{envelope}</div>;
+    if (reduceMotion) {
+      return <div className="relative flex items-center justify-center">{envelope}</div>;
+    }
+
+    return (
+      <motion.div
+        initial={{ opacity: 0.001, y: 18, rotate: -3, scale: 0.96 }}
+        whileInView={{ opacity: 1, y: 0, rotate: 0, scale: 1 }}
+        viewport={{ once: true, amount: 0.7 }}
+        transition={{ duration: 0.65, ease }}
+        className="relative flex items-center justify-center transform-gpu"
+        style={{ willChange: "transform, opacity" }}
+      >
+        <motion.div
+          animate={{ y: [0, -3, 0], rotate: [0, 1.2, 0, -1.2, 0] }}
+          transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
+          className="transform-gpu"
+          style={{ willChange: "transform" }}
+        >
+          {envelope}
+        </motion.div>
+      </motion.div>
+    );
   }
 
   return (
@@ -99,6 +193,7 @@ function EnvelopeIllustration({ liteMotion }: { liteMotion: boolean }) {
 export function Gifts() {
   const t = useTranslations("Gifts");
   const liteMotion = useLiteMotion();
+  const reduceMotion = useReducedMotion();
 
   return (
     <SectionWrapper id="gifts" className="relative overflow-hidden py-24">
@@ -127,7 +222,7 @@ export function Gifts() {
           transition={{ duration: liteMotion ? 0.45 : 0.9, ease }}
           className="flex justify-center mb-12"
         >
-          <EnvelopeIllustration liteMotion={liteMotion} />
+          <EnvelopeIllustration liteMotion={liteMotion} reduceMotion={Boolean(reduceMotion)} />
         </motion.div>
 
         <motion.p
@@ -141,39 +236,41 @@ export function Gifts() {
         </motion.p>
 
         {/* Amount cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-12">
-          {(["nok", "eur"] as const).map((currency, i) => (
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.35 }}
+          variants={cardListVariants}
+          className="grid grid-cols-1 gap-5 mb-12 sm:grid-cols-2"
+        >
+          {giftCards.map(({ currency, amount, label }) => (
             <motion.div
               key={currency}
-              initial={{ opacity: 0, y: liteMotion ? 16 : 28 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{
-                duration: liteMotion ? 0.45 : 0.75,
-                delay: liteMotion ? 0.06 + i * 0.05 : 0.18 + i * 0.14,
-                ease,
-              }}
+              variants={liteMotion ? mobileCardVariants : desktopCardVariants}
               className={cn(
-                "group relative rounded-3xl overflow-hidden border border-accent/20 transition-all duration-500",
+                "group relative overflow-hidden rounded-3xl border border-accent/20 transform-gpu",
                 liteMotion
-                  ? "bg-bg-primary/80"
-                  : "bg-bg-primary/40 backdrop-blur-lg hover:border-accent/40 hover:-translate-y-1"
+                  ? "bg-bg-primary/90 shadow-[0_18px_40px_-28px_rgba(0,0,0,0.45)]"
+                  : "bg-bg-primary/40 backdrop-blur-lg transition-[transform,border-color] duration-500 hover:-translate-y-1 hover:border-accent/40"
               )}
+              style={{ willChange: "transform, opacity" }}
             >
-              {!liteMotion && (
+              {liteMotion ? (
+                <div className="pointer-events-none absolute inset-x-5 top-0 h-px bg-linear-to-r from-transparent via-accent/35 to-transparent" />
+              ) : (
                 <div className="absolute inset-0 bg-linear-to-b from-accent/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
               )}
-              <div className="absolute inset-[1px] rounded-[calc(1.5rem-1px)] border border-accent/8 pointer-events-none" />
+              <div className="absolute inset-px rounded-[calc(1.5rem-1px)] border border-accent/8 pointer-events-none" />
 
-              <div className="relative z-10 p-8 flex flex-col items-center text-center">
+              <div className="relative z-10 flex min-h-[14.5rem] flex-col items-center justify-center px-8 py-9 text-center sm:min-h-[15.5rem]">
                 <p className="text-xs uppercase tracking-[0.22em] text-text-secondary/50 mb-3">
                   {t("from")}
                 </p>
                 <p className="heading-serif text-5xl md:text-6xl text-accent font-bold leading-none">
-                  {currency === "nok" ? "1300" : "120"}
+                  {amount}
                 </p>
                 <p className="font-cinzel text-lg text-accent/70 tracking-widest mt-2 mb-3">
-                  {currency === "nok" ? "NOK" : "EUR"}
+                  {label}
                 </p>
                 <div className="h-px w-8 bg-accent/20 mb-3" />
                 <p className="text-xs uppercase tracking-[0.18em] text-text-secondary/50">
@@ -182,7 +279,7 @@ export function Gifts() {
               </div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         <motion.p
           initial={{ opacity: 0, y: liteMotion ? 12 : 16 }}

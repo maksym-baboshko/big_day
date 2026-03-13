@@ -13,14 +13,14 @@ import { rsvpSchema, type RSVPFormData } from "./schema";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-// ── Confetti ─────────────────────────────────────────────────────────────────
+// ── Confetti colors ───────────────────────────────────────────────────────────
 const CONFETTI_COLORS = [
   "#C9A96E", "#E8D5A3", "#F5E6C0", "#D4AF37",
   "#B8860B", "#FAF0DC", "#E4C97E", "#F0E0B0",
   "#C8A05E", "#EDD888", "#FFF3D4", "#A0782A",
 ];
 
-// Wave 1 — instant burst: dense center cluster, very tight stagger (100 pieces)
+// ── Full confetti (desktop) ───────────────────────────────────────────────────
 const wave1 = Array.from({ length: 100 }, (_, i) => ({
   id: i,
   x: 10 + ((i * 0.618033988) % 1) * 80,
@@ -35,7 +35,6 @@ const wave1 = Array.from({ length: 100 }, (_, i) => ({
   opacity: 0.85 + Math.abs(Math.sin(i * 0.5)) * 0.15,
 }));
 
-// Wave 2 — full-width rain: spread across entire screen (160 pieces)
 const wave2 = Array.from({ length: 160 }, (_, i) => {
   const j = i + 100;
   return {
@@ -53,7 +52,6 @@ const wave2 = Array.from({ length: 160 }, (_, i) => {
   };
 });
 
-// Wave 3 — slow drifters: wide sway, linger long (80 pieces)
 const wave3 = Array.from({ length: 80 }, (_, i) => {
   const j = i + 260;
   return {
@@ -73,48 +71,76 @@ const wave3 = Array.from({ length: 80 }, (_, i) => {
 
 const confettiPieces = [...wave1, ...wave2, ...wave3];
 
-function ConfettiOverlay({ onDone }: { onDone: () => void }) {
+// ── Lite confetti (mobile) — 32 pieces, opacity+y only, GPU-friendly ──────────
+const liteConfettiPieces = Array.from({ length: 32 }, (_, i) => ({
+  id: i + 5000,
+  x: (i / 32) * 100,
+  startY: -(6 + (i % 5) * 9),
+  delay: i * 0.055,
+  duration: 1.8 + (i % 6) * 0.22,
+  color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+  width: 6 + (i % 3) * 7,
+  height: 3 + (i % 2) * 4,
+  opacity: 0.78 + (i % 3) * 0.08,
+}));
+
+// ── Confetti overlay ──────────────────────────────────────────────────────────
+function ConfettiOverlay({ onDone, lite }: { onDone: () => void; lite: boolean }) {
   return (
     <motion.div
       initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 1.5, delay: 5.0 }}
-      onAnimationComplete={() => {
-        setTimeout(onDone, 100);
-      }}
-      className="fixed inset-0 pointer-events-none z-[200] overflow-hidden"
+      transition={{ duration: lite ? 0.7 : 1.5, delay: lite ? 2.4 : 5.0 }}
+      onAnimationComplete={() => setTimeout(onDone, 100)}
+      className="fixed inset-0 pointer-events-none z-200 overflow-hidden"
     >
-      {confettiPieces.map((piece) => (
-        <motion.div
-          key={piece.id}
-          initial={{ y: piece.startY, x: 0, rotate: 0, opacity: piece.opacity }}
-          animate={{
-            y: "122vh",
-            x: [0, piece.swayX * 0.2, piece.swayX * 0.6, piece.swayX],
-            rotate: piece.rotate,
-            opacity: [piece.opacity, piece.opacity, piece.opacity * 0.85, 0],
-          }}
-          transition={{
-            duration: piece.duration,
-            delay: piece.delay,
-            ease: [0.08, 0.3, 0.85, 1],
-          }}
-          style={{
-            position: "absolute",
-            left: `${piece.x}%`,
-            top: 0,
-            width: piece.width,
-            height: piece.height,
-            backgroundColor: piece.color,
-            borderRadius: 2,
-          }}
-        />
-      ))}
+      {lite
+        ? liteConfettiPieces.map((piece) => (
+            <motion.div
+              key={piece.id}
+              initial={{ y: piece.startY, opacity: piece.opacity }}
+              animate={{ y: "115vh", opacity: [piece.opacity, piece.opacity, 0] }}
+              transition={{ duration: piece.duration, delay: piece.delay, ease: "easeIn" }}
+              style={{
+                position: "absolute",
+                left: `${piece.x}%`,
+                top: 0,
+                width: piece.width,
+                height: piece.height,
+                backgroundColor: piece.color,
+                borderRadius: 2,
+                willChange: "transform, opacity",
+              }}
+            />
+          ))
+        : confettiPieces.map((piece) => (
+            <motion.div
+              key={piece.id}
+              initial={{ y: piece.startY, x: 0, rotate: 0, opacity: piece.opacity }}
+              animate={{
+                y: "122vh",
+                x: [0, piece.swayX * 0.2, piece.swayX * 0.6, piece.swayX],
+                rotate: piece.rotate,
+                opacity: [piece.opacity, piece.opacity, piece.opacity * 0.85, 0],
+              }}
+              transition={{ duration: piece.duration, delay: piece.delay, ease: [0.08, 0.3, 0.85, 1] }}
+              style={{
+                position: "absolute",
+                left: `${piece.x}%`,
+                top: 0,
+                width: piece.width,
+                height: piece.height,
+                backgroundColor: piece.color,
+                borderRadius: 2,
+              }}
+            />
+          ))}
     </motion.div>
   );
 }
 
+// ── Small helpers ─────────────────────────────────────────────────────────────
 function FieldLabel({ children, required }: { children: React.ReactNode; required?: boolean }) {
   return (
     <p className="text-xs uppercase tracking-[0.18em] text-text-secondary/55 mb-3 font-medium">
@@ -151,6 +177,7 @@ function LeafIcon({ active }: { active: boolean }) {
   );
 }
 
+// ── Main component ────────────────────────────────────────────────────────────
 export function RSVP() {
   const t = useTranslations("RSVP");
   const liteMotion = useLiteMotion();
@@ -170,12 +197,32 @@ export function RSVP() {
     setSubmitted(true);
   };
 
+  // Stagger variants — defined inside component so liteMotion can influence delay
+  const formStagger = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.07,
+        delayChildren: liteMotion ? 0.18 : 0.45,
+      },
+    },
+  };
+
+  const formField = {
+    hidden: { opacity: 0, y: liteMotion ? 14 : 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: liteMotion ? 0.4 : 0.55, ease: [0.22, 1, 0.36, 1] as number[] },
+    },
+  };
+
   if (submitted) {
     return (
       <>
         <AnimatePresence>
           {showConfetti && (
-            <ConfettiOverlay onDone={() => setShowConfetti(false)} />
+            <ConfettiOverlay lite={liteMotion} onDone={() => setShowConfetti(false)} />
           )}
         </AnimatePresence>
 
@@ -247,7 +294,7 @@ export function RSVP() {
       <div className="max-w-7xl mx-auto mt-12 md:mt-32 px-4 relative z-10 flex flex-col xl:flex-row items-center justify-center">
         <div className="w-full max-w-2xl shrink-0 relative py-12">
 
-          {/* Photos — untouched */}
+          {/* Photos — desktop only */}
           <div className="hidden lg:block">
             <motion.div
               initial={{ opacity: 0, x: 40, y: 40 }}
@@ -306,17 +353,16 @@ export function RSVP() {
             </motion.div>
           </div>
 
-          {/* Glass card — untouched */}
+          {/* Glass card */}
           <AnimatedReveal
             direction="up"
             duration={1.2}
             blur
-            className="relative z-20 bg-bg-primary/45 rounded-[2.5rem] border border-accent/15 shadow-[0_30px_100px_rgba(0,0,0,0.25)] overflow-hidden group/form"
+            className="relative z-20 bg-bg-primary/45 rounded-4xl md:rounded-[2.5rem] border border-accent/15 shadow-[0_30px_100px_rgba(0,0,0,0.25)] overflow-hidden group/form"
           >
-            <div className="absolute inset-0 rounded-[2.5rem] border border-accent/0 group-hover/form:border-accent/30 transition-colors duration-500 pointer-events-none z-20" />
+            <div className="absolute inset-0 rounded-4xl md:rounded-[2.5rem] border border-accent/0 group-hover/form:border-accent/30 transition-colors duration-500 pointer-events-none z-20" />
 
-            {/* ── FORM CONTENT (redesigned) ── */}
-            <form onSubmit={handleSubmit(onSubmit)} className="relative z-10 p-8 md:p-12">
+            <form onSubmit={handleSubmit(onSubmit)} className="relative z-10 p-6 md:p-12">
               {!liteMotion && (
                 <>
                   <div className="absolute -top-32 -right-32 w-80 h-80 bg-accent/20 rounded-full blur-[100px] pointer-events-none" />
@@ -324,13 +370,20 @@ export function RSVP() {
                 </>
               )}
 
-              {/* Hidden field keeps "guests" registered with react-hook-form */}
+              {/* Hidden field */}
               <input type="hidden" {...register("guests")} />
 
-              <div className="relative z-10 space-y-9">
+              {/* Staggered form fields */}
+              <motion.div
+                variants={formStagger}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.05 }}
+                className="relative z-10 space-y-7 md:space-y-9"
+              >
 
                 {/* ── Name ── */}
-                <div>
+                <motion.div variants={formField}>
                   <FieldLabel required>{t("name_label")}</FieldLabel>
                   <Input
                     id="name"
@@ -342,12 +395,12 @@ export function RSVP() {
                   {errors.name && (
                     <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-red-400/70">{t("name_min")}</p>
                   )}
-                </div>
+                </motion.div>
 
-                <Divider />
+                <motion.div variants={formField}><Divider /></motion.div>
 
                 {/* ── Attending ── */}
-                <div>
+                <motion.div variants={formField}>
                   <FieldLabel>{t("attending_label")}</FieldLabel>
                   <div className="grid grid-cols-2 gap-3">
 
@@ -357,7 +410,7 @@ export function RSVP() {
                       whileTap={{ scale: 0.97 }}
                       onClick={() => setValue("attending", "yes", { shouldValidate: true })}
                       className={cn(
-                        "relative flex flex-col items-center justify-center gap-2.5 px-4 py-8 rounded-2xl border-2 transition-all duration-500 cursor-pointer overflow-hidden",
+                        "relative flex flex-col items-center justify-center gap-2 px-3 py-5 md:py-8 rounded-2xl border-2 transition-all duration-500 cursor-pointer overflow-hidden",
                         attending === "yes"
                           ? "border-accent bg-accent/8"
                           : "border-accent/10 hover:border-accent/30 bg-bg-primary/50"
@@ -376,12 +429,12 @@ export function RSVP() {
                       </AnimatePresence>
                       <RingIcon active={attending === "yes"} />
                       <span className={cn(
-                        "heading-serif text-xl transition-colors duration-300",
+                        "heading-serif text-lg md:text-xl transition-colors duration-300",
                         attending === "yes" ? "text-accent" : "text-text-secondary/70"
                       )}>
                         {t("attending_yes_heading")}
                       </span>
-                      <span className="text-[10px] uppercase tracking-[0.16em] text-text-secondary/40">
+                      <span className="text-[9px] md:text-[10px] uppercase tracking-[0.14em] text-text-secondary/40 text-center leading-tight">
                         {t("attending_yes_note")}
                       </span>
                     </motion.button>
@@ -392,7 +445,7 @@ export function RSVP() {
                       whileTap={{ scale: 0.97 }}
                       onClick={() => setValue("attending", "no", { shouldValidate: true })}
                       className={cn(
-                        "relative flex flex-col items-center justify-center gap-2.5 px-4 py-8 rounded-2xl border-2 transition-all duration-500 cursor-pointer overflow-hidden",
+                        "relative flex flex-col items-center justify-center gap-2 px-3 py-5 md:py-8 rounded-2xl border-2 transition-all duration-500 cursor-pointer overflow-hidden",
                         attending === "no"
                           ? "border-text-secondary/40 bg-text-primary/6"
                           : "border-accent/10 hover:border-accent/20 bg-bg-primary/50"
@@ -400,12 +453,12 @@ export function RSVP() {
                     >
                       <LeafIcon active={attending === "no"} />
                       <span className={cn(
-                        "heading-serif text-xl transition-colors duration-300",
+                        "heading-serif text-lg md:text-xl transition-colors duration-300",
                         attending === "no" ? "text-text-primary" : "text-text-secondary/70"
                       )}>
                         {t("attending_no_heading")}
                       </span>
-                      <span className="text-[10px] uppercase tracking-[0.16em] text-text-secondary/40">
+                      <span className="text-[9px] md:text-[10px] uppercase tracking-[0.14em] text-text-secondary/40 text-center leading-tight">
                         {t("attending_no_note")}
                       </span>
                     </motion.button>
@@ -414,7 +467,7 @@ export function RSVP() {
                   {errors.attending && (
                     <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-red-400/70">{t("attendance_required")}</p>
                   )}
-                </div>
+                </motion.div>
 
                 {/* ── Conditional: guests + dietary ── */}
                 <div
@@ -431,13 +484,13 @@ export function RSVP() {
                       transition: `opacity ${attending === "yes" ? "0.4s 0.08s" : "0.25s 0s"} cubic-bezier(0.22, 1, 0.36, 1)`,
                     }}
                   >
-                    <div className="space-y-9">
+                    <div className="space-y-7 md:space-y-9">
                       <Divider />
 
                       {/* Guest stepper */}
                       <div>
                         <FieldLabel>{t("guests_label")}</FieldLabel>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center justify-between w-full px-5 py-3 rounded-2xl border border-accent/15 bg-bg-primary/30">
                           <button
                             type="button"
                             onClick={() => setValue("guests", Math.max(1, guests - 1), { shouldValidate: true })}
@@ -451,7 +504,7 @@ export function RSVP() {
                             initial={{ scale: 1.25, opacity: 0.6 }}
                             animate={{ scale: 1, opacity: 1 }}
                             transition={{ duration: 0.22, ease }}
-                            className="w-18 text-center font-cinzel text-3xl text-accent select-none"
+                            className="font-cinzel text-3xl text-accent select-none"
                           >
                             {guests}
                           </motion.span>
@@ -480,10 +533,10 @@ export function RSVP() {
                   </div>
                 </div>
 
-                <Divider />
+                <motion.div variants={formField}><Divider /></motion.div>
 
                 {/* ── Message ── */}
-                <div>
+                <motion.div variants={formField}>
                   <FieldLabel>{t("message_label")}</FieldLabel>
                   <Textarea
                     id="message"
@@ -491,17 +544,17 @@ export function RSVP() {
                     className="rounded-2xl"
                     {...register("message")}
                   />
-                </div>
+                </motion.div>
 
                 {/* ── Submit ── */}
-                <div className="pt-1">
+                <motion.div variants={formField} className="pt-1">
                   <motion.button
                     type="submit"
                     disabled={!attending}
                     whileHover={attending ? { scale: 1.01 } : {}}
                     whileTap={attending ? { scale: 0.99 } : {}}
                     className={cn(
-                      "w-full py-5 rounded-2xl relative overflow-hidden font-medium text-lg tracking-wide transition-all duration-500",
+                      "w-full py-4 md:py-5 rounded-2xl relative overflow-hidden font-medium text-base md:text-lg tracking-wide transition-all duration-500",
                       attending
                         ? "bg-accent text-bg-primary shadow-xl shadow-accent/20 cursor-pointer"
                         : "bg-accent/15 text-text-secondary/30 cursor-not-allowed"
@@ -516,8 +569,8 @@ export function RSVP() {
                         →
                       </motion.span>
                     </span>
-                    {/* Shimmer sweep on hover */}
-                    {attending && (
+                    {/* Shimmer sweep on hover — desktop only */}
+                    {attending && !liteMotion && (
                       <motion.div
                         initial={{ x: "-110%" }}
                         whileHover={{ x: "110%" }}
@@ -530,9 +583,9 @@ export function RSVP() {
                   <p className="text-center text-[10px] uppercase tracking-[0.13em] text-text-secondary/30 mt-3">
                     {!attending ? t("attendance_required") : t("coming_soon_note")}
                   </p>
-                </div>
+                </motion.div>
 
-              </div>
+              </motion.div>
             </form>
           </AnimatedReveal>
         </div>

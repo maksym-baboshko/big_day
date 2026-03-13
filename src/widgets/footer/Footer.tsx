@@ -1,15 +1,20 @@
 "use client";
 
+import { motion, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Ornament } from "@/shared/ui";
 import { VENUE, WEDDING_DATE } from "@/shared/config";
+import { useLiteMotion } from "@/shared/lib";
 
 const romanDate = "XXVIII · VI · MMXXVI";
+const ease = [0.22, 1, 0.36, 1] as const;
 
 export function Footer() {
   const t = useTranslations("Footer");
   const tHero = useTranslations("Hero");
   const tNavbar = useTranslations("Navbar");
+  const liteMotion = useLiteMotion();
+  const reduceMotion = useReducedMotion();
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -119,12 +124,73 @@ export function Footer() {
         </nav>
 
         {/* Back to top */}
-        <button
+        <motion.button
           onClick={scrollToTop}
           className="group flex flex-col items-center gap-2 cursor-pointer mt-1"
+          animate={
+            reduceMotion
+              ? undefined
+              : {
+                  y: [0, liteMotion ? -3 : -4, 0],
+                }
+          }
+          transition={
+            reduceMotion
+              ? undefined
+              : {
+                  duration: liteMotion ? 3.2 : 3.6,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }
+          }
+          style={{ willChange: reduceMotion ? "auto" : "transform" }}
         >
-          <div className="w-11 h-11 rounded-full border border-accent/20 flex items-center justify-center text-accent/45 group-hover:border-accent/50 group-hover:text-accent group-hover:bg-accent/10 transition-all duration-500">
-            <svg
+          <motion.div
+            animate={
+              reduceMotion
+                ? undefined
+                : {
+                    scale: [1, liteMotion ? 1.035 : 1.05, 1],
+                    borderColor: [
+                      "rgba(var(--accent-rgb,180,140,100),0.2)",
+                      "rgba(var(--accent-rgb,180,140,100),0.42)",
+                      "rgba(var(--accent-rgb,180,140,100),0.2)",
+                    ],
+                    backgroundColor: [
+                      "rgba(var(--accent-rgb,180,140,100),0)",
+                      "rgba(var(--accent-rgb,180,140,100),0.08)",
+                      "rgba(var(--accent-rgb,180,140,100),0)",
+                    ],
+                    color: [
+                      "rgba(var(--accent-rgb,180,140,100),0.45)",
+                      "rgba(var(--accent-rgb,180,140,100),0.88)",
+                      "rgba(var(--accent-rgb,180,140,100),0.45)",
+                    ],
+                  }
+            }
+            whileHover={
+              liteMotion || reduceMotion
+                ? undefined
+                : {
+                    scale: 1.06,
+                    backgroundColor: "rgba(var(--accent-rgb,180,140,100),0.1)",
+                    borderColor: "rgba(var(--accent-rgb,180,140,100),0.5)",
+                    color: "rgba(var(--accent-rgb,180,140,100),1)",
+                  }
+            }
+            transition={
+              reduceMotion
+                ? undefined
+                : {
+                  duration: liteMotion ? 3.2 : 3.6,
+                  repeat: Infinity,
+                  ease,
+                }
+            }
+            className="w-11 h-11 rounded-full border border-accent/20 flex items-center justify-center text-accent/45 transition-all duration-500"
+            style={{ willChange: reduceMotion ? "auto" : "transform, opacity" }}
+          >
+            <motion.svg
               width="15"
               height="15"
               viewBox="0 0 24 24"
@@ -133,14 +199,50 @@ export function Footer() {
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
+              animate={reduceMotion ? undefined : { y: [0, liteMotion ? -1 : -1.5, 0] }}
+              transition={
+                reduceMotion
+                  ? undefined
+                  : {
+                      duration: liteMotion ? 1.9 : 2.2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }
+              }
+              style={{ willChange: reduceMotion ? "auto" : "transform" }}
             >
               <path d="M18 15l-6-6-6 6" />
-            </svg>
-          </div>
-          <span className="text-[8px] tracking-[0.25em] uppercase text-text-secondary/35 group-hover:text-accent/55 transition-colors duration-300">
+            </motion.svg>
+          </motion.div>
+          <motion.span
+            className="text-[8px] tracking-[0.25em] uppercase text-text-secondary/35 transition-colors duration-300"
+            animate={
+              reduceMotion
+                ? undefined
+                : {
+                    opacity: [0.35, 0.62, 0.35],
+                  }
+            }
+            whileHover={
+              liteMotion || reduceMotion
+                ? undefined
+                : {
+                    opacity: 0.8,
+                  }
+            }
+            transition={
+              reduceMotion
+                ? undefined
+                : {
+                    duration: liteMotion ? 3.2 : 3.6,
+                    repeat: Infinity,
+                    ease,
+                  }
+            }
+          >
             {t("back_to_top")}
-          </span>
-        </button>
+          </motion.span>
+        </motion.button>
 
         {/* Copyright */}
         <div className="w-full border-t border-accent/[0.07] pt-5 flex items-center justify-center">

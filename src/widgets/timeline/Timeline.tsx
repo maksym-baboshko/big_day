@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, type Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { SectionWrapper, SectionHeading, AnimatedReveal, Ornament } from "@/shared/ui";
 import { cn, useLiteMotion } from "@/shared/lib";
@@ -9,6 +10,39 @@ type TimelineEvent = {
   time: string;
   title: string;
   description: string;
+};
+
+const ease = [0.22, 1, 0.36, 1] as const;
+const mobileTimelineMarkerVariants: Variants = {
+  hidden: {
+    opacity: 0.001,
+    x: -10,
+    scale: 0.96,
+  },
+  visible: {
+    opacity: 1,
+    x: 0,
+    scale: 1,
+    transition: {
+      duration: 0.36,
+      ease,
+    },
+  },
+};
+
+const mobileTimelineCardVariants: Variants = {
+  hidden: {
+    opacity: 0.001,
+    x: -26,
+  },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.52,
+      ease,
+    },
+  },
 };
 
 const EVENT_ICONS: Record<string, React.ReactNode> = {
@@ -100,8 +134,20 @@ export function Timeline() {
             return (
               <div key={event.id} className="relative">
 
-                <div className="flex items-start md:hidden">
-                  <div className="absolute left-9 top-5 -translate-x-1/2 flex flex-col items-center z-10">
+                <motion.div
+                  initial={liteMotion ? { opacity: 1 } : undefined}
+                  whileInView={liteMotion ? { opacity: 1 } : undefined}
+                  viewport={liteMotion ? { once: true, amount: 0.35, margin: "-6% 0px -8% 0px" } : undefined}
+                  className="flex items-start md:hidden"
+                >
+                  <motion.div
+                    initial={liteMotion ? "hidden" : undefined}
+                    whileInView={liteMotion ? "visible" : undefined}
+                    viewport={liteMotion ? { once: true, amount: 0.45 } : undefined}
+                    variants={liteMotion ? mobileTimelineMarkerVariants : undefined}
+                    transition={liteMotion ? { delay: Math.min(index * 0.04, 0.12) } : undefined}
+                    className="absolute left-9 top-5 -translate-x-1/2 flex flex-col items-center z-10"
+                  >
                     <span className="font-cinzel text-sm text-accent mb-3 bg-bg-primary px-2.5 py-1 border border-accent/25 rounded-full whitespace-nowrap">
                       {event.time}
                     </span>
@@ -110,11 +156,25 @@ export function Timeline() {
                       <div className="absolute w-3 h-3 rounded-full bg-accent/15" />
                       <div className="w-1.5 h-1.5 rounded-full bg-accent/60" />
                     </div>
-                  </div>
-                  <AnimatedReveal direction={liteMotion ? "up" : "right"} delay={liteMotion ? 0 : index * 0.1} className="pl-20 w-full">
-                    {cardContent}
-                  </AnimatedReveal>
-                </div>
+                  </motion.div>
+                  {liteMotion ? (
+                    <motion.div
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true, amount: 0.45 }}
+                      variants={mobileTimelineCardVariants}
+                      transition={{ delay: Math.min(0.05 + index * 0.04, 0.16) }}
+                      className="w-full pl-20 transform-gpu"
+                      style={{ willChange: "transform, opacity" }}
+                    >
+                      {cardContent}
+                    </motion.div>
+                  ) : (
+                    <AnimatedReveal direction="right" delay={index * 0.1} className="pl-20 w-full">
+                      {cardContent}
+                    </AnimatedReveal>
+                  )}
+                </motion.div>
 
                 <div className="hidden md:grid md:grid-cols-[1fr_8rem_1fr] md:items-center md:gap-0">
 

@@ -56,11 +56,11 @@ export function Navbar() {
           "border-b",
           isScrolled || isMobileMenuOpen
             ? liteMotion
-              ? "bg-bg-primary/96 border-accent/10 shadow-lg py-3"
-              : "bg-bg-primary/80 backdrop-blur-2xl border-accent/10 shadow-lg py-3"
+              ? "bg-bg-primary border-accent/10 shadow-lg py-3 lg:bg-bg-primary/96"
+              : "bg-bg-primary border-accent/10 shadow-lg py-3 lg:bg-bg-primary/80 lg:backdrop-blur-2xl"
             : liteMotion
-              ? "bg-bg-primary/92 border-transparent"
-              : "bg-bg-primary/20 backdrop-blur-md border-transparent"
+              ? "bg-bg-primary border-transparent lg:bg-bg-primary/92"
+              : "bg-bg-primary border-transparent lg:bg-bg-primary/20 lg:backdrop-blur-md"
         )}
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
@@ -119,7 +119,7 @@ export function Navbar() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             className={cn(
-              "fixed inset-0 bg-bg-primary/96 z-50 lg:hidden overflow-hidden",
+              "fixed inset-0 bg-bg-primary z-50 lg:hidden overflow-hidden",
               !liteMotion && "backdrop-blur-2xl"
             )}
           >

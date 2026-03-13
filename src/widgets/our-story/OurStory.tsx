@@ -1,9 +1,45 @@
 "use client";
 
+import { motion, type Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { SectionWrapper, SectionHeading, AnimatedReveal, Ornament } from "@/shared/ui";
 import { useLiteMotion } from "@/shared/lib";
+
+const ease = [0.22, 1, 0.36, 1] as const;
+const mobilePortraitVariants: Variants = {
+  hidden: (direction: "left" | "right") => ({
+    opacity: 0.001,
+    x: direction === "left" ? -18 : 18,
+    y: 18,
+    scale: 0.985,
+  }),
+  visible: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.56,
+      ease,
+    },
+  },
+};
+
+const mobileImageVariants: Variants = {
+  hidden: {
+    scale: 1.045,
+    opacity: 0.001,
+  },
+  visible: {
+    scale: 1,
+    opacity: 1,
+    transition: {
+      duration: 0.72,
+      ease,
+    },
+  },
+};
 
 export function OurStory() {
   const t = useTranslations("OurStory");
@@ -27,20 +63,47 @@ export function OurStory() {
             </>
           )}
 
-          <AnimatedReveal direction="up" delay={liteMotion ? 0 : 0.1}>
-            <div className="flex flex-col items-center">
+          {liteMotion ? (
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.35 }}
+              variants={mobilePortraitVariants}
+              custom="left"
+              className="flex flex-col items-center"
+              style={{ willChange: "transform, opacity" }}
+            >
               <div className="relative w-full max-w-70 aspect-3/4 mb-4 md:mb-8 group">
                 <div className="absolute inset-0 border border-accent/70 rounded-t-[100px] rounded-b-sm transition-all duration-500 group-hover:border-accent shadow-[0_0_0_0_transparent] group-hover:shadow-[0_0_30px_4px_color-mix(in_srgb,var(--accent)_15%,transparent)] z-10 pointer-events-none" />
                 <div className="absolute inset-2 border border-accent/60 rounded-t-[92px] rounded-b-sm z-20 pointer-events-none" />
 
                 <div className="absolute inset-0 rounded-t-[100px] rounded-b-sm overflow-hidden">
-                  <Image
-                    src="/images/story/groom.jpg"
-                    alt={t("groom_name")}
-                    fill
-                    sizes="280px"
-                    className="object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
-                  />
+                  {liteMotion ? (
+                    <motion.div
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true, amount: 0.5 }}
+                      variants={mobileImageVariants}
+                      className="h-full w-full transform-gpu"
+                      style={{ willChange: "transform, opacity" }}
+                    >
+                      <Image
+                        src="/images/story/groom.jpg"
+                        alt={t("groom_name")}
+                        fill
+                        sizes="280px"
+                        className="object-cover"
+                      />
+                    </motion.div>
+                  ) : (
+                    <Image
+                      src="/images/story/groom.jpg"
+                      alt={t("groom_name")}
+                      fill
+                      sizes="280px"
+                      className="object-cover grayscale-[0.3] transition-all duration-1000 group-hover:scale-110 group-hover:grayscale-0"
+                    />
+                  )}
                 </div>
               </div>
 
@@ -50,23 +113,76 @@ export function OurStory() {
               <span className="text-xs tracking-widest uppercase text-accent font-medium text-center">
                 {t("groom_bio")}
               </span>
-            </div>
-          </AnimatedReveal>
+            </motion.div>
+          ) : (
+            <AnimatedReveal direction="up" delay={0.1}>
+              <div className="flex flex-col items-center">
+                <div className="relative w-full max-w-70 aspect-3/4 mb-4 md:mb-8 group">
+                  <div className="absolute inset-0 border border-accent/70 rounded-t-[100px] rounded-b-sm transition-all duration-500 group-hover:border-accent shadow-[0_0_0_0_transparent] group-hover:shadow-[0_0_30px_4px_color-mix(in_srgb,var(--accent)_15%,transparent)] z-10 pointer-events-none" />
+                  <div className="absolute inset-2 border border-accent/60 rounded-t-[92px] rounded-b-sm z-20 pointer-events-none" />
 
-          <AnimatedReveal direction="up" delay={liteMotion ? 0 : 0.2}>
-            <div className="flex flex-col items-center md:pt-16">
+                  <div className="absolute inset-0 rounded-t-[100px] rounded-b-sm overflow-hidden">
+                    <Image
+                      src="/images/story/groom.jpg"
+                      alt={t("groom_name")}
+                      fill
+                      sizes="280px"
+                      className="object-cover grayscale-[0.3] transition-all duration-1000 group-hover:scale-110 group-hover:grayscale-0"
+                    />
+                  </div>
+                </div>
+
+                <h3 className="heading-serif text-3xl md:text-4xl text-text-primary mb-2 text-center">
+                  {t("groom_name")}
+                </h3>
+                <span className="text-xs tracking-widest uppercase text-accent font-medium text-center">
+                  {t("groom_bio")}
+                </span>
+              </div>
+            </AnimatedReveal>
+          )}
+
+          {liteMotion ? (
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.35 }}
+              variants={mobilePortraitVariants}
+              custom="right"
+              className="flex flex-col items-center md:pt-16"
+              style={{ willChange: "transform, opacity" }}
+            >
               <div className="relative w-full max-w-70 aspect-3/4 mb-4 md:mb-8 group">
                 <div className="absolute inset-0 border border-accent/70 rounded-t-[100px] rounded-b-sm transition-all duration-500 group-hover:border-accent shadow-[0_0_0_0_transparent] group-hover:shadow-[0_0_30px_4px_color-mix(in_srgb,var(--accent)_15%,transparent)] z-10 pointer-events-none" />
                 <div className="absolute inset-2 border border-accent/60 rounded-t-[92px] rounded-b-sm z-20 pointer-events-none" />
 
                 <div className="absolute inset-0 rounded-t-[100px] rounded-b-sm overflow-hidden">
-                  <Image
-                    src="/images/story/bride.jpg"
-                    alt={t("bride_name")}
-                    fill
-                    sizes="280px"
-                    className="object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
-                  />
+                  {liteMotion ? (
+                    <motion.div
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true, amount: 0.5 }}
+                      variants={mobileImageVariants}
+                      className="h-full w-full transform-gpu"
+                      style={{ willChange: "transform, opacity" }}
+                    >
+                      <Image
+                        src="/images/story/bride.jpg"
+                        alt={t("bride_name")}
+                        fill
+                        sizes="280px"
+                        className="object-cover"
+                      />
+                    </motion.div>
+                  ) : (
+                    <Image
+                      src="/images/story/bride.jpg"
+                      alt={t("bride_name")}
+                      fill
+                      sizes="280px"
+                      className="object-cover grayscale-[0.3] transition-all duration-1000 group-hover:scale-110 group-hover:grayscale-0"
+                    />
+                  )}
                 </div>
               </div>
 
@@ -76,8 +192,34 @@ export function OurStory() {
               <span className="text-xs tracking-widest uppercase text-accent font-medium text-center">
                 {t("bride_bio")}
               </span>
-            </div>
-          </AnimatedReveal>
+            </motion.div>
+          ) : (
+            <AnimatedReveal direction="up" delay={0.2}>
+              <div className="flex flex-col items-center md:pt-16">
+                <div className="relative w-full max-w-70 aspect-3/4 mb-4 md:mb-8 group">
+                  <div className="absolute inset-0 border border-accent/70 rounded-t-[100px] rounded-b-sm transition-all duration-500 group-hover:border-accent shadow-[0_0_0_0_transparent] group-hover:shadow-[0_0_30px_4px_color-mix(in_srgb,var(--accent)_15%,transparent)] z-10 pointer-events-none" />
+                  <div className="absolute inset-2 border border-accent/60 rounded-t-[92px] rounded-b-sm z-20 pointer-events-none" />
+
+                  <div className="absolute inset-0 rounded-t-[100px] rounded-b-sm overflow-hidden">
+                    <Image
+                      src="/images/story/bride.jpg"
+                      alt={t("bride_name")}
+                      fill
+                      sizes="280px"
+                      className="object-cover grayscale-[0.3] transition-all duration-1000 group-hover:scale-110 group-hover:grayscale-0"
+                    />
+                  </div>
+                </div>
+
+                <h3 className="heading-serif text-3xl md:text-4xl text-text-primary mb-2 text-center">
+                  {t("bride_name")}
+                </h3>
+                <span className="text-xs tracking-widest uppercase text-accent font-medium text-center">
+                  {t("bride_bio")}
+                </span>
+              </div>
+            </AnimatedReveal>
+          )}
         </div>
 
         <AnimatedReveal direction="up" delay={liteMotion ? 0 : 0.1} threshold={0.1}>
