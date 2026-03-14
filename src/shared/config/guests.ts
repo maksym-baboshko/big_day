@@ -131,10 +131,10 @@ export const guests: Guest[] = [
     seats: 2,
   },
   {
-    slug: "aleksii-turchyn",
-    name: { uk: "Алексій Турчин", en: "Aleksii Turchyn" },
-    vocative: { uk: "Алексію Турчине", en: "Aleksii Turchyn" },
-    formName: { uk: "Алексій Турчин", en: "Aleksii Turchyn" },
+    slug: "oleksii-turchyn",
+    name: { uk: "Олексій Турчин", en: "Oleksii Turchyn" },
+    vocative: { uk: "Олексію Турчине", en: "Oleksii Turchyn" },
+    formName: { uk: "Олексій Турчин", en: "Oleksii Turchyn" },
     seats: 1,
   },
 ];
