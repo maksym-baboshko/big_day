@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { LanguageSwitcher } from "@/features/language-switcher";
 import { ThemeSwitcher } from "@/features/theme-switcher";
 import { Ornament } from "@/shared/ui";
@@ -20,12 +20,19 @@ const NAV_LINKS = [
 ];
 
 const ease = [0.22, 1, 0.36, 1] as const;
+const focusRingClass =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary";
 
 export function Navbar() {
   const t = useTranslations("Navbar");
+  const tA11y = useTranslations("Accessibility");
   const liteMotion = useLiteMotion();
+  const prefersReducedMotion = useReducedMotion();
   const [isScrolled, setIsScrolled]         = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isKeyboardNavigation, setIsKeyboardNavigation] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const firstMobileLinkRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -34,21 +41,94 @@ export function Navbar() {
   }, []);
 
   useEffect(() => {
+    const mainContent = document.getElementById("main-content");
+    const siteFooter = document.getElementById("site-footer");
+
     document.body.style.overflow = isMobileMenuOpen ? "hidden" : "unset";
-    return () => { document.body.style.overflow = "unset"; };
+
+    if (isMobileMenuOpen) {
+      mainContent?.setAttribute("inert", "");
+      siteFooter?.setAttribute("inert", "");
+      queueMicrotask(() => firstMobileLinkRef.current?.focus());
+    } else {
+      mainContent?.removeAttribute("inert");
+      siteFooter?.removeAttribute("inert");
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+      mainContent?.removeAttribute("inert");
+      siteFooter?.removeAttribute("inert");
+    };
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    const enableKeyboardNavigation = (event: KeyboardEvent) => {
+      if (event.key === "Tab") {
+        setIsKeyboardNavigation(true);
+      }
+    };
+
+    const disableKeyboardNavigation = () => {
+      setIsKeyboardNavigation(false);
+    };
+
+    document.addEventListener("keydown", enableKeyboardNavigation);
+    document.addEventListener("mousedown", disableKeyboardNavigation);
+    document.addEventListener("touchstart", disableKeyboardNavigation);
+    document.addEventListener("pointerdown", disableKeyboardNavigation);
+
+    return () => {
+      document.removeEventListener("keydown", enableKeyboardNavigation);
+      document.removeEventListener("mousedown", disableKeyboardNavigation);
+      document.removeEventListener("touchstart", disableKeyboardNavigation);
+      document.removeEventListener("pointerdown", disableKeyboardNavigation);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsMobileMenuOpen(false);
+        queueMicrotask(() => menuButtonRef.current?.focus());
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isMobileMenuOpen]);
 
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
     const el = document.getElementById(id);
     if (el) {
-      window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: "smooth" });
+      window.scrollTo({
+        top: el.getBoundingClientRect().top + window.scrollY - 80,
+        behavior: prefersReducedMotion ? "auto" : "smooth"
+      });
     }
     setIsMobileMenuOpen(false);
   };
 
+  const handleSkipToContent = () => {
+    requestAnimationFrame(() => {
+      document.getElementById("main-content")?.focus();
+    });
+  };
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50">
+    <header
+      className="fixed top-0 left-0 right-0 z-50"
+      data-keyboard-nav={isKeyboardNavigation ? "true" : "false"}
+    >
+      <a href="#main-content" onClick={handleSkipToContent} className="skip-link">
+        {tA11y("skip_to_content")}
+      </a>
+
       {/* ── Bar ─────────────────────────────────────────────────────────────── */}
       <div
         className={cn(
@@ -66,26 +146,32 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <Link
             href="/"
-            className="heading-serif text-xl md:text-2xl text-text-primary hover:text-accent transition-colors shrink-0"
+            className={cn(
+              "heading-serif rounded-sm text-xl text-text-primary transition-colors hover:text-accent shrink-0 md:text-2xl",
+              focusRingClass
+            )}
             onClick={(e) => handleLinkClick(e, "hero")}
           >
             M<span className="text-accent italic">&</span>D
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden lg:flex items-center gap-8">
+          <nav aria-label={tA11y("primary_navigation")} className="hidden lg:flex items-center gap-8">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.id}
                 href={`#${link.id}`}
                 onClick={(e) => handleLinkClick(e, link.id)}
-                className="text-xs uppercase tracking-widest font-medium text-text-secondary hover:text-accent transition-colors relative group py-2"
+                className={cn(
+                  "group relative rounded-sm px-1 py-2 text-xs font-medium uppercase tracking-widest text-text-secondary transition-colors hover:text-accent",
+                  focusRingClass
+                )}
               >
                 {t(link.label)}
-                <span className="absolute bottom-0 left-0 w-full h-px bg-accent scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
+                <span className="absolute bottom-0 left-1 right-1 h-px bg-accent scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100 group-focus-visible:scale-x-100" />
               </a>
             ))}
-            <div className="w-px h-4 bg-accent/30 mx-2" />
+            <div aria-hidden="true" className="w-px h-4 bg-accent/30 mx-2" />
             <div className="flex items-center gap-3">
               <ThemeSwitcher />
               <LanguageSwitcher />
@@ -98,13 +184,20 @@ export function Navbar() {
             <LanguageSwitcher />
             <div className="w-px h-4 bg-accent/30 mx-1" />
             <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="w-10 h-10 flex flex-col items-center justify-center gap-1.5 focus:outline-none"
-              aria-label="Toggle menu"
+              ref={menuButtonRef}
+              type="button"
+              onClick={() => setIsMobileMenuOpen((open) => !open)}
+              className={cn(
+                "flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-full",
+                focusRingClass
+              )}
+              aria-label={isMobileMenuOpen ? tA11y("close_menu") : tA11y("open_menu")}
+              aria-controls="mobile-navigation"
+              aria-expanded={isMobileMenuOpen}
             >
-              <motion.span animate={isMobileMenuOpen ? { rotate: 45, y: 8 }  : { rotate: 0, y: 0 }} className="w-6 h-0.5 bg-text-primary rounded-full" />
-              <motion.span animate={isMobileMenuOpen ? { opacity: 0 }         : { opacity: 1 }}      className="w-6 h-0.5 bg-text-primary rounded-full" />
-              <motion.span animate={isMobileMenuOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }} className="w-6 h-0.5 bg-text-primary rounded-full" />
+              <motion.span animate={isMobileMenuOpen ? { rotate: 45, y: 8 }  : { rotate: 0, y: 0 }} className="w-6 h-0.5 rounded-full bg-text-primary" />
+              <motion.span animate={isMobileMenuOpen ? { opacity: 0 }         : { opacity: 1 }}      className="w-6 h-0.5 rounded-full bg-text-primary" />
+              <motion.span animate={isMobileMenuOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }} className="w-6 h-0.5 rounded-full bg-text-primary" />
             </button>
           </div>
         </div>
@@ -135,7 +228,11 @@ export function Navbar() {
             <Ornament position="bottom-left" size="sm" className="opacity-[0.05]" />
 
             {/* Nav links */}
-            <nav className="flex flex-col justify-center h-full pt-16 px-8 pb-24">
+            <nav
+              id="mobile-navigation"
+              aria-label={tA11y("mobile_navigation")}
+              className="flex h-full flex-col justify-center px-8 pb-24 pt-16"
+            >
               {NAV_LINKS.map((link, index) => (
                 <motion.div
                   key={link.id}
@@ -146,22 +243,26 @@ export function Navbar() {
                   className="group border-b border-accent/10 last:border-0"
                 >
                   <a
+                    ref={index === 0 ? firstMobileLinkRef : undefined}
                     href={`#${link.id}`}
                     onClick={(e) => handleLinkClick(e, link.id)}
-                    className="flex items-center gap-4 py-[0.9rem]"
+                    className={cn(
+                      "flex items-center gap-4 rounded-sm py-[0.9rem]",
+                      focusRingClass
+                    )}
                   >
                     <span className="font-cinzel text-[9px] tracking-widest text-accent/40 w-5 shrink-0 mt-0.5">
                       {String(index + 1).padStart(2, "0")}
                     </span>
-                    <span className="heading-serif text-[1.7rem] leading-none text-text-primary group-hover:text-accent transition-colors duration-300">
+                    <span className="heading-serif text-[1.7rem] leading-none text-text-primary transition-colors duration-300 group-hover:text-accent group-focus-visible:text-accent">
                       {t(link.label)}
                     </span>
                     <motion.span
                       initial={{ opacity: 0, x: -4 }}
                       whileHover={{ opacity: 1, x: 0 }}
-                      className="ml-auto text-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      className="ml-auto text-accent opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
                     >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                         <path d="M5 12h14M12 5l7 7-7 7" />
                       </svg>
                     </motion.span>

@@ -17,7 +17,7 @@ export function Footer() {
   const reduceMotion = useReducedMotion();
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
   };
 
   const navLinks = [
@@ -30,7 +30,7 @@ export function Footer() {
   ];
 
   return (
-    <footer className="relative overflow-hidden bg-bg-secondary">
+    <footer id="site-footer" className="relative overflow-hidden bg-bg-secondary">
       {/* Smooth fade from previous section (bg-primary → bg-secondary) */}
       <div
         aria-hidden="true"
@@ -108,13 +108,13 @@ export function Footer() {
         </div>
 
         {/* Nav links */}
-        <nav aria-label={t("back_to_top")}>
+        <nav aria-label={t("section_navigation")}>
           <ul className="flex flex-wrap justify-center gap-x-5 gap-y-2">
             {navLinks.map(({ href, label }) => (
               <li key={href}>
                 <a
                   href={href}
-                  className="text-[9px] md:text-[10px] tracking-[0.2em] uppercase text-text-secondary/45 hover:text-accent transition-colors duration-300"
+                  className="rounded-sm px-1 py-0.5 text-[9px] tracking-[0.2em] uppercase text-text-secondary/45 transition-colors duration-300 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-secondary md:text-[10px]"
                 >
                   {label}
                 </a>
@@ -125,8 +125,10 @@ export function Footer() {
 
         {/* Back to top */}
         <motion.button
+          type="button"
           onClick={scrollToTop}
-          className="group flex flex-col items-center gap-2 cursor-pointer mt-1"
+          aria-label={t("back_to_top")}
+          className="group mt-1 flex flex-col items-center gap-2 rounded-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-secondary"
           animate={
             reduceMotion
               ? undefined

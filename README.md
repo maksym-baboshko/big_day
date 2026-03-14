@@ -13,6 +13,7 @@ The event:
 ## What the site includes
 
 - Ukrainian and English locales
+- Accessibility support for keyboard navigation, focus states, and reduced motion
 - Animated intro and section reveals
 - Live wedding countdown
 - Venue details with map embed
@@ -30,6 +31,12 @@ The event:
 - next-intl
 - react-hook-form + zod
 - Resend for RSVP email delivery
+
+## Accessibility and SEO
+
+The site is built with accessibility in mind: keyboard navigation, visible focus states, skip navigation, semantic landmarks, and reduced-motion support are part of the implementation rather than an afterthought.
+
+SEO is also covered with localized metadata, canonical and alternate language links, Open Graph and Twitter cards, and structured event data.
 
 ## Running locally
 

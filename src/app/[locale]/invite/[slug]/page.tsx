@@ -45,15 +45,38 @@ export async function generateMetadata({
   const name = guest.name[typedLocale];
   const title = t("title", { name });
   const description = t("description", { name });
+  const pagePath =
+    typedLocale === "uk" ? `/invite/${slug}` : `/en/invite/${slug}`;
+  const alternateLocale = typedLocale === "uk" ? "en_US" : "uk_UA";
 
   return {
     title,
     description,
+    alternates: {
+      canonical: pagePath,
+      languages: {
+        uk: `/invite/${slug}`,
+        en: `/en/invite/${slug}`,
+        "x-default": `/invite/${slug}`,
+      },
+    },
+    robots: {
+      index: false,
+      follow: false,
+    },
     openGraph: {
+      url: pagePath,
       title,
       description,
       type: "website",
-      images: [PREVIEW_IMAGE],
+      locale: typedLocale === "uk" ? "uk_UA" : "en_US",
+      alternateLocale: [alternateLocale],
+      images: [
+        {
+          url: PREVIEW_IMAGE,
+          alt: title,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",

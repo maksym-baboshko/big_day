@@ -24,7 +24,7 @@ export function InvitationPage({
     <>
       {showSplash ? <Splash /> : null}
       <Navbar />
-      <main className="relative">
+      <main id="main-content" tabIndex={-1} className="relative scroll-mt-24 outline-none">
         <Hero />
         <PersonalInvitation guest={guest} />
         <OurStory />

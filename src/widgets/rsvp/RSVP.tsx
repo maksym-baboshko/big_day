@@ -13,6 +13,8 @@ import type { Guest } from "@/shared/config";
 import { rsvpSchema, type RSVPFormData } from "@/widgets/rsvp/model";
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const focusRingClass =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary";
 
 // ── Confetti colors ───────────────────────────────────────────────────────────
 const CONFETTI_COLORS = [
@@ -259,6 +261,7 @@ export function RSVP({ guest }: RSVPProps) {
   const attending = watch("attending");
   const guests = watch("guests") ?? 1;
   const watchedGuestNames = watch("guestNames");
+  const isAttendingYes = attending === "yes";
   const visibleGuestFieldsCount = attending === "yes" ? guests : 1;
 
   useEffect(() => {
@@ -707,11 +710,13 @@ export function RSVP({ guest }: RSVPProps) {
                       whileTap={{ scale: 0.97 }}
                       onClick={() => setValue("attending", "yes", { shouldValidate: true })}
                       className={cn(
-                        "relative flex flex-col items-center justify-center gap-2 px-3 py-5 md:py-8 rounded-2xl border-2 transition-all duration-500 cursor-pointer overflow-hidden",
+                        "relative flex flex-col items-center justify-center gap-2 rounded-2xl border-2 px-3 py-5 md:py-8 transition-all duration-500 cursor-pointer overflow-hidden",
+                        focusRingClass,
                         attending === "yes"
                           ? "border-accent bg-accent/8"
                           : "border-accent/10 hover:border-accent/30 bg-bg-primary/50"
                       )}
+                      aria-pressed={attending === "yes"}
                     >
                       <AnimatePresence>
                         {attending === "yes" && (
@@ -743,11 +748,13 @@ export function RSVP({ guest }: RSVPProps) {
                       whileTap={{ scale: 0.97 }}
                       onClick={() => setValue("attending", "no", { shouldValidate: true })}
                       className={cn(
-                        "relative flex flex-col items-center justify-center gap-2 px-3 py-5 md:py-8 rounded-2xl border-2 transition-all duration-500 cursor-pointer overflow-hidden",
+                        "relative flex flex-col items-center justify-center gap-2 rounded-2xl border-2 px-3 py-5 md:py-8 transition-all duration-500 cursor-pointer overflow-hidden",
+                        focusRingClass,
                         attending === "no"
                           ? "border-text-secondary/40 bg-text-primary/6"
                           : "border-accent/10 hover:border-accent/20 bg-bg-primary/50"
                       )}
+                      aria-pressed={attending === "no"}
                     >
                       <LeafIcon active={attending === "no"} />
                       <span className={cn(
@@ -771,15 +778,20 @@ export function RSVP({ guest }: RSVPProps) {
                 <div
                   style={{
                     display: "grid",
-                    gridTemplateRows: attending === "yes" ? "1fr" : "0fr",
+                    gridTemplateRows: isAttendingYes ? "1fr" : "0fr",
                     transition: "grid-template-rows 0.5s cubic-bezier(0.22, 1, 0.36, 1)",
                   }}
+                  aria-hidden={!isAttendingYes}
+                  inert={!isAttendingYes}
                 >
                   <div
-                    className="overflow-hidden"
+                    className={cn(
+                      "overflow-hidden",
+                      !isAttendingYes && "pointer-events-none"
+                    )}
                     style={{
-                      opacity: attending === "yes" ? 1 : 0,
-                      transition: `opacity ${attending === "yes" ? "0.4s 0.08s" : "0.25s 0s"} cubic-bezier(0.22, 1, 0.36, 1)`,
+                      opacity: isAttendingYes ? 1 : 0,
+                      transition: `opacity ${isAttendingYes ? "0.4s 0.08s" : "0.25s 0s"} cubic-bezier(0.22, 1, 0.36, 1)`,
                     }}
                   >
                     <div className="space-y-7 md:space-y-9">
@@ -791,11 +803,12 @@ export function RSVP({ guest }: RSVPProps) {
                         <div className="flex items-center justify-between w-full px-5 py-3 rounded-2xl border border-accent/15 bg-bg-primary/30">
                           <button
                             type="button"
-                            disabled={isSubmitting || guests <= 1}
+                            disabled={!isAttendingYes || isSubmitting || guests <= 1}
                             onClick={() => setValue("guests", Math.max(1, guests - 1), { shouldValidate: true })}
                             className={cn(
-                              "w-11 h-11 rounded-full border border-accent/25 transition-all duration-300 flex items-center justify-center text-xl leading-none",
-                              isSubmitting || guests <= 1
+                              "flex h-11 w-11 items-center justify-center rounded-full border border-accent/25 text-xl leading-none transition-all duration-300",
+                              focusRingClass,
+                              !isAttendingYes || isSubmitting || guests <= 1
                                 ? "cursor-not-allowed text-accent/25"
                                 : "cursor-pointer text-accent/70 hover:bg-accent/10 hover:border-accent hover:text-accent"
                             )}
@@ -814,11 +827,12 @@ export function RSVP({ guest }: RSVPProps) {
                           </motion.span>
                           <button
                             type="button"
-                            disabled={isSubmitting || guests >= maxGuestCount}
+                            disabled={!isAttendingYes || isSubmitting || guests >= maxGuestCount}
                             onClick={() => setValue("guests", Math.min(maxGuestCount, guests + 1), { shouldValidate: true })}
                             className={cn(
-                              "w-11 h-11 rounded-full border border-accent/25 transition-all duration-300 flex items-center justify-center text-xl leading-none",
-                              isSubmitting || guests >= maxGuestCount
+                              "flex h-11 w-11 items-center justify-center rounded-full border border-accent/25 text-xl leading-none transition-all duration-300",
+                              focusRingClass,
+                              !isAttendingYes || isSubmitting || guests >= maxGuestCount
                                 ? "cursor-not-allowed text-accent/25"
                                 : "cursor-pointer text-accent/70 hover:bg-accent/10 hover:border-accent hover:text-accent"
                             )}
@@ -835,7 +849,7 @@ export function RSVP({ guest }: RSVPProps) {
                         <Textarea
                           id="dietary"
                           placeholder={t("dietary_placeholder")}
-                          disabled={isSubmitting}
+                          disabled={!isAttendingYes || isSubmitting}
                           className="rounded-2xl text-sm min-h-24"
                           {...register("dietary")}
                         />
@@ -872,6 +886,7 @@ export function RSVP({ guest }: RSVPProps) {
                     whileTap={attending && !isSubmitting ? { scale: 0.99 } : {}}
                     className={cn(
                       "w-full py-4 md:py-5 rounded-2xl relative overflow-hidden font-medium text-base md:text-lg tracking-wide transition-all duration-500",
+                      focusRingClass,
                       attending && !isSubmitting
                         ? "bg-accent text-bg-primary shadow-xl shadow-accent/20 cursor-pointer"
                         : "bg-accent/15 text-text-secondary/30 cursor-not-allowed"
