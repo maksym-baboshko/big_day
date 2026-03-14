@@ -13,136 +13,136 @@ export interface Guest {
 
 export const guests: Guest[] = [
   {
-    slug: "papa-ihor",
-    name: { uk: "Папа Ігор", en: "Papa Ihor" },
-    vocative: { uk: "Папа Ігор", en: "Papa Ihor" },
-    formName: { uk: "Ігор Бабошко", en: "Ihor Baboshko" },
-    seats: 4,
+    slug: 'papa-ihor',
+    name: { uk: 'Папа Ігор', en: 'Papa Ihor' },
+    vocative: { uk: 'Папа Ігор', en: 'Papa Ihor' },
+    formName: { uk: 'Ігор Бабошко', en: 'Ihor Baboshko' },
+    seats: 4
   },
   {
-    slug: "mama-ira",
-    name: { uk: "Мама Іра", en: "Mama Ira" },
-    vocative: { uk: "Мамо Іро", en: "Mama Ira" },
-    formName: { uk: "Іра Авдієва", en: "Ira Avdieieva" },
-    seats: 1,
+    slug: 'mama-ira',
+    name: { uk: 'Мама Іра', en: 'Mama Ira' },
+    vocative: { uk: 'Мама Іра', en: 'Mama Ira' },
+    formName: { uk: 'Іра Авдієва', en: 'Ira Avdieieva' },
+    seats: 1
   },
   {
-    slug: "didus-valentyn",
-    name: { uk: "Дідусь Валентин", en: "Grandpa Valentyn" },
-    vocative: { uk: "Дідусю Валентине", en: "Grandpa Valentyn" },
-    formName: { uk: "Валентин Бабошко", en: "Valentyn Baboshko" },
-    seats: 1,
+    slug: 'didus-valentyn',
+    name: { uk: 'Дідусь Валентин', en: 'Grandpa Valentyn' },
+    vocative: { uk: 'Дідусю Валентине', en: 'Grandpa Valentyn' },
+    formName: { uk: 'Валентин Бабошко', en: 'Valentyn Baboshko' },
+    seats: 1
   },
   {
-    slug: "babusia-alla",
-    name: { uk: "Бабуся Алла", en: "Grandma Alla" },
-    vocative: { uk: "Бабусю Алло", en: "Grandma Alla" },
-    formName: { uk: "Алла Роднєва", en: "Alla Rodneva" },
-    seats: 1,
+    slug: 'babusia-alla',
+    name: { uk: 'Бабуся Алла', en: 'Grandma Alla' },
+    vocative: { uk: 'Бабусю Алло', en: 'Grandma Alla' },
+    formName: { uk: 'Алла Роднєва', en: 'Alla Rodneva' },
+    seats: 1
   },
   {
-    slug: "family-prodan",
-    name: { uk: "Родина Продан", en: "Prodan Family" },
-    vocative: { uk: "Родино Продан", en: "Prodan Family" },
-    formName: { uk: "Віталій Продан", en: "Vitalii Prodan" },
-    seats: 3,
+    slug: 'family-prodan',
+    name: { uk: 'Родина Продан', en: 'Prodan Family' },
+    vocative: { uk: 'Родино Продан', en: 'Prodan Family' },
+    formName: { uk: 'Віталій Продан', en: 'Vitalii Prodan' },
+    seats: 3
   },
   {
-    slug: "family-dedikert",
-    name: { uk: "Родина Дедікерт", en: "Dedikert Family" },
-    vocative: { uk: "Родино Дедікерт", en: "Dedikert Family" },
-    formName: { uk: "Михайло Дедікерт", en: "Mykhailo Dedikert" },
-    seats: 2,
+    slug: 'family-dedikert',
+    name: { uk: 'Родина Дедікерт', en: 'Dedikert Family' },
+    vocative: { uk: 'Михайло та Віталіно', en: 'Dedikert Family' },
+    formName: { uk: 'Михайло Дедікерт', en: 'Mykhailo Dedikert' },
+    seats: 2
   },
   {
-    slug: "family-kruk",
-    name: { uk: "Родина Крук", en: "Kruk Family" },
-    vocative: { uk: "Родино Крук", en: "Kruk Family" },
-    formName: { uk: "Тарас Крук", en: "Taras Kruk" },
-    seats: 2,
+    slug: 'family-kruk',
+    name: { uk: 'Родина Крук', en: 'Kruk Family' },
+    vocative: { uk: 'Тарасе та Анжеліко', en: 'Kruk Family' },
+    formName: { uk: 'Тарас Крук', en: 'Taras Kruk' },
+    seats: 2
   },
   {
-    slug: "oleksandr-nila",
+    slug: 'oleksandr-nila',
     name: {
-      uk: "Дідусь Олександр та бабуся Ніла",
-      en: "Grandpa Oleksandr and Grandma Nila",
+      uk: 'Дідусь Олександр та бабуся Ніла',
+      en: 'Grandpa Oleksandr and Grandma Nila'
     },
     vocative: {
-      uk: "Дідусю Олександре та бабусю Ніло",
-      en: "Grandpa Oleksandr and Grandma Nila",
+      uk: 'Дідусю Олександре та бабусю Ніло',
+      en: 'Grandpa Oleksandr and Grandma Nila'
     },
-    formName: { uk: "Олександр", en: "Oleksandr" },
-    seats: 2,
+    formName: { uk: 'Олександр', en: 'Oleksandr' },
+    seats: 2
   },
   {
-    slug: "babusia-halyna",
-    name: { uk: "Бабуся Галина", en: "Grandma Halyna" },
-    vocative: { uk: "Бабусю Галино", en: "Grandma Halyna" },
-    formName: { uk: "Галина", en: "Halyna" },
-    seats: 1,
+    slug: 'babusia-halyna',
+    name: { uk: 'Бабуся Галина', en: 'Grandma Halyna' },
+    vocative: { uk: 'Бабусю Галино', en: 'Grandma Halyna' },
+    formName: { uk: 'Галина', en: 'Halyna' },
+    seats: 1
   },
   {
-    slug: "serhii-prodan",
-    name: { uk: "Сергій", en: "Serhii" },
-    vocative: { uk: "Сергію", en: "Serhii" },
-    formName: { uk: "Сергій Продан", en: "Serhii Prodan" },
-    seats: 1,
+    slug: 'serhii-prodan',
+    name: { uk: 'Сергій', en: 'Serhii' },
+    vocative: { uk: 'Сергію', en: 'Serhii' },
+    formName: { uk: 'Сергій Продан', en: 'Serhii Prodan' },
+    seats: 1
   },
   {
-    slug: "family-sundal",
-    name: { uk: "Родина Сундал", en: "Sundal Family" },
-    vocative: { uk: "Родино Сундал", en: "Sundal Family" },
-    formName: { uk: "Антоніна Сундал", en: "Antonina Sundal" },
-    seats: 4,
+    slug: 'family-sundal',
+    name: { uk: 'Родина Сундал', en: 'Sundal Family' },
+    vocative: { uk: 'Родино Сундал', en: 'Sundal Family' },
+    formName: { uk: 'Антоніна Сундал', en: 'Antonina Sundal' },
+    seats: 4
   },
   {
-    slug: "family-shevchuk",
-    name: { uk: "Родина Шевчук", en: "Shevchuk Family" },
-    vocative: { uk: "Родино Шевчук", en: "Shevchuk Family" },
-    formName: { uk: "Олександр Шевчук", en: "Oleksandr Shevchuk" },
-    seats: 5,
+    slug: 'family-shevchuk',
+    name: { uk: 'Родина Шевчук', en: 'Shevchuk Family' },
+    vocative: { uk: 'Родино Шевчук', en: 'Shevchuk Family' },
+    formName: { uk: 'Олександр Шевчук', en: 'Oleksandr Shevchuk' },
+    seats: 5
   },
   {
-    slug: "virsaviia-berezna",
-    name: { uk: "Вірсавія", en: "Virsaviia" },
-    vocative: { uk: "Вірсавіє", en: "Virsaviia" },
-    formName: { uk: "Вірсавія Березна", en: "Virsaviia Berezna" },
-    seats: 1,
+    slug: 'virsaviia-berezna',
+    name: { uk: 'Вірсавія', en: 'Virsaviia' },
+    vocative: { uk: 'Вірсавіє', en: 'Virsaviia' },
+    formName: { uk: 'Вірсавія Березна', en: 'Virsaviia Berezna' },
+    seats: 1
   },
   {
-    slug: "family-sheiko",
-    name: { uk: "Родина Шейко", en: "Sheiko Family" },
-    vocative: { uk: "Родино Шейко", en: "Sheiko Family" },
-    formName: { uk: "Даніл Шейко", en: "Danil Sheiko" },
-    seats: 2,
+    slug: 'family-sheiko',
+    name: { uk: 'Родина Шейко', en: 'Sheiko Family' },
+    vocative: { uk: 'Родино Шейко', en: 'Sheiko Family' },
+    formName: { uk: 'Даніл Шейко', en: 'Danil Sheiko' },
+    seats: 2
   },
   {
-    slug: "oleksandr-anastasiia",
-    name: { uk: "Олександр і Анастасія", en: "Oleksandr and Anastasiia" },
-    vocative: { uk: "Олександре та Анастасіє", en: "Oleksandr and Anastasiia" },
-    formName: { uk: "Олександр Кулачінський", en: "Oleksandr Kulachinskyi" },
-    seats: 2,
+    slug: 'oleksandr-anastasiia',
+    name: { uk: 'Олександр і Анастасія', en: 'Oleksandr and Anastasiia' },
+    vocative: { uk: 'Олександре та Анастасіє', en: 'Oleksandr and Anastasiia' },
+    formName: { uk: 'Олександр Кулачінський', en: 'Oleksandr Kulachinskyi' },
+    seats: 2
   },
   {
-    slug: "dmytro-anna",
-    name: { uk: "Дмитро і Анна", en: "Dmytro and Anna" },
-    vocative: { uk: "Дмитре та Анно", en: "Dmytro and Anna" },
-    formName: { uk: "Дмитро Ржавський", en: "Dmytro Rzhavskyi" },
-    seats: 2,
+    slug: 'dmytro-anna',
+    name: { uk: 'Дмитро і Анна', en: 'Dmytro and Anna' },
+    vocative: { uk: 'Дмитро та Анно', en: 'Dmytro and Anna' },
+    formName: { uk: 'Дмитро Ржавський', en: 'Dmytro Rzhavskyi' },
+    seats: 2
   },
   {
-    slug: "oleksii-turchyn",
-    name: { uk: "Олексій Турчин", en: "Oleksii Turchyn" },
-    vocative: { uk: "Олексію Турчине", en: "Oleksii Turchyn" },
-    formName: { uk: "Олексій Турчин", en: "Oleksii Turchyn" },
-    seats: 1,
-  },
+    slug: 'oleksii-turchyn',
+    name: { uk: 'Олексій Турчин', en: 'Oleksii Turchyn' },
+    vocative: { uk: 'Олексію', en: 'Oleksii Turchyn' },
+    formName: { uk: 'Олексій Турчин', en: 'Oleksii Turchyn' },
+    seats: 1
+  }
 ];
 
 export function getGuestBySlug(slug: string): Guest | undefined {
-  return guests.find((guest) => guest.slug === slug);
+  return guests.find(guest => guest.slug === slug);
 }
 
 export function getAllGuestSlugs(): string[] {
-  return guests.map((guest) => guest.slug);
+  return guests.map(guest => guest.slug);
 }
