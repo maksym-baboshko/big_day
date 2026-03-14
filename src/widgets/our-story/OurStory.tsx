@@ -266,13 +266,13 @@ export function OurStory() {
                   "
                 </span>
 
-                <p className="heading-serif-italic text-xl md:text-2xl lg:text-[1.65rem] text-text-primary leading-snug md:leading-relaxed">
+                <p className="heading-serif-italic text-[1.1rem] sm:text-xl md:text-2xl lg:text-[1.65rem] text-text-primary leading-[1.4] md:leading-relaxed">
                   {t("story_closing")}
                   <span
-                    className="inline-block ml-2 text-[1.4em] align-middle leading-none"
+                    className="inline-block whitespace-nowrap text-[1.2em] align-middle leading-none sm:text-[1.4em]"
                     aria-hidden="true"
                   >
-                    💛
+                    {"\u00A0"}💛
                   </span>
                 </p>
 
