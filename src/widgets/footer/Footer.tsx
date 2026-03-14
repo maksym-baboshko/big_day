@@ -21,7 +21,7 @@ export function Footer() {
   };
 
   const navLinks = [
-    { href: "#story", label: tNavbar("story") },
+    { href: "#our-story", label: tNavbar("story") },
     { href: "#timeline", label: tNavbar("timeline") },
     { href: "#location", label: tNavbar("location") },
     { href: "#dress-code", label: tNavbar("dress_code") },

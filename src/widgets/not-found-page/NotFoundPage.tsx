@@ -1,13 +1,24 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/features/language-switcher";
 import { ThemeSwitcher } from "@/features/theme-switcher";
 import { Link } from "@/shared/i18n/navigation";
 import { AnimatedReveal, Button, Ornament } from "@/shared/ui";
 
 export function NotFoundPage() {
+  const locale = useLocale();
   const t = useTranslations("NotFoundPage");
+  const homeHref = locale === "en" ? "/en" : "/";
+
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      window.history.back();
+      return;
+    }
+
+    window.location.assign(homeHref);
+  };
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-bg-primary text-text-primary">
@@ -23,7 +34,7 @@ export function NotFoundPage() {
       <div className="relative z-10 flex min-h-screen flex-col">
         <div className="flex items-center justify-between px-6 py-6 md:px-10 md:py-8">
           <Link
-            href="/"
+            href={homeHref}
             className="heading-serif text-2xl text-text-primary transition-colors hover:text-accent md:text-3xl"
           >
             M<span className="text-accent italic">&</span>D
@@ -92,7 +103,7 @@ export function NotFoundPage() {
                   <div className="mt-9 flex flex-wrap gap-4">
                     <Button
                       as={Link}
-                      href="/"
+                      href={homeHref}
                       size="lg"
                       className="min-w-[220px]"
                     >
@@ -103,7 +114,7 @@ export function NotFoundPage() {
                       type="button"
                       variant="outline"
                       size="lg"
-                      onClick={() => window.history.back()}
+                      onClick={handleBack}
                       className="min-w-[220px] border-accent/30 text-bg-primary hover:bg-bg-primary/10 hover:text-bg-primary dark:text-text-primary dark:hover:bg-accent/12 dark:hover:text-text-primary"
                     >
                       {t("secondary_cta")}

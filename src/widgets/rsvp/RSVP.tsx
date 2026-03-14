@@ -174,6 +174,19 @@ function Divider() {
   return <div className="h-px bg-accent/8" />;
 }
 
+function createDefaultFormValues(
+  guest: Guest | undefined,
+  locale: "uk" | "en"
+) {
+  return {
+    guestNames: [guest?.formName?.[locale] ?? guest?.name[locale] ?? ""],
+    guests: guest?.seats ?? 1,
+    dietary: "",
+    message: "",
+    website: "",
+  };
+}
+
 function RingIcon({ active }: { active: boolean }) {
   return (
     <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
@@ -212,13 +225,7 @@ export function RSVP({ guest }: RSVPProps) {
   const [submittedAttending, setSubmittedAttending] = useState<RSVPFormData["attending"] | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const maxGuestCount = guest?.seats ?? 10;
-  const defaultFormValues = {
-    guestNames: [guest?.formName?.[locale] ?? guest?.name[locale] ?? ""],
-    guests: guest?.seats ?? 1,
-    dietary: "",
-    message: "",
-    website: "",
-  };
+  const defaultFormValues = createDefaultFormValues(guest, locale);
 
   const {
     register,
@@ -226,6 +233,7 @@ export function RSVP({ guest }: RSVPProps) {
     watch,
     setValue,
     reset,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<RSVPFormData>({
     resolver: zodResolver(rsvpSchema),
@@ -268,6 +276,34 @@ export function RSVP({ guest }: RSVPProps) {
       { shouldDirty: true }
     );
   }, [setValue, visibleGuestFieldsCount, watchedGuestNames]);
+
+  useEffect(() => {
+    if (!guest || submitted) {
+      return;
+    }
+
+    const currentNames = getValues("guestNames");
+    const currentPrimaryGuest = currentNames?.[0] ?? "";
+    const currentGuestCount = getValues("guests") ?? 1;
+
+    const isDefaultState =
+      currentPrimaryGuest === defaultFormValues.guestNames[0] &&
+      currentGuestCount === defaultFormValues.guests &&
+      !getValues("attending") &&
+      !getValues("dietary") &&
+      !getValues("message");
+
+    if (isDefaultState) {
+      reset(defaultFormValues);
+    }
+  }, [
+    defaultFormValues,
+    getValues,
+    guest,
+    locale,
+    reset,
+    submitted,
+  ]);
 
   const onSubmit = async (data: RSVPFormData) => {
     setSubmitError(null);

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { cookies } from "next/headers";
-import { playfair, inter, cinzel, vibes } from "@/shared/lib";
+import { playfair, inter, cinzel, vibes, THEME_INIT_SCRIPT } from "@/shared/lib";
 import { Button, Ornament } from "@/shared/ui";
 import ukMessages from "@/shared/i18n/messages/uk.json";
 import enMessages from "@/shared/i18n/messages/en.json";
@@ -38,16 +38,7 @@ export default async function GlobalNotFound() {
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var theme = localStorage.getItem('theme');
-                  if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                    document.documentElement.classList.add('dark');
-                  }
-                } catch (e) {}
-              })();
-            `,
+            __html: THEME_INIT_SCRIPT,
           }}
         />
       </head>

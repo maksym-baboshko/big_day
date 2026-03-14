@@ -3,7 +3,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { NextIntlClientProvider } from "next-intl";
 import { setRequestLocale, getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { playfair, inter, cinzel, vibes } from "@/shared/lib";
+import { playfair, inter, cinzel, vibes, THEME_INIT_SCRIPT } from "@/shared/lib";
 import { ThemeProvider } from "@/features/theme-switcher";
 import { routing, type Locale } from "@/shared/i18n/routing";
 import "../globals.css";
@@ -99,16 +99,7 @@ export default async function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var theme = localStorage.getItem('theme');
-                  if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                    document.documentElement.classList.add('dark');
-                  }
-                } catch(e) {}
-              })();
-            `,
+            __html: THEME_INIT_SCRIPT,
           }}
         />
       </head>

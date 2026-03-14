@@ -263,7 +263,7 @@ export function OurStory() {
                   className="absolute -top-2 left-0 md:left-2 heading-serif text-[4rem] md:text-[5rem] leading-none text-accent/15 select-none"
                   style={{ lineHeight: 1 }}
                 >
-                  "
+                  &ldquo;
                 </span>
 
                 <p className="heading-serif-italic text-[1.1rem] sm:text-xl md:text-2xl lg:text-[1.65rem] text-text-primary leading-[1.4] md:leading-relaxed">
@@ -282,7 +282,7 @@ export function OurStory() {
                   className="absolute -bottom-8 right-0 md:right-2 heading-serif text-[4rem] md:text-[5rem] leading-none text-accent/15 select-none"
                   style={{ lineHeight: 1 }}
                 >
-                  "
+                  &rdquo;
                 </span>
               </div>
 

@@ -27,21 +27,28 @@ function calculateTimeLeft(): TimeLeft {
 
 let globalStore = calculateTimeLeft();
 const listeners = new Set<() => void>();
+let countdownIntervalStarted = false;
+
+function ensureCountdownInterval() {
+  if (typeof window === "undefined" || countdownIntervalStarted) {
+    return;
+  }
+
+  countdownIntervalStarted = true;
+  window.setInterval(() => {
+    globalStore = calculateTimeLeft();
+    listeners.forEach((callback) => callback());
+  }, 1000);
+}
 
 function subscribe(callback: () => void) {
+  ensureCountdownInterval();
   listeners.add(callback);
   return () => listeners.delete(callback);
 }
 
 function getSnapshot() {
   return globalStore;
-}
-
-if (typeof window !== "undefined") {
-  setInterval(() => {
-    globalStore = calculateTimeLeft();
-    listeners.forEach((cb) => cb());
-  }, 1000);
 }
 
 const SERVER_SNAPSHOT: TimeLeft = { days: 0, hours: 0, minutes: 0, seconds: 0 };
