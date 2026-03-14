@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { getAllGuestSlugs, getGuestBySlug } from "@/shared/config";
+import { PREVIEW_IMAGE, getAllGuestSlugs, getGuestBySlug } from "@/shared/config";
 import { routing, type Locale } from "@/shared/i18n/routing";
 import { InvitationPage } from "@/widgets/invitation-page";
-
-const PREVIEW_IMAGE = "/images/preview/og-image.jpg";
 
 interface InvitePageProps {
   params: Promise<{
