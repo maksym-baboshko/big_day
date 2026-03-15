@@ -55,7 +55,7 @@ export function NotFoundPage() {
                 </div>
 
                 <div className="mt-6 max-w-sm">
-                  <p className="text-[10px] uppercase tracking-[0.34em] text-accent/75 md:text-xs">
+                  <p className="text-[10px] uppercase tracking-[0.34em] text-accent md:text-xs">
                     {t("eyebrow")}
                   </p>
                   <p className="heading-serif mt-4 text-3xl leading-tight text-text-primary md:text-4xl">

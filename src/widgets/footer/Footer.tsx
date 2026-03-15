@@ -68,7 +68,7 @@ export function Footer() {
         {/* Location label */}
         <div className="flex items-center gap-3">
           <span className="block h-px w-10 bg-linear-to-r from-transparent to-accent/35" />
-          <span className="text-[9px] tracking-[0.35em] uppercase text-text-secondary/55 font-medium">
+          <span className="text-[9px] tracking-[0.35em] uppercase text-text-secondary/90 font-medium">
             Bergen · Norway
           </span>
           <span className="block h-px w-10 bg-linear-to-l from-transparent to-accent/35" />
@@ -84,11 +84,11 @@ export function Footer() {
             {tHero("bride_name")}
           </h2>
 
-          <p className="font-cinzel text-[0.6rem] md:text-[0.7rem] tracking-[0.45em] text-text-secondary/70 uppercase mt-1">
+          <p className="mt-1 font-cinzel text-[0.6rem] uppercase tracking-[0.45em] text-text-secondary/90 md:text-[0.7rem]">
             {romanDate}
           </p>
 
-          <p className="text-xs tracking-wider text-text-secondary/50 mt-0.5">
+          <p className="mt-0.5 text-xs tracking-wider text-text-secondary/90">
             {VENUE.name}
           </p>
         </div>
@@ -114,7 +114,7 @@ export function Footer() {
               <li key={href}>
                 <a
                   href={href}
-                  className="rounded-sm px-1 py-0.5 text-[9px] tracking-[0.2em] uppercase text-text-secondary/45 transition-colors duration-300 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-secondary md:text-[10px]"
+                  className="rounded-sm px-1 py-0.5 text-[9px] tracking-[0.2em] uppercase text-text-secondary/90 transition-colors duration-300 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-secondary md:text-[10px]"
                 >
                   {label}
                 </a>
@@ -154,9 +154,9 @@ export function Footer() {
                 : {
                     scale: [1, liteMotion ? 1.035 : 1.05, 1],
                     borderColor: [
-                      "rgba(var(--accent-rgb,180,140,100),0.2)",
-                      "rgba(var(--accent-rgb,180,140,100),0.42)",
-                      "rgba(var(--accent-rgb,180,140,100),0.2)",
+                      "rgba(var(--accent-rgb,180,140,100),0.34)",
+                      "rgba(var(--accent-rgb,180,140,100),0.52)",
+                      "rgba(var(--accent-rgb,180,140,100),0.34)",
                     ],
                     backgroundColor: [
                       "rgba(var(--accent-rgb,180,140,100),0)",
@@ -164,9 +164,9 @@ export function Footer() {
                       "rgba(var(--accent-rgb,180,140,100),0)",
                     ],
                     color: [
-                      "rgba(var(--accent-rgb,180,140,100),0.45)",
-                      "rgba(var(--accent-rgb,180,140,100),0.88)",
-                      "rgba(var(--accent-rgb,180,140,100),0.45)",
+                      "rgba(var(--accent-rgb,180,140,100),0.82)",
+                      "rgba(var(--accent-rgb,180,140,100),1)",
+                      "rgba(var(--accent-rgb,180,140,100),0.82)",
                     ],
                   }
             }
@@ -189,7 +189,7 @@ export function Footer() {
                   ease,
                 }
             }
-            className="w-11 h-11 rounded-full border border-accent/20 flex items-center justify-center text-accent/45 transition-all duration-500"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-accent/34 text-accent transition-all duration-500"
             style={{ willChange: reduceMotion ? "auto" : "transform, opacity" }}
           >
             <motion.svg
@@ -217,12 +217,12 @@ export function Footer() {
             </motion.svg>
           </motion.div>
           <motion.span
-            className="text-[8px] tracking-[0.25em] uppercase text-text-secondary/35 transition-colors duration-300"
+            className="text-[8px] tracking-[0.25em] uppercase text-text-secondary/90 transition-colors duration-300"
             animate={
               reduceMotion
                 ? undefined
                 : {
-                    opacity: [0.35, 0.62, 0.35],
+                    opacity: [0.88, 1, 0.88],
                   }
             }
             whileHover={
@@ -247,8 +247,8 @@ export function Footer() {
         </motion.button>
 
         {/* Copyright */}
-        <div className="w-full border-t border-accent/[0.07] pt-5 flex items-center justify-center">
-          <p className="text-[8px] md:text-[9px] tracking-[0.25em] uppercase text-text-secondary/28 text-center">
+        <div className="flex w-full items-center justify-center border-t border-accent/[0.12] pt-5">
+          <p className="text-center text-[8px] uppercase tracking-[0.25em] text-text-secondary/90 md:text-[9px]">
             &copy; {WEDDING_DATE.getFullYear()} &middot; {t("made_with_love")}
           </p>
         </div>

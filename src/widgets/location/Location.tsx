@@ -85,7 +85,7 @@ export function Location() {
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
             variants={mobileCardVariants}
-            className="rounded-3xl border border-accent/15 bg-bg-secondary/20 shadow-[0_8px_80px_rgba(0,0,0,0.12)] overflow-hidden flex flex-col lg:flex-row min-h-130"
+            className="min-h-130 overflow-hidden rounded-3xl border border-accent/22 bg-bg-secondary/32 shadow-[0_8px_80px_rgba(0,0,0,0.12)] flex flex-col lg:flex-row"
           >
             <div className="lg:w-1/2 p-8 md:p-12 lg:p-14 flex flex-col items-center lg:items-start text-center lg:text-left">
 
@@ -99,19 +99,19 @@ export function Location() {
                 <motion.span
                   animate={{ scale: [0.82, 1.04, 1.42], opacity: [0, 0.3, 0] }}
                   transition={mobilePinRippleTransition}
-                  className="absolute inline-flex h-16 w-16 rounded-full border border-accent/28"
+                  className="absolute inline-flex h-16 w-16 rounded-full border border-accent/34"
                   style={{ willChange: "transform, opacity" }}
                 />
                 <motion.div
                   animate={{ scale: [0.82, 1.04, 1.42], opacity: [0, 0.22, 0] }}
                   transition={{ ...mobilePinRippleTransition, delay: -1.6 }}
-                  className="absolute inline-flex h-16 w-16 rounded-full border border-accent/22"
+                  className="absolute inline-flex h-16 w-16 rounded-full border border-accent/28"
                   style={{ willChange: "transform, opacity" }}
                 />
                 <motion.div
                   animate={{ scale: [1, 1.018, 1] }}
                   transition={{ duration: 4.6, repeat: Infinity, ease: "easeInOut" }}
-                  className="relative inline-flex items-center justify-center rounded-full bg-accent/15 p-4 text-accent ring-1 ring-accent/20"
+                  className="relative inline-flex items-center justify-center rounded-full bg-accent/18 p-4 text-accent ring-1 ring-accent/24"
                   style={{ willChange: "transform" }}
                 >
                   <MapPin className="h-6 w-6" />
@@ -122,7 +122,7 @@ export function Location() {
                 {t("venue_name")}
               </h3>
 
-              <p className="font-cinzel text-xs text-accent/80 tracking-widest uppercase mb-6">
+              <p className="mb-6 font-cinzel text-xs uppercase tracking-widest text-accent">
                 {t("address")}
               </p>
 
@@ -130,7 +130,7 @@ export function Location() {
                 {chips.map(({ icon, key }) => (
                   <span
                     key={key}
-                    className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-accent/10 text-accent/90 border border-accent/15"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-accent/22 bg-accent/12 px-3 py-1.5 text-xs font-medium text-accent"
                   >
                     <span>{icon}</span>
                     {t(key)}
@@ -159,7 +159,7 @@ export function Location() {
 
             <motion.div
               variants={mobileMapVariants}
-              className="lg:w-1/2 relative min-h-75 lg:min-h-0 border-t border-accent/10 lg:border-t-0 lg:border-l lg:border-accent/10"
+              className="relative min-h-75 border-t border-accent/16 lg:min-h-0 lg:w-1/2 lg:border-t-0 lg:border-l lg:border-accent/16"
             >
               <iframe
                 src={VENUE.mapsUrl}
@@ -179,7 +179,7 @@ export function Location() {
           </motion.div>
         ) : (
           <AnimatedReveal direction="up">
-            <div className="rounded-3xl border border-accent/15 bg-bg-secondary/20 shadow-[0_8px_80px_rgba(0,0,0,0.12)] overflow-hidden flex flex-col lg:flex-row min-h-130">
+            <div className="min-h-130 overflow-hidden rounded-3xl border border-accent/22 bg-bg-secondary/32 shadow-[0_8px_80px_rgba(0,0,0,0.12)] flex flex-col lg:flex-row">
 
               <div className="lg:w-1/2 p-8 md:p-12 lg:p-14 flex flex-col items-center lg:items-start text-center lg:text-left">
 
@@ -188,7 +188,7 @@ export function Location() {
                     className={cn("absolute inline-flex h-16 w-16 rounded-full bg-accent/20", "animate-ping")}
                     style={{ animationDuration: "2.5s" }}
                   />
-                  <div className="relative inline-flex items-center justify-center rounded-full bg-accent/15 p-4 text-accent ring-1 ring-accent/20">
+                  <div className="relative inline-flex items-center justify-center rounded-full bg-accent/18 p-4 text-accent ring-1 ring-accent/24">
                     <MapPin className="h-6 w-6" />
                   </div>
                 </div>
@@ -197,7 +197,7 @@ export function Location() {
                   {t("venue_name")}
                 </h3>
 
-                <p className="font-cinzel text-xs text-accent/80 tracking-widest uppercase mb-6">
+                <p className="mb-6 font-cinzel text-xs uppercase tracking-widest text-accent">
                   {t("address")}
                 </p>
 
@@ -205,7 +205,7 @@ export function Location() {
                   {chips.map(({ icon, key }) => (
                     <span
                       key={key}
-                      className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-accent/10 text-accent/90 border border-accent/15"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-accent/22 bg-accent/12 px-3 py-1.5 text-xs font-medium text-accent"
                     >
                       <span>{icon}</span>
                       {t(key)}
@@ -230,7 +230,7 @@ export function Location() {
                 </Button>
               </div>
 
-              <div className="lg:w-1/2 relative min-h-75 lg:min-h-0 border-t border-accent/10 lg:border-t-0 lg:border-l lg:border-accent/10">
+              <div className="relative min-h-75 border-t border-accent/16 lg:min-h-0 lg:w-1/2 lg:border-t-0 lg:border-l lg:border-accent/16">
                 <iframe
                   src={VENUE.mapsUrl}
                   width="100%"

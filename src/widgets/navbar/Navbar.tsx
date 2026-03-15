@@ -160,8 +160,8 @@ export function Navbar() {
           "border-b",
           isScrolled || isMobileOverlayActive
             ? liteMotion
-              ? "bg-bg-primary border-accent/10 shadow-lg py-3 lg:bg-bg-primary/96"
-              : "bg-bg-primary border-accent/10 shadow-lg py-3 lg:bg-bg-primary/80 lg:backdrop-blur-2xl"
+              ? "bg-bg-primary border-accent/18 shadow-lg py-3 lg:bg-bg-primary/96"
+              : "bg-bg-primary border-accent/18 shadow-lg py-3 lg:bg-bg-primary/80 lg:backdrop-blur-2xl"
             : liteMotion
               ? "bg-bg-primary border-transparent lg:bg-bg-primary/92"
               : "bg-bg-primary border-transparent lg:bg-bg-primary/20 lg:backdrop-blur-md"
@@ -264,7 +264,7 @@ export function Navbar() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -28 }}
                   transition={{ delay: 0.05 + index * 0.07, duration: 0.45, ease }}
-                  className="group border-b border-accent/10 last:border-0"
+                  className="group border-b border-accent/18 last:border-0"
                 >
                   <a
                     ref={index === 0 ? firstMobileLinkRef : undefined}
@@ -275,7 +275,7 @@ export function Navbar() {
                       focusRingClass
                     )}
                   >
-                    <span className="font-cinzel text-[9px] tracking-widest text-accent/40 w-5 shrink-0 mt-0.5">
+                    <span className="mt-0.5 w-5 shrink-0 font-cinzel text-[9px] tracking-widest text-accent">
                       {String(index + 1).padStart(2, "0")}
                     </span>
                     <span className="heading-serif text-[1.7rem] leading-none text-text-primary transition-colors duration-300 group-hover:text-accent group-focus-visible:text-accent">
@@ -302,10 +302,10 @@ export function Navbar() {
               transition={{ delay: 0.55, duration: 0.4 }}
               className="absolute bottom-8 left-8 right-8 flex items-center justify-between"
             >
-              <span className="font-cinzel text-[8px] tracking-[0.3em] uppercase text-text-secondary/35">
+              <span className="font-cinzel text-[8px] tracking-[0.3em] uppercase text-text-secondary/90">
                 Bergen · Norway
               </span>
-              <span className="font-cinzel text-[8px] tracking-[0.3em] uppercase text-text-secondary/35">
+              <span className="font-cinzel text-[8px] tracking-[0.3em] uppercase text-text-secondary/90">
                 XXVIII · VI · MMXXVI
               </span>
             </motion.div>

@@ -109,8 +109,8 @@ function ColorSwatch({
       <p
         className={
           liteMotion
-            ? "mt-3 px-1 text-center text-xs font-medium leading-tight text-text-secondary/72"
-            : "mt-3 px-1 text-center text-xs font-medium leading-tight text-text-secondary/70 transition-colors duration-300 group-hover:text-accent md:text-sm"
+            ? "mt-3 px-1 text-center text-xs font-medium leading-tight text-text-secondary/90"
+            : "mt-3 px-1 text-center text-xs font-medium leading-tight text-text-secondary/90 transition-colors duration-300 group-hover:text-accent md:text-sm"
         }
       >
         {name}
@@ -147,7 +147,7 @@ function GroupHeading({
       <h3 className="heading-serif text-2xl md:text-3xl text-accent mb-2">
         {title}
       </h3>
-      <p className="text-sm text-text-secondary/55 italic tracking-wide">{note}</p>
+      <p className="text-sm italic tracking-wide text-text-secondary/90">{note}</p>
     </>
   );
 

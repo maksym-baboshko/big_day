@@ -2,12 +2,13 @@
 
 :root {
   --bg-primary: #FAF6F0;
-  --bg-secondary: #F0EAD6;
-  --text-primary: #2C2825;
-  --text-secondary: #857D71;
-  --accent: #A8845A;
-  --accent-hover: #8B6B45;
-  --accent-soft: #C8B49A;
+  --bg-secondary: #EEE4D4;
+  --text-primary: #241D19;
+  --text-secondary: #685B4E;
+  --accent: #8E6842;
+  --accent-hover: #734F31;
+  --accent-soft: #B79A79;
+  --accent-rgb: 142, 104, 66;
 }
 
 .dark {
@@ -18,6 +19,7 @@
   --accent: #BF9570;
   --accent-hover: #A87C56;
   --accent-soft: #3d352c;
+  --accent-rgb: 191, 149, 112;
 }
 
 @theme inline {

@@ -174,9 +174,9 @@ export function Hero() {
                 style={{ willChange: reduceMotion ? "auto" : "transform" }}
               >
                 <motion.span
-                  animate={reduceMotion ? undefined : { opacity: [0.5, 0.78, 0.5] }}
+                  animate={reduceMotion ? undefined : { opacity: [0.88, 1, 0.88] }}
                   transition={reduceMotion ? undefined : { duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
-                  className="text-xs font-medium uppercase tracking-widest text-text-secondary/60"
+                  className="text-xs font-medium uppercase tracking-widest text-text-secondary/90"
                   style={{ willChange: reduceMotion ? "auto" : "opacity" }}
                 >
                   {t("scroll_down")}
@@ -244,7 +244,7 @@ export function Hero() {
 
             <AnimatedReveal direction="up" delay={0.9} className="w-full relative z-10 flex-none">
               <div className="flex flex-col items-center gap-4">
-                <span className="text-xs tracking-widest uppercase text-text-secondary/60 font-medium">
+                <span className="text-xs font-medium tracking-widest uppercase text-text-secondary/90">
                   {t("scroll_down")}
                 </span>
                 <div className="w-px h-16 bg-linear-to-b from-accent/50 to-transparent" />

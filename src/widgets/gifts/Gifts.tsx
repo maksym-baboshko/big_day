@@ -248,10 +248,10 @@ export function Gifts() {
               key={currency}
               variants={liteMotion ? mobileCardVariants : desktopCardVariants}
               className={cn(
-                "group relative overflow-hidden rounded-3xl border border-accent/20 transform-gpu",
+                "group relative overflow-hidden rounded-3xl border border-accent/24 transform-gpu",
                 liteMotion
                   ? "bg-bg-primary/90 shadow-[0_18px_40px_-28px_rgba(0,0,0,0.45)]"
-                  : "bg-bg-primary/40 backdrop-blur-lg transition-[transform,border-color] duration-500 hover:-translate-y-1 hover:border-accent/40"
+                  : "bg-bg-primary/58 backdrop-blur-lg transition-[transform,border-color] duration-500 hover:-translate-y-1 hover:border-accent/40"
               )}
               style={{ willChange: "transform, opacity" }}
             >
@@ -263,17 +263,17 @@ export function Gifts() {
               <div className="absolute inset-px rounded-[calc(1.5rem-1px)] border border-accent/8 pointer-events-none" />
 
               <div className="relative z-10 flex min-h-[14.5rem] flex-col items-center justify-center px-8 py-9 text-center sm:min-h-[15.5rem]">
-                <p className="text-xs uppercase tracking-[0.22em] text-text-secondary/50 mb-3">
+                <p className="mb-3 text-xs uppercase tracking-[0.22em] text-text-secondary/90">
                   {t("from")}
                 </p>
                 <p className="heading-serif text-5xl md:text-6xl text-accent font-bold leading-none">
                   {amount}
                 </p>
-                <p className="font-cinzel text-lg text-accent/70 tracking-widest mt-2 mb-3">
+                <p className="mt-2 mb-3 font-cinzel text-lg tracking-widest text-accent">
                   {label}
                 </p>
                 <div className="h-px w-8 bg-accent/20 mb-3" />
-                <p className="text-xs uppercase tracking-[0.18em] text-text-secondary/50">
+                <p className="text-xs uppercase tracking-[0.18em] text-text-secondary/90">
                   {t("per_guest")}
                 </p>
               </div>
@@ -286,7 +286,7 @@ export function Gifts() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: liteMotion ? 0.45 : 0.8, delay: liteMotion ? 0.08 : 0.3, ease }}
-          className="text-center text-base md:text-lg text-text-secondary/80 leading-relaxed mb-10"
+          className="mb-10 text-center text-base leading-relaxed text-text-secondary/90 md:text-lg"
         >
           {t("details")}
         </motion.p>
@@ -310,7 +310,7 @@ export function Gifts() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: liteMotion ? 0.45 : 0.8, delay: liteMotion ? 0.12 : 0.44, ease }}
-          className="text-center text-base text-text-secondary/60 italic leading-relaxed"
+          className="text-center text-base italic leading-relaxed text-text-secondary/90"
         >
           {t("closing")}
         </motion.p>

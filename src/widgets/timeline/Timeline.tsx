@@ -116,7 +116,7 @@ export function Timeline() {
             const icon = EVENT_ICONS[event.id];
 
             const cardContent = (
-              <div className="bg-bg-secondary/25 border border-accent/12 rounded-2xl px-5 py-5 md:px-6 md:py-6 hover:border-accent/25 transition-colors duration-300 group/card">
+              <div className="rounded-2xl border border-accent/20 bg-bg-secondary/32 px-5 py-5 transition-colors duration-300 group/card hover:border-accent/32 md:px-6 md:py-6">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-7 h-7 rounded-full bg-accent/10 flex items-center justify-center shrink-0 text-accent group-hover/card:bg-accent/20 transition-colors duration-300">
                     {icon}

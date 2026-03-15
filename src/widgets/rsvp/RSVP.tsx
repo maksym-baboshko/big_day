@@ -165,7 +165,7 @@ function ConfettiOverlay({ onDone, lite }: { onDone: () => void; lite: boolean }
 // ── Small helpers ─────────────────────────────────────────────────────────────
 function FieldLabel({ children, required }: { children: React.ReactNode; required?: boolean }) {
   return (
-    <p className="text-xs uppercase tracking-[0.18em] text-text-secondary/55 mb-3 font-medium">
+    <p className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-text-secondary/90">
       {children}
       {required && <span className="text-accent ml-1">*</span>}
     </p>
@@ -173,7 +173,7 @@ function FieldLabel({ children, required }: { children: React.ReactNode; require
 }
 
 function Divider() {
-  return <div className="h-px bg-accent/8" />;
+  return <div className="h-px bg-accent/16" />;
 }
 
 interface RSVPDefaultValues {
@@ -200,7 +200,7 @@ function createDefaultFormValues(
 function RingIcon({ active }: { active: boolean }) {
   return (
     <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
-      className={cn("transition-all duration-500", active ? "text-accent" : "text-text-secondary/25")}
+      className={cn("transition-all duration-500", active ? "text-accent" : "text-text-secondary/42")}
     >
       <circle cx="13" cy="13" r="8.5" stroke="currentColor" strokeWidth="1.5" />
       <circle cx="13" cy="13" r="4.5" stroke="currentColor" strokeWidth="1" strokeOpacity="0.5" />
@@ -212,7 +212,7 @@ function RingIcon({ active }: { active: boolean }) {
 function LeafIcon({ active }: { active: boolean }) {
   return (
     <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
-      className={cn("transition-all duration-500", active ? "text-text-primary" : "text-text-secondary/25")}
+      className={cn("transition-all duration-500", active ? "text-text-primary" : "text-text-secondary/42")}
     >
       <circle cx="13" cy="13" r="8.5" stroke="currentColor" strokeWidth="1.5" />
       <path d="M9 13 L17 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -501,7 +501,7 @@ export function RSVP({ guest }: RSVPProps) {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.7, ease }}
-              className="relative z-10 mb-10 max-w-2xl text-base leading-relaxed text-text-secondary/60 md:text-xl"
+              className="relative z-10 mb-10 max-w-2xl text-base leading-relaxed text-text-secondary/90 md:text-xl"
             >
               {submittedAttending === "no"
                 ? t("success_subtitle_no")
@@ -515,7 +515,7 @@ export function RSVP({ guest }: RSVPProps) {
                 setSubmitted(false);
                 setSubmittedAttending(null);
               }}
-              className="relative z-10 cursor-pointer text-xs uppercase tracking-[0.18em] text-text-secondary/50 transition-colors duration-300 hover:text-accent md:text-sm"
+              className="relative z-10 cursor-pointer text-xs uppercase tracking-[0.18em] text-text-secondary/90 transition-colors duration-300 hover:text-accent md:text-sm"
             >
               ← {t("return_button")}
             </motion.button>
@@ -596,9 +596,9 @@ export function RSVP({ guest }: RSVPProps) {
             direction="up"
             duration={1.2}
             blur
-            className="relative z-20 bg-bg-primary/45 rounded-4xl md:rounded-[2.5rem] border border-accent/15 shadow-[0_30px_100px_rgba(0,0,0,0.25)] overflow-hidden group/form"
+            className="relative z-20 overflow-hidden rounded-4xl border border-accent/24 bg-bg-primary/72 shadow-[0_30px_100px_rgba(0,0,0,0.25)] md:rounded-[2.5rem] group/form"
           >
-            <div className="absolute inset-0 rounded-4xl md:rounded-[2.5rem] border border-accent/0 group-hover/form:border-accent/30 transition-colors duration-500 pointer-events-none z-20" />
+            <div className="pointer-events-none absolute inset-0 z-20 rounded-4xl border border-accent/0 transition-colors duration-500 group-hover/form:border-accent/40 md:rounded-[2.5rem]" />
 
             <form onSubmit={handleSubmit(onSubmit)} className="relative z-10 p-6 md:p-12">
               {!liteMotion && (
@@ -630,11 +630,11 @@ export function RSVP({ guest }: RSVPProps) {
                 {guest ? (
                   <>
                     <motion.div variants={formField}>
-                      <div className="rounded-[1.75rem] border border-accent/15 bg-accent/8 px-5 py-4 text-left">
-                        <p className="text-[10px] uppercase tracking-[0.2em] text-accent/80">
+                      <div className="rounded-[1.75rem] border border-accent/22 bg-accent/12 px-5 py-4 text-left">
+                        <p className="text-[10px] uppercase tracking-[0.2em] text-accent">
                           {t("personalized_note_label")}
                         </p>
-                        <p className="mt-2 text-sm leading-relaxed text-text-secondary/80 md:text-[15px]">
+                        <p className="mt-2 text-sm leading-relaxed text-text-secondary/90 md:text-[15px]">
                           {t("personalized_note", {
                             name: guest.vocative[locale],
                             seats: guest.seats,
@@ -660,7 +660,7 @@ export function RSVP({ guest }: RSVPProps) {
                       return (
                         <div key={`guest-name-${index}`}>
                           {visibleGuestFieldsCount > 1 && (
-                            <p className="mb-2 text-[10px] uppercase tracking-[0.15em] text-text-secondary/40">
+                            <p className="mb-2 text-[10px] uppercase tracking-[0.15em] text-text-secondary/90">
                               {t("guest_name_field_label", { number: index + 1 })}
                             </p>
                           )}
@@ -676,7 +676,7 @@ export function RSVP({ guest }: RSVPProps) {
                             {...register(`guestNames.${index}`)}
                           />
                           {fieldError && (
-                            <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-red-400/70">
+                            <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-red-500/85">
                               {t("name_min")}
                             </p>
                           )}
@@ -685,12 +685,12 @@ export function RSVP({ guest }: RSVPProps) {
                     })}
                   </div>
                   {visibleGuestFieldsCount > 1 && (
-                    <p className="mt-3 text-[10px] uppercase tracking-[0.13em] text-text-secondary/35">
+                    <p className="mt-3 text-[10px] uppercase tracking-[0.13em] text-text-secondary/90">
                       {t("guest_names_hint")}
                     </p>
                   )}
                   {errors.guestNames && !Array.isArray(errors.guestNames) && (
-                    <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-red-400/70">
+                    <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-red-500/85">
                       {t("guest_names_required")}
                     </p>
                   )}
@@ -713,8 +713,8 @@ export function RSVP({ guest }: RSVPProps) {
                         "relative flex flex-col items-center justify-center gap-2 rounded-2xl border-2 px-3 py-5 md:py-8 transition-all duration-500 cursor-pointer overflow-hidden",
                         focusRingClass,
                         attending === "yes"
-                          ? "border-accent bg-accent/8"
-                          : "border-accent/10 hover:border-accent/30 bg-bg-primary/50"
+                          ? "border-accent bg-accent/12 shadow-[0_14px_38px_-30px_rgba(var(--accent-rgb),0.75)]"
+                          : "border-accent/18 bg-bg-primary/72 hover:border-accent/40"
                       )}
                       aria-pressed={attending === "yes"}
                     >
@@ -732,11 +732,11 @@ export function RSVP({ guest }: RSVPProps) {
                       <RingIcon active={attending === "yes"} />
                       <span className={cn(
                         "heading-serif text-lg md:text-xl transition-colors duration-300",
-                        attending === "yes" ? "text-accent" : "text-text-secondary/70"
+                        attending === "yes" ? "text-accent" : "text-text-secondary/88"
                       )}>
                         {t("attending_yes_heading")}
                       </span>
-                      <span className="text-[9px] md:text-[10px] uppercase tracking-[0.14em] text-text-secondary/40 text-center leading-tight">
+                      <span className="text-center text-[9px] leading-tight uppercase tracking-[0.14em] text-text-secondary/90 md:text-[10px]">
                         {t("attending_yes_note")}
                       </span>
                     </motion.button>
@@ -751,26 +751,26 @@ export function RSVP({ guest }: RSVPProps) {
                         "relative flex flex-col items-center justify-center gap-2 rounded-2xl border-2 px-3 py-5 md:py-8 transition-all duration-500 cursor-pointer overflow-hidden",
                         focusRingClass,
                         attending === "no"
-                          ? "border-text-secondary/40 bg-text-primary/6"
-                          : "border-accent/10 hover:border-accent/20 bg-bg-primary/50"
+                          ? "border-text-secondary/48 bg-text-primary/[0.08]"
+                          : "border-accent/18 bg-bg-primary/72 hover:border-accent/32"
                       )}
                       aria-pressed={attending === "no"}
                     >
                       <LeafIcon active={attending === "no"} />
                       <span className={cn(
                         "heading-serif text-lg md:text-xl transition-colors duration-300",
-                        attending === "no" ? "text-text-primary" : "text-text-secondary/70"
+                        attending === "no" ? "text-text-primary" : "text-text-secondary/88"
                       )}>
                         {t("attending_no_heading")}
                       </span>
-                      <span className="text-[9px] md:text-[10px] uppercase tracking-[0.14em] text-text-secondary/40 text-center leading-tight">
+                      <span className="text-center text-[9px] leading-tight uppercase tracking-[0.14em] text-text-secondary/90 md:text-[10px]">
                         {t("attending_no_note")}
                       </span>
                     </motion.button>
 
                   </div>
                   {errors.attending && (
-                    <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-red-400/70">{t("attendance_required")}</p>
+                    <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-red-500/85">{t("attendance_required")}</p>
                   )}
                 </motion.div>
 
@@ -800,17 +800,17 @@ export function RSVP({ guest }: RSVPProps) {
                       {/* Guest stepper */}
                       <div>
                         <FieldLabel>{t("guests_label")}</FieldLabel>
-                        <div className="flex items-center justify-between w-full px-5 py-3 rounded-2xl border border-accent/15 bg-bg-primary/30">
+                        <div className="flex w-full items-center justify-between rounded-2xl border border-accent/22 bg-bg-primary/55 px-5 py-3">
                           <button
                             type="button"
                             disabled={!isAttendingYes || isSubmitting || guests <= 1}
                             onClick={() => setValue("guests", Math.max(1, guests - 1), { shouldValidate: true })}
                             className={cn(
-                              "flex h-11 w-11 items-center justify-center rounded-full border border-accent/25 text-xl leading-none transition-all duration-300",
+                              "flex h-11 w-11 items-center justify-center rounded-full border border-accent/32 text-xl leading-none transition-all duration-300",
                               focusRingClass,
                               !isAttendingYes || isSubmitting || guests <= 1
-                                ? "cursor-not-allowed text-accent/25"
-                                : "cursor-pointer text-accent/70 hover:bg-accent/10 hover:border-accent hover:text-accent"
+                                ? "cursor-not-allowed border-accent/18 bg-bg-secondary/35 text-accent/38"
+                                : "cursor-pointer text-accent/85 hover:bg-accent/12 hover:border-accent hover:text-accent"
                             )}
                             aria-label="−"
                           >
@@ -830,11 +830,11 @@ export function RSVP({ guest }: RSVPProps) {
                             disabled={!isAttendingYes || isSubmitting || guests >= maxGuestCount}
                             onClick={() => setValue("guests", Math.min(maxGuestCount, guests + 1), { shouldValidate: true })}
                             className={cn(
-                              "flex h-11 w-11 items-center justify-center rounded-full border border-accent/25 text-xl leading-none transition-all duration-300",
+                              "flex h-11 w-11 items-center justify-center rounded-full border border-accent/32 text-xl leading-none transition-all duration-300",
                               focusRingClass,
                               !isAttendingYes || isSubmitting || guests >= maxGuestCount
-                                ? "cursor-not-allowed text-accent/25"
-                                : "cursor-pointer text-accent/70 hover:bg-accent/10 hover:border-accent hover:text-accent"
+                                ? "cursor-not-allowed border-accent/18 bg-bg-secondary/35 text-accent/38"
+                                : "cursor-pointer text-accent/85 hover:bg-accent/12 hover:border-accent hover:text-accent"
                             )}
                             aria-label="+"
                           >
@@ -875,7 +875,7 @@ export function RSVP({ guest }: RSVPProps) {
                 {/* ── Submit ── */}
                 <motion.div variants={formField} className="pt-1">
                   {submitError && (
-                    <p className="mb-3 text-center text-[10px] uppercase tracking-[0.13em] text-red-400/80">
+                    <p className="mb-3 text-center text-[10px] uppercase tracking-[0.13em] text-red-500/90">
                       {submitError}
                     </p>
                   )}
@@ -889,7 +889,7 @@ export function RSVP({ guest }: RSVPProps) {
                       focusRingClass,
                       attending && !isSubmitting
                         ? "bg-accent text-bg-primary shadow-xl shadow-accent/20 cursor-pointer"
-                        : "bg-accent/15 text-text-secondary/30 cursor-not-allowed"
+                        : "cursor-not-allowed border border-accent/22 bg-accent/22 text-text-primary/58"
                     )}
                   >
                     <span className="relative z-10 flex items-center justify-center gap-3">
@@ -914,7 +914,7 @@ export function RSVP({ guest }: RSVPProps) {
                     )}
                   </motion.button>
 
-                  <p className="text-center text-[10px] uppercase tracking-[0.13em] text-text-secondary/30 mt-3">
+                  <p className="mt-3 text-center text-[10px] uppercase tracking-[0.13em] text-text-secondary/90">
                     {!attending
                       ? t("attendance_required")
                       : isSubmitting
