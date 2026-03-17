@@ -8,7 +8,6 @@ export interface LocalizedGameText {
 export type GameSlug =
   | "wheel-of-fortune"
   | "baby-detective"
-  | "meme-generator"
   | "secret-missions"
   | "roast"
   | "time-machine"
@@ -44,30 +43,6 @@ export const GAMES: GameCatalogItem[] = [
       en: "Spin the wheel to unlock a question or a playful challenge.",
     },
     status: "live",
-  },
-  {
-    slug: "baby-detective",
-    title: {
-      uk: "Дитячий детектив",
-      en: "Baby Detective",
-    },
-    description: {
-      uk: "Вгадай, кому належить дитяче фото, і познайомся з гостями ближче.",
-      en: "Guess whose childhood photo is on screen and get to know the guests.",
-    },
-    status: "comingSoon",
-  },
-  {
-    slug: "meme-generator",
-    title: {
-      uk: "Генератор мемів",
-      en: "Meme Generator",
-    },
-    description: {
-      uk: "Придумай смішний підпис до фото молодят або гостей.",
-      en: "Write a funny caption for a photo of the couple or the guests.",
-    },
-    status: "comingSoon",
   },
   {
     slug: "secret-missions",
@@ -114,6 +89,18 @@ export const GAMES: GameCatalogItem[] = [
     description: {
       uk: "Поділися короткою порадою для шлюбу або сімейного життя.",
       en: "Leave a short piece of advice for married life.",
+    },
+    status: "comingSoon",
+  },
+  {
+    slug: "baby-detective",
+    title: {
+      uk: "Дитячий детектив",
+      en: "Baby Detective",
+    },
+    description: {
+      uk: "Вгадай, кому належить дитяче фото, і познайомся з гостями ближче.",
+      en: "Guess whose childhood photo is on screen and get to know the guests.",
     },
     status: "comingSoon",
   },

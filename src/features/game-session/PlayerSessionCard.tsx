@@ -2,9 +2,69 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Input, Label } from "@/shared/ui";
+import { motion } from "framer-motion";
+import { Button, Input } from "@/shared/ui";
 import { cn } from "@/shared/lib";
 import type { GameApiErrorCode, PlayerSessionSnapshot } from "./types";
+
+function DecorativeBurst({ className }: { className?: string }) {
+  const rays = 12;
+  return (
+    <svg viewBox="0 0 100 100" className={className} aria-hidden="true">
+      {Array.from({ length: rays }, (_, i) => {
+        const angle = (i * 360) / rays - 90;
+        const rad = (angle * Math.PI) / 180;
+        const inner = 8;
+        const outer = 48;
+        const x1 = 50 + inner * Math.cos(rad);
+        const y1 = 50 + inner * Math.sin(rad);
+        const x2 = 50 + outer * Math.cos(rad);
+        const y2 = 50 + outer * Math.sin(rad);
+        return (
+          <line
+            key={i}
+            x1={x1}
+            y1={y1}
+            x2={x2}
+            y2={y2}
+            stroke="currentColor"
+            strokeWidth={i % 2 === 0 ? "0.8" : "0.4"}
+            opacity={i % 2 === 0 ? 0.1 : 0.05}
+          />
+        );
+      })}
+      <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="0.5" opacity={0.08} />
+      <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeWidth="0.3" opacity={0.05} />
+      <circle cx="50" cy="50" r="6" fill="currentColor" opacity={0.06} />
+    </svg>
+  );
+}
+
+function CardShell({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={cn("relative rounded-4xl bg-accent/10 p-px", className)}>
+      <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-4xl">
+        <motion.div
+          className="absolute left-1/2 top-1/2 aspect-square w-[200%] -translate-x-1/2 -translate-y-1/2"
+          style={{
+            backgroundImage:
+              "conic-gradient(from 0deg, transparent 60%, var(--accent) 88%, transparent 94%)",
+            opacity: 0.6,
+          }}
+          animate={{ rotate: 360 }}
+          transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+        />
+      </div>
+      {children}
+    </div>
+  );
+}
 
 interface PlayerSessionCardProps {
   session: PlayerSessionSnapshot | null;
@@ -21,18 +81,9 @@ function resolveErrorMessage(
   errorCode: GameApiErrorCode | null,
   t: ReturnType<typeof useTranslations>
 ) {
-  if (!errorCode) {
-    return null;
-  }
-
-  if (errorCode === "SUPABASE_NOT_CONFIGURED") {
-    return t("errors.storage_unavailable");
-  }
-
-  if (errorCode === "PLAYER_NOT_FOUND") {
-    return t("errors.session_missing");
-  }
-
+  if (!errorCode) return null;
+  if (errorCode === "SUPABASE_NOT_CONFIGURED") return t("errors.storage_unavailable");
+  if (errorCode === "PLAYER_NOT_FOUND") return t("errors.session_missing");
   return t("errors.generic");
 }
 
@@ -52,159 +103,204 @@ export function PlayerSessionCard({
 
   const errorMessage = resolveErrorMessage(errorCode, t);
   const isSummaryVisible = session && !isEditing;
+
   const cardClass = cn(
-    "relative overflow-hidden rounded-4xl border border-accent/14 bg-bg-primary/55 p-6 shadow-[0_24px_60px_-40px_rgba(0,0,0,0.45)] md:p-8",
-    compact && "p-5 md:p-6",
-    className
+    "relative overflow-hidden rounded-[31px] bg-bg-primary p-6 shadow-[0_24px_60px_-40px_rgba(0,0,0,0.45)] md:p-7",
+    !compact && "h-[285px]",
+    compact && "p-5 md:p-6"
   );
+
   const chrome = (
-    <>
-      <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-linear-to-r from-transparent via-accent/35 to-transparent" />
-      <div className="pointer-events-none absolute -right-8 top-8 h-24 w-24 rounded-full bg-accent/8 blur-3xl" />
-    </>
+    <div className="pointer-events-none absolute -right-8 top-8 h-24 w-24 rounded-full bg-accent/8 blur-3xl" />
   );
+
+  const linkBtnClass =
+    "cursor-pointer text-sm text-text-secondary transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary";
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const normalizedNickname = nickname.trim().replace(/\s+/g, " ");
-    const savedSession = await onSave(normalizedNickname);
-
-    if (savedSession) {
-      setNickname(savedSession.nickname);
+    const saved = await onSave(nickname.trim().replace(/\s+/g, " "));
+    if (saved) {
+      setNickname(saved.nickname);
       setIsEditing(false);
     }
   }
 
+  /* ── Skeleton ── */
   if (isHydrating) {
     return (
-      <div className={cardClass}>
-        {chrome}
-        <div className="relative z-10 space-y-3 animate-pulse">
-          <div className="h-3 w-24 rounded-full bg-accent/20" />
-          <div className="h-8 w-48 rounded-full bg-accent/12" />
-          <div className="h-4 w-full rounded-full bg-accent/10" />
-          <div className="h-4 w-3/4 rounded-full bg-accent/10" />
+      <CardShell className={className}>
+        <div className={cardClass}>
+          {chrome}
+          <div className="relative z-10 flex h-full flex-col justify-between animate-pulse">
+            <div className="space-y-2">
+              <div className="h-3 w-20 rounded-full bg-accent/20" />
+              <div className="h-8 w-36 rounded-full bg-accent/12" />
+              <div className="h-3.5 w-48 rounded-full bg-accent/8" />
+            </div>
+            <div>
+              <div className="h-11 rounded-2xl bg-accent/8" />
+              <div className="mt-2 h-3 w-40 rounded-full bg-accent/6" />
+            </div>
+            <div className="h-10 w-28 rounded-full bg-accent/12" />
+          </div>
         </div>
-      </div>
+      </CardShell>
     );
   }
 
+  /* ── Filled state ── */
   if (isSummaryVisible) {
     return (
-      <div className={cardClass}>
-        {chrome}
-        <div className="relative z-10">
-          <p className="text-[10px] uppercase tracking-[0.34em] text-accent md:text-xs">
-            {t("playing_as_label")}
-          </p>
-
-          {/* Name + points */}
-          <div className="mt-4 flex items-end justify-between gap-4">
-            <h2
-              className={cn(
-                "heading-serif min-w-0 truncate leading-[0.94] text-text-primary",
-                compact ? "text-3xl" : "text-4xl"
-              )}
-              title={session.nickname}
+      <CardShell className={className}>
+        <div className={cardClass}>
+          {chrome}
+          {/* Decorative animated burst */}
+          <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[31px]">
+            <motion.div
+              className="absolute -right-6 top-1/2 h-56 w-56 -translate-y-1/2 text-accent md:right-2 md:h-64 md:w-64"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
             >
-              {session.nickname}
-            </h2>
-            <div className="shrink-0 text-right">
-              <p
-                className={cn(
-                  "font-cinzel leading-none text-text-primary",
-                  compact ? "text-3xl" : "text-4xl"
-                )}
+              <DecorativeBurst className="h-full w-full" />
+            </motion.div>
+          </div>
+          <div className="relative z-10 flex h-full flex-col">
+            {/* Identity + points — centered between top and "Інший гравець" */}
+            <div className="flex flex-1 items-center -mt-2">
+              <div className="flex w-full items-end justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[11px] uppercase tracking-[0.34em] text-accent">
+                    {t("playing_as_label")}
+                  </p>
+                  <h2
+                    className={cn(
+                      "heading-serif mt-3 truncate text-[2.75rem] leading-[0.92] tracking-[0.04em] text-text-primary",
+                      compact && "text-3xl"
+                    )}
+                    title={session.nickname}
+                  >
+                    {session.nickname}
+                  </h2>
+                </div>
+                <div className="shrink-0 flex flex-col items-center">
+                  <p
+                    className={cn(
+                      "font-cinzel text-[42px] leading-none text-text-primary",
+                      compact && "text-3xl"
+                    )}
+                  >
+                    {session.totalPoints}
+                  </p>
+                  <p className="mt-2.5 text-[11px] uppercase tracking-[0.22em] text-accent/50">
+                    {t("points_label", { points: session.totalPoints })}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom: actions */}
+            <div className="flex flex-col items-center gap-4">
+              <button
+                type="button"
+                onClick={() => {
+                  onClear();
+                  setNickname("");
+                  setIsEditing(false);
+                }}
+                className={linkBtnClass}
               >
-                {session.totalPoints}
-              </p>
-              <p className="mt-1.5 text-[10px] uppercase tracking-[0.28em] text-accent">
-                {t("points_label")}
-              </p>
+                {t("reset_cta")}
+              </button>
+              <Button
+                type="button"
+                variant="secondary"
+                size="lg"
+                onClick={() => {
+                  setNickname(session.nickname);
+                  setIsEditing(true);
+                }}
+                className="w-full"
+              >
+                {t("edit_cta")}
+              </Button>
             </div>
-          </div>
-
-          {/* Thin divider + status inline */}
-          <div className="mt-5 border-t border-accent/10 pt-4">
-            <div className="flex items-center gap-2.5">
-              <span className="inline-flex h-2 w-2 shrink-0 rounded-full bg-accent shadow-[0_0_0_5px_rgba(var(--accent-rgb,180,140,100),0.1)]" />
-              <p className="text-sm text-text-secondary">
-                {t("status_ready")}
-              </p>
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="mt-5 flex items-center gap-4">
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={() => {
-                setNickname(session.nickname);
-                setIsEditing(true);
-              }}
-            >
-              {t("edit_cta")}
-            </Button>
-
-            <button
-              type="button"
-              onClick={() => {
-                onClear();
-                setNickname("");
-                setIsEditing(false);
-              }}
-              className="text-sm text-text-secondary transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
-            >
-              {t("reset_cta")}
-            </button>
           </div>
         </div>
-      </div>
+      </CardShell>
     );
   }
 
+  /* ── Empty + Edit states (form) ── */
   return (
-    <div className={cardClass}>
-      {chrome}
-      <div className="relative z-10">
-        <p className="text-[10px] uppercase tracking-[0.34em] text-accent md:text-xs">
-          {session ? t("edit_label") : t("new_label")}
-        </p>
-        <h2 className="heading-serif mt-4 text-3xl text-text-primary md:text-4xl">
-          {session ? t("edit_title") : t("new_title")}
-        </h2>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-text-secondary md:text-base">
-          {session ? t("edit_note") : t("new_note")}
-        </p>
+    <CardShell className={className}>
+      <div className={cardClass}>
+        {chrome}
+        <form
+          onSubmit={handleSubmit}
+          className="relative z-10 flex h-full flex-col justify-between"
+        >
+          {/* Top: header */}
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.34em] text-accent">
+              {session ? t("edit_label") : t("new_label")}
+            </p>
+            <p className="mt-1.5 text-sm leading-relaxed text-text-secondary">
+              {session ? t("edit_note") : t("new_title")}
+            </p>
+          </div>
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-5">
-          <div className="space-y-2">
-            <Label htmlFor="player-nickname">{t("nickname_label")}</Label>
+          {/* Middle: input + helper */}
+          <div>
             <Input
               id="player-nickname"
               value={nickname}
-              onChange={(event) => setNickname(event.target.value)}
+              onChange={(e) => setNickname(e.target.value)}
               placeholder={t("nickname_placeholder")}
               minLength={2}
               maxLength={40}
               autoComplete="nickname"
+              autoFocus
               disabled={isSaving}
+              aria-label={t("nickname_label")}
+              className="h-13 rounded-2xl px-5 text-base"
             />
+            {!session && (
+              <p
+                className={cn(
+                  "mt-2 pl-3.75 text-xs leading-relaxed",
+                  errorMessage ? "text-text-secondary" : "text-text-secondary/50"
+                )}
+              >
+                {errorMessage ?? t("device_hint")}
+              </p>
+            )}
+            {session && errorMessage && (
+              <p className="mt-2 pl-3.75 text-xs leading-relaxed text-text-secondary">
+                {errorMessage}
+              </p>
+            )}
           </div>
 
-          {errorMessage ? (
-            <p className="rounded-2xl border border-accent/18 bg-bg-primary/70 px-4 py-3 text-sm text-text-secondary">
-              {errorMessage}
-            </p>
-          ) : null}
-
-          <div className="flex flex-wrap gap-3">
+          {/* Bottom: actions */}
+          <div className="flex flex-col items-center gap-4">
+            {session ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsEditing(false);
+                  setNickname(session.nickname);
+                }}
+                className={linkBtnClass}
+              >
+                {t("cancel_cta")}
+              </button>
+            ) : null}
             <Button
               type="submit"
-              size={compact ? "sm" : "md"}
+              size="lg"
               disabled={isSaving || nickname.trim().length < 2}
+              className="w-full"
             >
               {isSaving
                 ? t("saving_cta")
@@ -212,23 +308,9 @@ export function PlayerSessionCard({
                   ? t("update_cta")
                   : t("save_cta")}
             </Button>
-
-            {session ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size={compact ? "sm" : "md"}
-                onClick={() => {
-                  setIsEditing(false);
-                  setNickname(session.nickname);
-                }}
-              >
-                {t("cancel_cta")}
-              </Button>
-            ) : null}
           </div>
         </form>
       </div>
-    </div>
+    </CardShell>
   );
 }
