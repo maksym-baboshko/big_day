@@ -9,6 +9,7 @@ import type {
 
 export type GameApiErrorCode =
   | "INVALID_DATA"
+  | "RATE_LIMITED"
   | "PLAYER_NOT_FOUND"
   | "NO_TASKS_LEFT"
   | "ROUND_NOT_FOUND"

@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
+  enforceRateLimit,
+  getRateLimitErrorPayload,
+  RateLimitExceededError,
+} from "@/shared/lib/server";
+import {
   bootstrapPlayerProfile,
   savePlayerProfile,
   requireAuthenticatedGameUser,
@@ -60,6 +65,14 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const user = await requireAuthenticatedGameUser(request);
+    await enforceRateLimit({
+      request,
+      scope: "games.player.save",
+      limit: 20,
+      windowSeconds: 10 * 60,
+      authUserId: user.id,
+    });
+
     const body = await request.json();
     const result = playerPayloadSchema.safeParse(body);
 
@@ -91,6 +104,18 @@ export async function POST(request: Request) {
           code: "SUPABASE_NOT_CONFIGURED",
         },
         { status: 503 }
+      );
+    }
+
+    if (error instanceof RateLimitExceededError) {
+      return NextResponse.json(
+        getRateLimitErrorPayload(error.retryAfterSeconds),
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(error.retryAfterSeconds),
+          },
+        }
       );
     }
 

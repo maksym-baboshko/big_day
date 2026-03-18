@@ -54,6 +54,7 @@ pnpm dev
 pnpm build
 pnpm start
 pnpm lint
+pnpm smoke:games
 ```
 
 ## RSVP configuration
@@ -96,6 +97,8 @@ Local setup flow:
 5. Run the script from `supabase/seed_wheel_content.sql`.
 6. Add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, and `SUPABASE_SECRET_KEY` to `.env.local`.
 7. Restart the Next.js dev server.
+8. Optionally run `supabase/verify_games_platform_setup.sql` to verify counts, RLS, and realtime publication status.
+9. With the dev server running, use `pnpm smoke:games` to verify anonymous auth, player bootstrap, wheel mutations, leaderboard reads, and live snapshot reads end to end.
 
 Notes:
 
@@ -105,6 +108,11 @@ Notes:
 - the current slice bootstraps anonymous players and shared XP persistence; the full task lifecycle lands in the next wheel redesign slice
 - wheel content source files live in `src/shared/config/wheel-categories.json` and `src/shared/config/wheel-tasks.json`
 - regenerate `supabase/seed_wheel_content.sql` with `pnpm generate:wheel-content-seed` after editing wheel content
+- rerun the full `supabase/games_platform_schema.sql` after schema-level changes; rerun `supabase/seed_wheel_content.sql` after content-only changes
+- mutation routes now use a Supabase-backed fixed-window limiter and may return `429 Too Many Requests` with a `retryAfterSeconds` hint
+- use `supabase/reset_runtime_data.sql` to wipe player/runtime data without touching game content; the script is intentionally guarded and requires either replacing `__CONFIRM_RESET_RUNTIME_DATA__` with `yes` or prepending `set local app.reset_runtime_data_confirm = 'yes';` in the same SQL batch
+- Supabase may still label views as `UNRESTRICTED` in the dashboard; that is expected because RLS applies to tables, not views
+- leaderboard/feed views are intentionally server-only; direct client access through `anon` or `authenticated` roles is revoked and the app reads them through Next.js route handlers
 
 ## Project structure
 

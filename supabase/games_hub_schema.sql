@@ -1,3 +1,7 @@
+-- Legacy schema snapshot.
+-- Do not apply this file to new or current setups.
+-- Use `supabase/games_platform_schema.sql` instead.
+
 create extension if not exists pgcrypto;
 
 create table if not exists public.players (

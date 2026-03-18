@@ -403,6 +403,8 @@ function getWheelErrorMessage(
   switch (errorCode) {
     case "SUPABASE_NOT_CONFIGURED":
       return t("errors.storage_unavailable");
+    case "RATE_LIMITED":
+      return t("errors.rate_limited");
     case "NO_TASKS_LEFT":
       return t("errors.no_tasks_left");
     case "PLAYER_NOT_FOUND":

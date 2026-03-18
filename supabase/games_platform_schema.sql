@@ -97,6 +97,16 @@ create table if not exists public.realtime_signals (
   created_at timestamptz not null default timezone('utc', now())
 );
 
+create table if not exists public.request_rate_limits (
+  scope text not null,
+  identifier text not null,
+  window_started_at timestamptz not null,
+  request_count integer not null default 0,
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now()),
+  primary key (scope, identifier, window_started_at)
+);
+
 create table if not exists public.wheel_categories (
   id uuid primary key default gen_random_uuid(),
   slug text not null unique,
@@ -719,6 +729,9 @@ create index if not exists realtime_signals_game_created_idx
   on public.realtime_signals (game_slug, created_at desc)
   where game_slug is not null;
 
+create index if not exists request_rate_limits_updated_idx
+  on public.request_rate_limits (updated_at desc);
+
 create index if not exists wheel_tasks_category_active_idx
   on public.wheel_tasks (category_id, is_active, created_at desc);
 
@@ -949,6 +962,400 @@ alter table if exists public.wheel_tasks
 alter table if exists public.wheel_tasks
   add constraint wheel_tasks_physical_contact_level_check
   check (physical_contact_level in ('none', 'handshake', 'high_five', 'hug'));
+
+alter table if exists public.player_profiles enable row level security;
+alter table if exists public.game_definitions enable row level security;
+alter table if exists public.game_sessions enable row level security;
+alter table if exists public.game_rounds enable row level security;
+alter table if exists public.xp_transactions enable row level security;
+alter table if exists public.activity_events enable row level security;
+alter table if exists public.realtime_signals enable row level security;
+alter table if exists public.request_rate_limits enable row level security;
+alter table if exists public.wheel_categories enable row level security;
+alter table if exists public.wheel_tasks enable row level security;
+alter table if exists public.wheel_round_assignments enable row level security;
+alter table if exists public.wheel_player_task_history enable row level security;
+
+drop policy if exists realtime_signals_select_public on public.realtime_signals;
+
+create policy realtime_signals_select_public
+on public.realtime_signals
+for select
+to anon, authenticated
+using (channel in ('live-projector', 'game-leaderboard'));
+
+do $$
+begin
+  if exists (
+    select 1
+    from pg_publication
+    where pubname = 'supabase_realtime'
+  ) and not exists (
+    select 1
+    from pg_publication_tables
+    where pubname = 'supabase_realtime'
+      and schemaname = 'public'
+      and tablename = 'realtime_signals'
+  ) then
+    execute 'alter publication supabase_realtime add table public.realtime_signals';
+  end if;
+end;
+$$;
+
+drop function if exists public.consume_rate_limit_window(text, text, integer, integer, timestamptz);
+
+create or replace function public.consume_rate_limit_window(
+  p_scope text,
+  p_identifier text,
+  p_limit integer,
+  p_window_seconds integer,
+  p_now timestamptz
+)
+returns table (
+  allowed boolean,
+  current_count integer,
+  remaining integer,
+  retry_after_seconds integer,
+  rate_limit_window_started_at timestamptz
+)
+language plpgsql
+as $$
+declare
+  v_now timestamptz := coalesce(p_now, timezone('utc', now()));
+  v_window_started_at timestamptz;
+  v_current_count integer;
+begin
+  if p_scope is null or btrim(p_scope) = '' then
+    raise exception 'rate_limit_scope_required';
+  end if;
+
+  if p_identifier is null or btrim(p_identifier) = '' then
+    raise exception 'rate_limit_identifier_required';
+  end if;
+
+  if p_limit <= 0 then
+    raise exception 'rate_limit_limit_invalid';
+  end if;
+
+  if p_window_seconds <= 0 then
+    raise exception 'rate_limit_window_invalid';
+  end if;
+
+  v_window_started_at := to_timestamp(
+    floor(extract(epoch from v_now) / p_window_seconds) * p_window_seconds
+  );
+
+  insert into public.request_rate_limits (
+    scope,
+    identifier,
+    window_started_at,
+    request_count,
+    created_at,
+    updated_at
+  )
+  values (
+    p_scope,
+    p_identifier,
+    v_window_started_at,
+    1,
+    v_now,
+    v_now
+  )
+  on conflict (scope, identifier, window_started_at)
+  do update set
+    request_count = public.request_rate_limits.request_count + 1,
+    updated_at = excluded.updated_at
+  returning public.request_rate_limits.request_count
+  into v_current_count;
+
+  return query
+  select
+    v_current_count <= p_limit,
+    v_current_count,
+    greatest(p_limit - v_current_count, 0),
+    greatest(
+      ceil(
+        extract(
+          epoch from (
+            v_window_started_at
+            + make_interval(secs => p_window_seconds)
+            - v_now
+          )
+        )
+      )::integer,
+      0
+    ),
+    v_window_started_at;
+end;
+$$;
+
+create or replace function public.start_wheel_round_atomic(
+  p_session_id uuid,
+  p_player_id uuid,
+  p_started_at timestamptz,
+  p_category_id uuid,
+  p_task_id uuid,
+  p_spin_angle integer,
+  p_cycle_number integer,
+  p_selection_rank integer,
+  p_timer_status text,
+  p_timer_duration_seconds integer,
+  p_timer_remaining_seconds integer,
+  p_round_metadata jsonb,
+  p_activity_payload jsonb
+)
+returns uuid
+language plpgsql
+as $$
+declare
+  v_round_id uuid := gen_random_uuid();
+begin
+  insert into public.game_rounds (
+    id,
+    session_id,
+    player_id,
+    game_slug,
+    status,
+    started_at,
+    resolution_reason,
+    timer_status,
+    timer_duration_seconds,
+    timer_remaining_seconds,
+    timer_last_started_at,
+    timer_last_paused_at,
+    timer_last_sync_at,
+    response_payload,
+    metadata
+  )
+  values (
+    v_round_id,
+    p_session_id,
+    p_player_id,
+    'wheel-of-fortune',
+    'open',
+    p_started_at,
+    null,
+    p_timer_status,
+    p_timer_duration_seconds,
+    p_timer_remaining_seconds,
+    null,
+    null,
+    null,
+    '{}'::jsonb,
+    coalesce(p_round_metadata, '{}'::jsonb)
+  );
+
+  insert into public.wheel_round_assignments (
+    round_id,
+    category_id,
+    task_id,
+    spin_angle,
+    cycle_number,
+    selection_rank,
+    created_at
+  )
+  values (
+    v_round_id,
+    p_category_id,
+    p_task_id,
+    p_spin_angle,
+    p_cycle_number,
+    p_selection_rank,
+    p_started_at
+  );
+
+  insert into public.wheel_player_task_history (
+    session_id,
+    player_id,
+    task_id,
+    first_round_id,
+    round_id,
+    cycle_number,
+    assigned_at,
+    created_at
+  )
+  values (
+    p_session_id,
+    p_player_id,
+    p_task_id,
+    v_round_id,
+    v_round_id,
+    p_cycle_number,
+    p_started_at,
+    p_started_at
+  );
+
+  update public.game_sessions
+  set
+    current_cycle = p_cycle_number,
+    total_rounds = total_rounds + 1,
+    last_round_started_at = p_started_at
+  where id = p_session_id
+    and player_id = p_player_id
+    and game_slug = 'wheel-of-fortune';
+
+  if not found then
+    raise exception 'wheel_session_not_found';
+  end if;
+
+  insert into public.activity_events (
+    session_id,
+    player_id,
+    game_slug,
+    round_id,
+    event_type,
+    visibility,
+    payload,
+    snapshot_prompt_i18n,
+    created_at
+  )
+  values (
+    p_session_id,
+    p_player_id,
+    'wheel-of-fortune',
+    v_round_id,
+    'wheel.round.started',
+    'private',
+    coalesce(p_activity_payload, '{}'::jsonb),
+    '{}'::jsonb,
+    p_started_at
+  );
+
+  return v_round_id;
+end;
+$$;
+
+revoke all on function public.consume_rate_limit_window(text, text, integer, integer, timestamptz)
+from public, anon, authenticated;
+
+grant execute on function public.consume_rate_limit_window(text, text, integer, integer, timestamptz)
+to service_role;
+
+create or replace function public.resolve_wheel_round_atomic(
+  p_round_id uuid,
+  p_player_id uuid,
+  p_resolved_at timestamptz,
+  p_resolution text,
+  p_resolution_reason text,
+  p_timer_status text,
+  p_timer_duration_seconds integer,
+  p_timer_remaining_seconds integer,
+  p_timer_last_paused_at timestamptz,
+  p_timer_last_sync_at timestamptz,
+  p_response_payload jsonb,
+  p_round_metadata jsonb,
+  p_xp_reason text,
+  p_xp_delta integer,
+  p_xp_event_snapshot jsonb,
+  p_xp_metadata jsonb,
+  p_activity_events jsonb
+)
+returns uuid
+language plpgsql
+as $$
+declare
+  v_session_id uuid;
+begin
+  update public.game_rounds
+  set
+    status = 'resolved',
+    resolved_at = p_resolved_at,
+    resolution = p_resolution,
+    resolution_reason = p_resolution_reason,
+    timer_status = p_timer_status,
+    timer_duration_seconds = p_timer_duration_seconds,
+    timer_remaining_seconds = p_timer_remaining_seconds,
+    timer_last_started_at = null,
+    timer_last_paused_at = p_timer_last_paused_at,
+    timer_last_sync_at = p_timer_last_sync_at,
+    response_payload = coalesce(p_response_payload, '{}'::jsonb),
+    metadata = coalesce(p_round_metadata, '{}'::jsonb)
+  where id = p_round_id
+    and player_id = p_player_id
+    and status = 'open'
+  returning session_id into v_session_id;
+
+  if v_session_id is null then
+    raise exception 'wheel_round_not_open';
+  end if;
+
+  if coalesce(p_xp_delta, 0) <> 0 then
+    insert into public.xp_transactions (
+      player_id,
+      game_slug,
+      round_id,
+      reason,
+      delta,
+      event_snapshot,
+      metadata,
+      created_at
+    )
+    values (
+      p_player_id,
+      'wheel-of-fortune',
+      p_round_id,
+      p_xp_reason,
+      p_xp_delta,
+      coalesce(p_xp_event_snapshot, '{}'::jsonb),
+      coalesce(p_xp_metadata, '{}'::jsonb),
+      p_resolved_at
+    );
+  end if;
+
+  if jsonb_typeof(coalesce(p_activity_events, '[]'::jsonb)) = 'array'
+    and jsonb_array_length(coalesce(p_activity_events, '[]'::jsonb)) > 0 then
+    insert into public.activity_events (
+      session_id,
+      player_id,
+      game_slug,
+      round_id,
+      event_type,
+      visibility,
+      payload,
+      snapshot_name,
+      snapshot_avatar_key,
+      snapshot_prompt_i18n,
+      snapshot_answer_text,
+      snapshot_xp_delta,
+      created_at
+    )
+    select
+      v_session_id,
+      p_player_id,
+      'wheel-of-fortune',
+      p_round_id,
+      item->>'event_type',
+      item->>'visibility',
+      coalesce(item->'payload', '{}'::jsonb),
+      nullif(item->>'snapshot_name', ''),
+      nullif(item->>'snapshot_avatar_key', ''),
+      coalesce(item->'snapshot_prompt_i18n', '{}'::jsonb),
+      nullif(item->>'snapshot_answer_text', ''),
+      case
+        when item ? 'snapshot_xp_delta'
+          and jsonb_typeof(item->'snapshot_xp_delta') = 'number'
+        then (item->>'snapshot_xp_delta')::integer
+        else null
+      end,
+      p_resolved_at
+    from jsonb_array_elements(coalesce(p_activity_events, '[]'::jsonb)) as item;
+  end if;
+
+  update public.game_sessions
+  set
+    resolved_rounds = resolved_rounds + 1,
+    last_round_resolved_at = p_resolved_at
+  where id = v_session_id
+    and player_id = p_player_id
+    and game_slug = 'wheel-of-fortune';
+
+  if not found then
+    raise exception 'wheel_session_not_found';
+  end if;
+
+  return p_round_id;
+end;
+$$;
 
 create or replace function public.set_updated_at()
 returns trigger
@@ -1225,3 +1632,126 @@ select
   updated_at,
   last_seen_at
 from public.leaderboard_global_view;
+
+alter view if exists public.leaderboard_global_view
+  set (security_invoker = true);
+
+alter view if exists public.leaderboard_game_view
+  set (security_invoker = true);
+
+alter view if exists public.live_feed_view
+  set (security_invoker = true);
+
+alter view if exists public.leaderboard_view
+  set (security_invoker = true);
+
+revoke all on table public.leaderboard_global_view
+from public, anon, authenticated;
+
+revoke all on table public.leaderboard_game_view
+from public, anon, authenticated;
+
+revoke all on table public.live_feed_view
+from public, anon, authenticated;
+
+revoke all on table public.leaderboard_view
+from public, anon, authenticated;
+
+grant select on table public.leaderboard_global_view to service_role;
+grant select on table public.leaderboard_game_view to service_role;
+grant select on table public.live_feed_view to service_role;
+grant select on table public.leaderboard_view to service_role;
+
+revoke all on function public.start_wheel_round_atomic(
+  uuid,
+  uuid,
+  timestamptz,
+  uuid,
+  uuid,
+  integer,
+  integer,
+  integer,
+  text,
+  integer,
+  integer,
+  jsonb,
+  jsonb
+)
+from public, anon, authenticated;
+
+grant execute on function public.start_wheel_round_atomic(
+  uuid,
+  uuid,
+  timestamptz,
+  uuid,
+  uuid,
+  integer,
+  integer,
+  integer,
+  text,
+  integer,
+  integer,
+  jsonb,
+  jsonb
+)
+to service_role;
+
+revoke all on function public.resolve_wheel_round_atomic(
+  uuid,
+  uuid,
+  timestamptz,
+  text,
+  text,
+  text,
+  integer,
+  integer,
+  timestamptz,
+  timestamptz,
+  jsonb,
+  jsonb,
+  text,
+  integer,
+  jsonb,
+  jsonb,
+  jsonb
+)
+from public, anon, authenticated;
+
+grant execute on function public.resolve_wheel_round_atomic(
+  uuid,
+  uuid,
+  timestamptz,
+  text,
+  text,
+  text,
+  integer,
+  integer,
+  timestamptz,
+  timestamptz,
+  jsonb,
+  jsonb,
+  text,
+  integer,
+  jsonb,
+  jsonb,
+  jsonb
+)
+to service_role;
+
+comment on table public.realtime_signals is
+  'Public-safe realtime invalidation layer. Carries only lightweight signals, not feed or leaderboard business data.';
+
+comment on table public.request_rate_limits is
+  'Fixed-window request limiter state for public mutation routes.';
+
+comment on view public.leaderboard_global_view is
+  'Canonical global leaderboard read model.';
+
+comment on view public.leaderboard_game_view is
+  'Canonical per-game leaderboard read model.';
+
+comment on view public.live_feed_view is
+  'Canonical projector/live feed read model.';
+
+comment on view public.leaderboard_view is
+  'Compatibility alias for legacy global leaderboard consumers. Prefer leaderboard_global_view in new code.';

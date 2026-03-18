@@ -26,6 +26,7 @@ export {
   getLocalePath,
   getOpenGraphLocale,
 } from "./site";
+export { getStructuredDataJson } from "./structured-data";
 export { guests, getGuestBySlug, getAllGuestSlugs } from "./guests";
 export type { Guest } from "./guests";
 export type {

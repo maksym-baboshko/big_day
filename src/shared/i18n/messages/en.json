@@ -260,6 +260,7 @@
     "errors": {
       "storage_unavailable": "Supabase is not connected yet. Add the env variables and run the SQL script first, then the session will start saving.",
       "session_missing": "This session was not found. Save your nickname once more.",
+      "rate_limited": "Too many attempts in a short time. Wait a little and try again.",
       "generic": "Something went wrong. Try again in a few seconds."
     }
   },
@@ -337,6 +338,7 @@
     "legend_count": "{count} tasks in this category",
     "errors": {
       "storage_unavailable": "The wheel is visible, but Supabase is not connected yet, so new rounds and XP cannot be saved right now.",
+      "rate_limited": "You are acting too quickly. Wait a few seconds and try again.",
       "generic": "Something went wrong while processing the challenge. Try again.",
       "no_tasks_left": "You have already completed the full set. There are no tasks left for your profile.",
       "session_required": "Refresh or create your game session first, then try again."

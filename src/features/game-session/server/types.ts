@@ -86,6 +86,15 @@ export type RealtimeSignalRow = Record<string, unknown> & {
   created_at: string;
 };
 
+export type RequestRateLimitRow = Record<string, unknown> & {
+  scope: string;
+  identifier: string;
+  window_started_at: string;
+  request_count: number;
+  created_at: string;
+  updated_at: string;
+};
+
 export type XpTransactionRow = Record<string, unknown> & {
   id: string;
   player_id: string;
@@ -420,6 +429,26 @@ export interface GamesDatabase {
         };
         Relationships: [];
       };
+      request_rate_limits: {
+        Row: RequestRateLimitRow;
+        Insert: {
+          scope: string;
+          identifier: string;
+          window_started_at: string;
+          request_count?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          scope?: string;
+          identifier?: string;
+          window_started_at?: string;
+          request_count?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       wheel_categories: {
         Row: WheelCategoryRow;
         Insert: {
@@ -671,6 +700,63 @@ export interface GamesDatabase {
         Relationships: [];
       };
     };
-    Functions: Record<string, never>;
+    Functions: {
+      start_wheel_round_atomic: {
+        Args: {
+          p_session_id: string;
+          p_player_id: string;
+          p_started_at: string;
+          p_category_id: string;
+          p_task_id: string;
+          p_spin_angle: number;
+          p_cycle_number: number;
+          p_selection_rank: number;
+          p_timer_status: string;
+          p_timer_duration_seconds: number | null;
+          p_timer_remaining_seconds: number | null;
+          p_round_metadata: JsonValue;
+          p_activity_payload: JsonValue;
+        };
+        Returns: string;
+      };
+      resolve_wheel_round_atomic: {
+        Args: {
+          p_round_id: string;
+          p_player_id: string;
+          p_resolved_at: string;
+          p_resolution: string;
+          p_resolution_reason: string;
+          p_timer_status: string;
+          p_timer_duration_seconds: number | null;
+          p_timer_remaining_seconds: number | null;
+          p_timer_last_paused_at: string | null;
+          p_timer_last_sync_at: string | null;
+          p_response_payload: JsonValue;
+          p_round_metadata: JsonValue;
+          p_xp_reason: string | null;
+          p_xp_delta: number;
+          p_xp_event_snapshot: JsonValue;
+          p_xp_metadata: JsonValue;
+          p_activity_events: JsonValue;
+        };
+        Returns: string;
+      };
+      consume_rate_limit_window: {
+        Args: {
+          p_scope: string;
+          p_identifier: string;
+          p_limit: number;
+          p_window_seconds: number;
+          p_now: string;
+        };
+        Returns: {
+          allowed: boolean;
+          current_count: number;
+          remaining: number;
+          retry_after_seconds: number;
+          window_started_at: string;
+        }[];
+      };
+    };
   };
 }

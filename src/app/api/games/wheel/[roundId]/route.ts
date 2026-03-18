@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import type { SupportedLocale } from "@/shared/config";
 import {
+  enforceRateLimit,
+  getRateLimitErrorPayload,
+  RateLimitExceededError,
+} from "@/shared/lib/server";
+import {
   InvalidWheelRoundResponseError,
   InvalidWheelRoundStateError,
   PlayerProfileNotReadyError,
@@ -28,6 +33,14 @@ export async function POST(
 ) {
   try {
     const user = await requireAuthenticatedGameUser(request);
+    await enforceRateLimit({
+      request,
+      scope: "games.wheel.resolve",
+      limit: 90,
+      windowSeconds: 10 * 60,
+      authUserId: user.id,
+    });
+
     const { roundId } = await context.params;
     const body = await request.json();
     const result = wheelResolutionSchema.safeParse(body);
@@ -117,6 +130,18 @@ export async function POST(
           code: "INVALID_DATA",
         },
         { status: 409 }
+      );
+    }
+
+    if (error instanceof RateLimitExceededError) {
+      return NextResponse.json(
+        getRateLimitErrorPayload(error.retryAfterSeconds),
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(error.retryAfterSeconds),
+          },
+        }
       );
     }
 

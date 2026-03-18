@@ -85,6 +85,7 @@ function resolveErrorMessage(
   if (errorCode === "SUPABASE_NOT_CONFIGURED") return t("errors.storage_unavailable");
   if (errorCode === "PLAYER_NOT_FOUND") return t("errors.session_missing");
   if (errorCode === "UNAUTHORIZED") return t("errors.session_missing");
+  if (errorCode === "RATE_LIMITED") return t("errors.rate_limited");
   return t("errors.generic");
 }
 
