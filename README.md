@@ -1,65 +1,57 @@
 # Big Day
 
-Big Day is a personal wedding invitation website.
+Big Day is a bilingual wedding website for Maksym and Diana.
 
-It was built as a small, polished event site rather than a generic landing page: bilingual, animated, and structured around the actual flow of the day. Guests can read the story, check the venue and dress code, open a personal invitation page, and send an RSVP.
+The project now has two public surfaces:
 
-The event:
+- the invitation experience at `/` and `/en`
+- the wedding games platform at `/games`, with a live projector view at `/live`
 
-- June 28, 2026
-- Grand Hotel Terminus
-- Bergen, Norway
+## Current public routes
 
-## What the site includes
+- `/` and `/en`: main invitation page
+- `/invite/[slug]`: personalized invitation pages with guest-specific copy and RSVP defaults
+- `/games`: games hub
+- `/games/wheel-of-fortune`: live game
+- `/live`: projector-style live leaderboard and activity feed
 
-- Ukrainian and English locales
-- Accessibility support for keyboard navigation, focus states, and reduced motion
-- Animated intro and section reveals
-- Live wedding countdown
-- Venue details with map embed
-- Dress code and gift sections
-- RSVP form with validation
-- Guest-specific invitation pages by slug
-- Light and dark theme switcher
+## What is implemented
+
+- Ukrainian and English locales via `next-intl`
+- Light and dark themes
+- Hydration-safe animated splash, countdown, and language/theme controls
+- Wedding sections: story, timeline, venue, dress code, gifts, RSVP
+- Personalized invitation cards with seat counts from `src/shared/config/guests.ts`
+- RSVP API with `zod` validation, honeypot field, rate limiting, and Resend/mock email delivery
+- Supabase-backed anonymous auth for games
+- Player onboarding, leaderboard, live feed, and wheel round lifecycle
+- Projector page backed by `/api/live` plus Supabase realtime refresh
 
 ## Tech stack
 
 - Next.js 16 App Router
-- TypeScript
+- TypeScript 5 (strict mode)
 - Tailwind CSS v4
-- Framer Motion
-- next-intl
+- Framer Motion 12
+- next-intl 4
 - react-hook-form + zod
-- Resend for RSVP email delivery
+- Supabase
+- Resend
 
-## Accessibility and SEO
+## Environment variables
 
-The site is built with accessibility in mind: keyboard navigation, visible focus states, skip navigation, semantic landmarks, and reduced-motion support are part of the implementation rather than an afterthought.
+### Base site URL
 
-SEO is also covered with localized metadata, canonical and alternate language links, Open Graph and Twitter cards, and structured event data.
-
-## Running locally
-
-```bash
-pnpm install
-pnpm dev
-```
-
-Then open [http://localhost:3000](http://localhost:3000).
-
-Useful commands:
+Used for metadata, sitemap, and robots:
 
 ```bash
-pnpm dev
-pnpm build
-pnpm start
-pnpm lint
-pnpm smoke:games
+NEXT_PUBLIC_SITE_URL=
+SITE_URL=
 ```
 
-## RSVP configuration
+If neither is set, the app falls back to `http://localhost:3000`. On Vercel it also accepts `VERCEL_PROJECT_PRODUCTION_URL`.
 
-The RSVP endpoint can send email notifications. For that to work, set these environment variables:
+### RSVP email delivery
 
 ```bash
 RESEND_API_KEY=
@@ -71,16 +63,11 @@ RSVP_DELIVERY_MODE=
 
 Notes:
 
-- `RSVP_TO_EMAILS` accepts a comma- or semicolon-separated list
-- `RSVP_DELIVERY_MODE=mock` lets you test without sending real email
-- if `RSVP_DELIVERY_MODE` is not `mock`, both `RESEND_API_KEY` and `RSVP_TO_EMAILS` are required
+- `RSVP_TO_EMAILS` accepts comma- or semicolon-separated addresses
+- `RSVP_DELIVERY_MODE=mock` logs the email payload instead of sending it
+- non-mock mode requires both `RESEND_API_KEY` and `RSVP_TO_EMAILS`
 
-## Wedding Game Hub and Supabase
-
-The game hub stores shared game data in Supabase.
-The browser now uses a public Supabase key for anonymous auth, while route handlers keep using a server-only secret key for protected writes.
-
-Required environment variables:
+### Games and live platform
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=
@@ -88,59 +75,77 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 SUPABASE_SECRET_KEY=
 ```
 
-Local setup flow:
+The code also accepts legacy fallbacks:
 
-1. Create a Supabase project.
-2. Enable Anonymous sign-ins in Supabase Auth.
-3. Open the SQL Editor in Supabase.
-4. Run the script from `supabase/games_platform_schema.sql`.
-5. Run the script from `supabase/seed_wheel_content.sql`.
-6. Add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, and `SUPABASE_SECRET_KEY` to `.env.local`.
-7. Restart the Next.js dev server.
-8. Optionally run `supabase/verify_games_platform_setup.sql` to verify counts, RLS, and realtime publication status.
-9. With the dev server running, use `pnpm smoke:games` to verify anonymous auth, player bootstrap, wheel mutations, leaderboard reads, and live snapshot reads end to end.
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_URL`
 
-Notes:
+## Local setup
 
-- prepared images for games should stay in `public/images/games/...`
-- Supabase Storage is intentionally not used for the current MVP
-- the code also accepts `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` as fallbacks for older setups
-- the current slice bootstraps anonymous players and shared XP persistence; the full task lifecycle lands in the next wheel redesign slice
-- wheel content source files live in `src/shared/config/wheel-categories.json` and `src/shared/config/wheel-tasks.json`
-- regenerate `supabase/seed_wheel_content.sql` with `pnpm generate:wheel-content-seed` after editing wheel content
-- rerun the full `supabase/games_platform_schema.sql` after schema-level changes; rerun `supabase/seed_wheel_content.sql` after content-only changes
-- mutation routes now use a Supabase-backed fixed-window limiter and may return `429 Too Many Requests` with a `retryAfterSeconds` hint
-- use `supabase/reset_runtime_data.sql` to wipe player/runtime data without touching game content; the script is intentionally guarded and requires replacing `__CONFIRM_RESET_RUNTIME_DATA__` with `yes` before execution
-- Supabase may still label views as `UNRESTRICTED` in the dashboard; that is expected because RLS applies to tables, not views
-- leaderboard/feed views are intentionally server-only; direct client access through `anon` or `authenticated` roles is revoked and the app reads them through Next.js route handlers
+```bash
+pnpm install
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+## Useful commands
+
+```bash
+pnpm dev
+pnpm build
+pnpm lint
+pnpm smoke:games
+pnpm generate:wheel-content-seed
+```
+
+`pnpm smoke:games` expects:
+
+- the Next.js app to be running locally
+- Supabase env vars to be configured
+- the schema from `supabase/games_platform_schema.sql` to be applied
 
 ## Project structure
 
-The codebase follows a lightweight FSD-style structure:
-
 ```text
 src/
-├── app/                 # routes, layouts, API handlers
-├── features/            # focused interactive features
-├── shared/              # config, i18n, utilities, UI primitives
-└── widgets/             # full-page sections and composed screens
+├── app/
+│   ├── [locale]/                 # invitation, games, live, invite pages
+│   └── api/                      # rsvp, live, games APIs
+├── features/
+│   ├── countdown/
+│   ├── game-session/             # auth, local session cache, shared client/server types
+│   ├── language-switcher/
+│   ├── theme-switcher/
+│   └── wheel-of-fortune/
+├── shared/
+│   ├── config/                   # wedding data, game catalog, wheel content, metadata helpers
+│   ├── i18n/
+│   ├── lib/
+│   └── ui/
+└── widgets/
+    ├── invitation-page/          # assembled invitation screen
+    ├── games-hub/
+    ├── games-shell/
+    ├── games-wheel-page/
+    ├── live-projector/
+    ├── personal-invitation/
+    └── page sections
 ```
 
-Some notable areas:
+## Project rules
 
-- `src/shared/config` stores wedding data, including the date, venue, dress code, and guest list
-- `src/shared/i18n/messages` contains `uk.json` and `en.json`
-- `src/app/[locale]/invite/[slug]/page.tsx` renders personal invitation pages
-- `src/app/api/rsvp/route.ts` handles RSVP submissions
+- Do not hardcode the wedding date. Import `WEDDING_DATE` from `@/shared/config`.
+- Keep `src/shared/i18n/messages/uk.json` and `en.json` in sync.
+- Prefer CSS variable-based Tailwind classes instead of hardcoded component colors.
+- Use barrel exports where they already exist.
+- Treat `Countdown`, `Splash`, `LanguageSwitcher`, and `ThemeProvider` as hydration-sensitive code.
 
-## A few project rules
+## Current product status
 
-- Do not hardcode the wedding date; use `WEDDING_DATE` from shared config
-- Do not hardcode colors in components; use the design tokens from `globals.css`
-- Keep `uk.json` and `en.json` in sync
-- Prefer server components unless client interactivity is actually needed
-- Import through barrel exports where they exist
-
-## Why this project exists
-
-This repository is both a real invitation website and a small frontend craft project. The goal was to make something warm and personal, while still keeping the codebase clean enough to scale with features like personal guest pages and RSVP delivery.
+- RSVP delivery is implemented and no longer a stub.
+- Personalized invite pages are implemented and statically generated.
+- The games hub is live, but only `wheel-of-fortune` is currently playable.
+- `/live` is meant for projector/live usage and is marked `noindex`.
