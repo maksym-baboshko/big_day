@@ -100,7 +100,7 @@ function ConfettiOverlay({ onDone, lite }: { onDone: () => void; lite: boolean }
       exit={{ opacity: 0 }}
       transition={{ duration: lite ? 0.9 : 1.5, delay: lite ? 8.6 : 5.0 }}
       onAnimationComplete={() => setTimeout(onDone, 100)}
-      className="fixed inset-0 z-[220] overflow-hidden pointer-events-none"
+      className="fixed inset-0 z-220 overflow-hidden pointer-events-none"
     >
       {lite
         ? liteConfettiPieces.map((piece) => (
@@ -438,7 +438,7 @@ export function RSVP({ guest }: RSVPProps) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.35 }}
-          className="fixed inset-0 z-[180]"
+          className="fixed inset-0 z-180"
         >
           <motion.div
             initial={{ opacity: 0, y: liteMotion ? 18 : 28, scale: liteMotion ? 0.98 : 0.96 }}
@@ -751,7 +751,7 @@ export function RSVP({ guest }: RSVPProps) {
                         "relative flex flex-col items-center justify-center gap-2 rounded-2xl border-2 px-3 py-5 md:py-8 transition-all duration-500 cursor-pointer overflow-hidden",
                         focusRingClass,
                         attending === "no"
-                          ? "border-text-secondary/48 bg-text-primary/[0.08]"
+                          ? "border-text-secondary/48 bg-text-primary/8"
                           : "border-accent/18 bg-bg-primary/72 hover:border-accent/32"
                       )}
                       aria-pressed={attending === "no"}

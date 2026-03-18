@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "generate:wheel-content-seed": "node scripts/generate-wheel-content-seed.mjs",
     "lint:classes": "node scripts/lint-canonical-classes.mjs",
     "lint": "eslint && pnpm lint:classes"
   },

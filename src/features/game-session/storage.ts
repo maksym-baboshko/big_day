@@ -2,7 +2,7 @@
 
 import type { PlayerSessionSnapshot } from "./types";
 
-const PLAYER_SESSION_STORAGE_KEY = "big-day.games.player-session.v1";
+const PLAYER_SESSION_STORAGE_KEY = "big-day.games.player-session.v2";
 const playerSessionListeners = new Set<() => void>();
 let cachedRawPlayerSession: string | null | undefined;
 let cachedPlayerSessionSnapshot: PlayerSessionSnapshot | null = null;
@@ -18,8 +18,8 @@ function isPlayerSessionSnapshot(
 
   return (
     typeof candidate.playerId === "string" &&
-    typeof candidate.clientSessionId === "string" &&
     typeof candidate.nickname === "string" &&
+    typeof candidate.avatarKey === "string" &&
     typeof candidate.totalPoints === "number"
   );
 }

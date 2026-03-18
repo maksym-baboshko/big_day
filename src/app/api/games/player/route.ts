@@ -1,46 +1,44 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
-  getPlayerSnapshotByClientSessionId,
-  savePlayerSession,
+  bootstrapPlayerProfile,
+  savePlayerProfile,
+  requireAuthenticatedGameUser,
   SupabaseConfigurationError,
+  UnauthorizedGameRequestError,
 } from "@/features/game-session/server";
 
 export const runtime = "nodejs";
 
 const playerPayloadSchema = z.object({
-  clientSessionId: z.string().uuid(),
   nickname: z
     .string()
     .trim()
     .min(2)
     .max(40)
     .transform((value) => value.replace(/\s+/g, " ")),
+  locale: z.enum(["uk", "en"]).default("uk"),
 });
 
 export async function GET(request: Request) {
   try {
+    const user = await requireAuthenticatedGameUser(request);
     const { searchParams } = new URL(request.url);
-    const clientSessionId = searchParams.get("clientSessionId");
-    const result = z.string().uuid().safeParse(clientSessionId);
-
-    if (!result.success) {
-      return NextResponse.json(
-        { error: "Invalid client session id.", code: "INVALID_DATA" },
-        { status: 400 }
-      );
-    }
-
-    const player = await getPlayerSnapshotByClientSessionId(result.data);
-    if (!player) {
-      return NextResponse.json(
-        { error: "Player was not found.", code: "PLAYER_NOT_FOUND" },
-        { status: 404 }
-      );
-    }
+    const locale = z.enum(["uk", "en"]).catch("uk").parse(searchParams.get("locale"));
+    const player = await bootstrapPlayerProfile({
+      authUserId: user.id,
+      locale,
+    });
 
     return NextResponse.json({ player });
   } catch (error) {
+    if (error instanceof UnauthorizedGameRequestError) {
+      return NextResponse.json(
+        { error: "Unauthorized game request.", code: "UNAUTHORIZED" },
+        { status: 401 }
+      );
+    }
+
     if (error instanceof SupabaseConfigurationError) {
       return NextResponse.json(
         {
@@ -61,6 +59,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const user = await requireAuthenticatedGameUser(request);
     const body = await request.json();
     const result = playerPayloadSchema.safeParse(body);
 
@@ -71,9 +70,20 @@ export async function POST(request: Request) {
       );
     }
 
-    const player = await savePlayerSession(result.data);
+    const player = await savePlayerProfile({
+      authUserId: user.id,
+      nickname: result.data.nickname,
+      locale: result.data.locale,
+    });
     return NextResponse.json({ player });
   } catch (error) {
+    if (error instanceof UnauthorizedGameRequestError) {
+      return NextResponse.json(
+        { error: "Unauthorized game request.", code: "UNAUTHORIZED" },
+        { status: 401 }
+      );
+    }
+
     if (error instanceof SupabaseConfigurationError) {
       return NextResponse.json(
         {

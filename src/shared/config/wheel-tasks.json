@@ -1,0 +1,2842 @@
+[
+  {
+    "taskKey": "treasure-of-memories-01",
+    "categorySlug": "treasure-of-memories",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Поділися з людиною поруч одним світлим спогадом з дитинства.",
+      "en": "Share one bright childhood memory with the person next to you."
+    }
+  },
+  {
+    "taskKey": "treasure-of-memories-02",
+    "categorySlug": "treasure-of-memories",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Запитай когось за іншим столом, який момент цього дня вже хочеться згадувати.",
+      "en": "Ask someone at another table which moment of today already feels worth remembering."
+    }
+  },
+  {
+    "taskKey": "treasure-of-memories-03",
+    "categorySlug": "treasure-of-memories",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Знайди гостя старшого покоління і подякуй йому за приклад вірності.",
+      "en": "Find a guest from an older generation and thank them for their example of faithfulness."
+    }
+  },
+  {
+    "taskKey": "treasure-of-memories-04",
+    "categorySlug": "treasure-of-memories",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Назви вголос одну сімейну традицію, яку ти особливо цінуєш.",
+      "en": "Name one family tradition you especially value."
+    }
+  },
+  {
+    "taskKey": "treasure-of-memories-05",
+    "categorySlug": "treasure-of-memories",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Розкажи сусіду по столу про одну подію, яка навчила тебе вдячності.",
+      "en": "Tell your table neighbor about one event that taught you gratitude."
+    }
+  },
+  {
+    "taskKey": "treasure-of-memories-06",
+    "categorySlug": "treasure-of-memories",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Згадай людину, яка підтримала тебе в складний час, і коротко скажи про це поруч.",
+      "en": "Recall a person who supported you in a hard season and mention it briefly to someone nearby."
+    }
+  },
+  {
+    "taskKey": "treasure-of-memories-07",
+    "categorySlug": "treasure-of-memories",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Обміняйся іменами з кимось, з ким ще не говорив сьогодні.",
+      "en": "Exchange names with someone you have not spoken to yet today."
+    }
+  },
+  {
+    "taskKey": "treasure-of-memories-08",
+    "categorySlug": "treasure-of-memories",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Запитай когось, який весільний момент вони бережуть у пам'яті найдовше.",
+      "en": "Ask someone which wedding moment they have carried in memory the longest."
+    }
+  },
+  {
+    "taskKey": "treasure-of-memories-09",
+    "categorySlug": "treasure-of-memories",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Напиши одним реченням, якою ти бачиш атмосферу цього дня.",
+      "en": "Write one sentence describing the atmosphere of today."
+    }
+  },
+  {
+    "taskKey": "treasure-of-memories-10",
+    "categorySlug": "treasure-of-memories",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши короткий спогад, у якому головне місце займає доброта.",
+      "en": "Write a short memory where kindness was the main thing."
+    }
+  },
+  {
+    "taskKey": "treasure-of-memories-11",
+    "categorySlug": "treasure-of-memories",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Заверши фразу: «Сьогодні я точно запам'ятаю...»",
+      "en": "Finish the phrase: \"Today I will definitely remember...\""
+    }
+  },
+  {
+    "taskKey": "treasure-of-memories-12",
+    "categorySlug": "treasure-of-memories",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Напиши, що для тебе робить дім теплим.",
+      "en": "Write what makes a home feel warm to you."
+    }
+  },
+  {
+    "taskKey": "treasure-of-memories-13",
+    "categorySlug": "treasure-of-memories",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши одну рису, яка допомагає сім'ї проходити крізь різні сезони.",
+      "en": "Write one quality that helps a family move through different seasons."
+    }
+  },
+  {
+    "taskKey": "treasure-of-memories-14",
+    "categorySlug": "treasure-of-memories",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши маленьку подію цього вечора, яку хотілося б згадати через багато років.",
+      "en": "Write a small moment from tonight you would want to remember years from now."
+    }
+  },
+  {
+    "taskKey": "treasure-of-memories-15",
+    "categorySlug": "treasure-of-memories",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 60,
+    "prompt": {
+      "uk": "За 60 секунд знайди двох гостей, які знають молодят на різних етапах, і почуй від кожного по одному реченню.",
+      "en": "In 60 seconds, find two guests who know the couple from different stages and hear one sentence from each."
+    }
+  },
+  {
+    "taskKey": "treasure-of-memories-16",
+    "categorySlug": "treasure-of-memories",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "gentle",
+    "timerSeconds": 45,
+    "prompt": {
+      "uk": "За 45 секунд назви комусь поруч три благословення з минулого року.",
+      "en": "In 45 seconds, name three blessings from the past year to someone nearby."
+    }
+  },
+  {
+    "taskKey": "treasure-of-memories-17",
+    "categorySlug": "treasure-of-memories",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 75,
+    "prompt": {
+      "uk": "За 75 секунд зроби спокійне фото деталі в залі, яку хочеться запам'ятати.",
+      "en": "In 75 seconds, take a calm photo of one detail in the room worth remembering."
+    }
+  },
+  {
+    "taskKey": "treasure-of-memories-18",
+    "categorySlug": "treasure-of-memories",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 60,
+    "prompt": {
+      "uk": "За 60 секунд знайди гостя з тією самою порою народження і обміняйся одним теплим спогадом про неї.",
+      "en": "In 60 seconds, find a guest born in the same season and exchange one warm memory tied to it."
+    }
+  },
+  {
+    "taskKey": "treasure-of-memories-19",
+    "categorySlug": "treasure-of-memories",
+    "interactionType": "async_task",
+    "responseMode": "confirm",
+    "executionMode": "deferred",
+    "allowPromise": true,
+    "allowEarlyCompletion": false,
+    "difficulty": "bold",
+    "prompt": {
+      "uk": "До десерту запитай старшого гостя, що допомагає берегти мир у сім'ї.",
+      "en": "Before dessert, ask an older guest what helps preserve peace in a family."
+    }
+  },
+  {
+    "taskKey": "treasure-of-memories-20",
+    "categorySlug": "treasure-of-memories",
+    "interactionType": "async_task",
+    "responseMode": "confirm",
+    "executionMode": "deferred",
+    "allowPromise": true,
+    "allowEarlyCompletion": false,
+    "difficulty": "bold",
+    "prompt": {
+      "uk": "До завершення вечора зроби одне фото з людьми щонайменше двох поколінь.",
+      "en": "Before the evening ends, take one photo with people from at least two generations."
+    }
+  },
+  {
+    "taskKey": "improvisation-01",
+    "categorySlug": "improvisation",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Дай вашому столу лагідну командну назву і скажи її вголос.",
+      "en": "Give your table a gentle team name and say it aloud."
+    }
+  },
+  {
+    "taskKey": "improvisation-02",
+    "categorySlug": "improvisation",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Обери предмет на столі й порівняй його з щасливим домом.",
+      "en": "Choose an object on the table and compare it to a happy home."
+    }
+  },
+  {
+    "taskKey": "improvisation-03",
+    "categorySlug": "improvisation",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Опиши цей вечір трьома теплими словами.",
+      "en": "Describe this evening in three warm words."
+    }
+  },
+  {
+    "taskKey": "improvisation-04",
+    "categorySlug": "improvisation",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Придумай коротку назву для сьогоднішнього свята і скажи її поруч.",
+      "en": "Invent a short title for today's celebration and say it to someone nearby."
+    }
+  },
+  {
+    "taskKey": "improvisation-05",
+    "categorySlug": "improvisation",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Придумай короткий девіз для вашого столу і пошепки поділися ним з усіма.",
+      "en": "Come up with a short motto for your table and whisper it to everyone there."
+    }
+  },
+  {
+    "taskKey": "improvisation-06",
+    "categorySlug": "improvisation",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Уяви, що цей день - листівка. Опиши її однією фразою вголос.",
+      "en": "Imagine this day is a postcard. Describe it in one spoken phrase."
+    }
+  },
+  {
+    "taskKey": "improvisation-07",
+    "categorySlug": "improvisation",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Придумай назву для розділу фотоальбому про цей вечір.",
+      "en": "Invent a title for the photo album chapter about tonight."
+    }
+  },
+  {
+    "taskKey": "improvisation-08",
+    "categorySlug": "improvisation",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Склади тепле побажання рівно з трьох слів і скажи його поруч.",
+      "en": "Create a warm wish in exactly three words and say it to someone nearby."
+    }
+  },
+  {
+    "taskKey": "improvisation-09",
+    "categorySlug": "improvisation",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши короткий підпис до фото, яке могло б передати сьогоднішній настрій.",
+      "en": "Write a short caption for a photo that could carry today's mood."
+    }
+  },
+  {
+    "taskKey": "improvisation-10",
+    "categorySlug": "improvisation",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши фразу, з якої міг би починатися добрий сімейний фільм.",
+      "en": "Write a line that could open a kind family film."
+    }
+  },
+  {
+    "taskKey": "improvisation-11",
+    "categorySlug": "improvisation",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Напиши нову назву для «тихого щастя».",
+      "en": "Write a new name for \"quiet happiness.\""
+    }
+  },
+  {
+    "taskKey": "improvisation-12",
+    "categorySlug": "improvisation",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши один образ, який найкраще передає слово «вірність».",
+      "en": "Write one image that best expresses the word \"faithfulness.\""
+    }
+  },
+  {
+    "taskKey": "improvisation-13",
+    "categorySlug": "improvisation",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши коротку метафору для дружби між гостями сьогодні.",
+      "en": "Write a short metaphor for the friendship among guests tonight."
+    }
+  },
+  {
+    "taskKey": "improvisation-14",
+    "categorySlug": "improvisation",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Заверши фразу: «Любов інколи звучить як...»",
+      "en": "Finish the phrase: \"Love sometimes sounds like...\""
+    }
+  },
+  {
+    "taskKey": "improvisation-15",
+    "categorySlug": "improvisation",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 45,
+    "prompt": {
+      "uk": "За 45 секунд придумай три лагідні назви для дуже доброго вечора.",
+      "en": "In 45 seconds, invent three gentle names for a very good evening."
+    }
+  },
+  {
+    "taskKey": "improvisation-16",
+    "categorySlug": "improvisation",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 60,
+    "prompt": {
+      "uk": "За 60 секунд скажи двом людям по одній творчій асоціації з цим святом.",
+      "en": "In 60 seconds, give two people one creative association each for this celebration."
+    }
+  },
+  {
+    "taskKey": "improvisation-17",
+    "categorySlug": "improvisation",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "gentle",
+    "timerSeconds": 45,
+    "prompt": {
+      "uk": "За 45 секунд придумай міні-слоган для сімейного фото.",
+      "en": "In 45 seconds, invent a mini slogan for a family photo."
+    }
+  },
+  {
+    "taskKey": "improvisation-18",
+    "categorySlug": "improvisation",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 60,
+    "prompt": {
+      "uk": "За 60 секунд назви чотири слова, які добре пасують затишному дому.",
+      "en": "In 60 seconds, name four words that suit a cozy home."
+    }
+  },
+  {
+    "taskKey": "improvisation-19",
+    "categorySlug": "improvisation",
+    "interactionType": "async_task",
+    "responseMode": "confirm",
+    "executionMode": "deferred",
+    "allowPromise": true,
+    "allowEarlyCompletion": false,
+    "difficulty": "bold",
+    "prompt": {
+      "uk": "До завершення вечора придумай один рядок підпису до реального фото, зробленого сьогодні.",
+      "en": "Before the evening ends, create a one-line caption for a real photo taken tonight."
+    }
+  },
+  {
+    "taskKey": "improvisation-20",
+    "categorySlug": "improvisation",
+    "interactionType": "async_task",
+    "responseMode": "confirm",
+    "executionMode": "deferred",
+    "allowPromise": true,
+    "allowEarlyCompletion": false,
+    "difficulty": "bold",
+    "prompt": {
+      "uk": "Пізніше цього вечора поміть тихий красивий момент і опиши його п'ятьма словами.",
+      "en": "Later tonight, notice one quiet beautiful moment and describe it in five words."
+    }
+  },
+  {
+    "taskKey": "honest-or-action-01",
+    "categorySlug": "honest-or-action",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Обери одне: скажи, що тебе найбільше зворушило сьогодні, або принеси комусь поруч склянку води.",
+      "en": "Choose one: say what moved you most today, or bring a glass of water to someone nearby."
+    }
+  },
+  {
+    "taskKey": "honest-or-action-02",
+    "categorySlug": "honest-or-action",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Обери одне: подякуй людині поруч за щось мале, або посунь стілець так, щоб комусь було зручніше.",
+      "en": "Choose one: thank the person next to you for something small, or move a chair so someone is more comfortable."
+    }
+  },
+  {
+    "taskKey": "honest-or-action-03",
+    "categorySlug": "honest-or-action",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Обери одне: назви одну рису, якій ти зараз вчишся, або запитай когось, як у них справи насправді.",
+      "en": "Choose one: name one quality you are learning right now, or ask someone how they are really doing."
+    }
+  },
+  {
+    "taskKey": "honest-or-action-04",
+    "categorySlug": "honest-or-action",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Обери одне: скажи, за що ти вдячний Богові цього тижня, або тихо підбадьор когось сором'язливого.",
+      "en": "Choose one: say what you are thankful to God for this week, or quietly encourage someone shy."
+    }
+  },
+  {
+    "taskKey": "honest-or-action-05",
+    "categorySlug": "honest-or-action",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Обери одне: назви одну добру звичку, яку хочеш мати в сім'ї, або коротко допоможи комусь зі столом.",
+      "en": "Choose one: name one good habit you want in a family, or briefly help someone with the table."
+    }
+  },
+  {
+    "taskKey": "honest-or-action-06",
+    "categorySlug": "honest-or-action",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Обери одне: скажи, хто навчив тебе вірності, або потисни руку людині, з якою ще не говорив.",
+      "en": "Choose one: say who taught you faithfulness, or shake hands with someone you have not spoken to yet."
+    }
+  },
+  {
+    "taskKey": "honest-or-action-07",
+    "categorySlug": "honest-or-action",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Обери одне: поділися однією правдивою радістю цього місяця, або щиро подякуй працівнику залу.",
+      "en": "Choose one: share one real joy from this month, or sincerely thank a member of the venue staff."
+    }
+  },
+  {
+    "taskKey": "honest-or-action-08",
+    "categorySlug": "honest-or-action",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Обери одне: назви одну просту річ, що повертає тобі мир, або привітай гостя, який сидить самотніше.",
+      "en": "Choose one: name one simple thing that restores peace to you, or greet a guest who seems more alone."
+    }
+  },
+  {
+    "taskKey": "honest-or-action-09",
+    "categorySlug": "honest-or-action",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши чесну відповідь: що допомагає тобі не здаватися в непрості дні?",
+      "en": "Write an honest answer: what helps you not give up on difficult days?"
+    }
+  },
+  {
+    "taskKey": "honest-or-action-10",
+    "categorySlug": "honest-or-action",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши одну правду про любов, яку ти зрозумів з досвіду.",
+      "en": "Write one truth about love that experience has taught you."
+    }
+  },
+  {
+    "taskKey": "honest-or-action-11",
+    "categorySlug": "honest-or-action",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Заверши фразу: «Для мене турбота виглядає як...»",
+      "en": "Finish the phrase: \"To me, care looks like...\""
+    }
+  },
+  {
+    "taskKey": "honest-or-action-12",
+    "categorySlug": "honest-or-action",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши, що допомагає тобі просити пробачення щиро.",
+      "en": "Write what helps you ask for forgiveness sincerely."
+    }
+  },
+  {
+    "taskKey": "honest-or-action-13",
+    "categorySlug": "honest-or-action",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши одну малу звичку, яка зміцнює довіру.",
+      "en": "Write one small habit that strengthens trust."
+    }
+  },
+  {
+    "taskKey": "honest-or-action-14",
+    "categorySlug": "honest-or-action",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Напиши, яку дію сьогодні ти хотів би зробити добрішою.",
+      "en": "Write which action today you would like to make kinder."
+    }
+  },
+  {
+    "taskKey": "honest-or-action-15",
+    "categorySlug": "honest-or-action",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 60,
+    "prompt": {
+      "uk": "За 60 секунд обери одне і зроби це: скажи два щирі «дякую» або наведи трохи ладу на своєму столі.",
+      "en": "In 60 seconds, choose one and do it: say two sincere thank-yous or tidy a small part of your table."
+    }
+  },
+  {
+    "taskKey": "honest-or-action-16",
+    "categorySlug": "honest-or-action",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "gentle",
+    "timerSeconds": 45,
+    "prompt": {
+      "uk": "За 45 секунд знайди людину, з якою ще не вітався, і представся.",
+      "en": "In 45 seconds, find someone you have not greeted and introduce yourself."
+    }
+  },
+  {
+    "taskKey": "honest-or-action-17",
+    "categorySlug": "honest-or-action",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 60,
+    "prompt": {
+      "uk": "За 60 секунд скажи по одному підбадьорливому реченню двом різним людям.",
+      "en": "In 60 seconds, say one encouraging sentence each to two different people."
+    }
+  },
+  {
+    "taskKey": "honest-or-action-18",
+    "categorySlug": "honest-or-action",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 45,
+    "prompt": {
+      "uk": "За 45 секунд назви три речі, які допомагають дому залишатися мирним.",
+      "en": "In 45 seconds, name three things that help a home remain peaceful."
+    }
+  },
+  {
+    "taskKey": "honest-or-action-19",
+    "categorySlug": "honest-or-action",
+    "interactionType": "async_task",
+    "responseMode": "confirm",
+    "executionMode": "deferred",
+    "allowPromise": true,
+    "allowEarlyCompletion": false,
+    "difficulty": "bold",
+    "prompt": {
+      "uk": "До кінця вечора зроби одну тиху корисну дію, про яку тебе ніхто не просив.",
+      "en": "Before the evening ends, do one quiet helpful action nobody asked you for."
+    }
+  },
+  {
+    "taskKey": "honest-or-action-20",
+    "categorySlug": "honest-or-action",
+    "interactionType": "async_task",
+    "responseMode": "confirm",
+    "executionMode": "deferred",
+    "allowPromise": true,
+    "allowEarlyCompletion": false,
+    "difficulty": "bold",
+    "prompt": {
+      "uk": "Перед відходом знайди момент, щоб подякувати комусь, хто сьогодні служив або допомагав.",
+      "en": "Before leaving, find a moment to thank someone who served or helped tonight."
+    }
+  },
+  {
+    "taskKey": "stream-of-kind-words-01",
+    "categorySlug": "stream-of-kind-words",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Скажи людині ліворуч один щирий комплімент.",
+      "en": "Give one sincere compliment to the person on your left."
+    }
+  },
+  {
+    "taskKey": "stream-of-kind-words-02",
+    "categorySlug": "stream-of-kind-words",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Скажи людині праворуч одне спокійне підбадьорливе речення.",
+      "en": "Say one calm encouraging sentence to the person on your right."
+    }
+  },
+  {
+    "taskKey": "stream-of-kind-words-03",
+    "categorySlug": "stream-of-kind-words",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Подякуй комусь за усмішку або теплий тон цього вечора.",
+      "en": "Thank someone for their smile or warm tone tonight."
+    }
+  },
+  {
+    "taskKey": "stream-of-kind-words-04",
+    "categorySlug": "stream-of-kind-words",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Назви одну сильну рису, яку ти помітив у комусь за столом.",
+      "en": "Name one strong quality you noticed in someone at your table."
+    }
+  },
+  {
+    "taskKey": "stream-of-kind-words-05",
+    "categorySlug": "stream-of-kind-words",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Скажи комусь поруч: «Я радий, що ти сьогодні тут».",
+      "en": "Tell someone nearby, \"I'm glad you're here today.\""
+    }
+  },
+  {
+    "taskKey": "stream-of-kind-words-06",
+    "categorySlug": "stream-of-kind-words",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Поділися за столом одним добрим словом про сімейне життя.",
+      "en": "Share one kind word about family life with your table."
+    }
+  },
+  {
+    "taskKey": "stream-of-kind-words-07",
+    "categorySlug": "stream-of-kind-words",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Скажи молодятам одне тепле речення як благословення на будні.",
+      "en": "Say one warm sentence to the couple as a blessing over their ordinary days."
+    }
+  },
+  {
+    "taskKey": "stream-of-kind-words-08",
+    "categorySlug": "stream-of-kind-words",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Скажи комусь старшому або молодшому, що ти цінуєш у їхньому поколінні.",
+      "en": "Tell someone older or younger what you value in their generation."
+    }
+  },
+  {
+    "taskKey": "stream-of-kind-words-09",
+    "categorySlug": "stream-of-kind-words",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Напиши один комплімент про характер, а не про зовнішність.",
+      "en": "Write one compliment about character, not appearance."
+    }
+  },
+  {
+    "taskKey": "stream-of-kind-words-10",
+    "categorySlug": "stream-of-kind-words",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши коротку добру нотатку для майбутнього дому молодят.",
+      "en": "Write a short kind note for the couple's future home."
+    }
+  },
+  {
+    "taskKey": "stream-of-kind-words-11",
+    "categorySlug": "stream-of-kind-words",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Заверши фразу: «Нехай мир не залишає цю сім'ю, бо...»",
+      "en": "Finish the phrase: \"May peace never leave this family because...\""
+    }
+  },
+  {
+    "taskKey": "stream-of-kind-words-12",
+    "categorySlug": "stream-of-kind-words",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши одне речення, яке могло б зміцнити втомлену людину.",
+      "en": "Write one sentence that could strengthen a tired person."
+    }
+  },
+  {
+    "taskKey": "stream-of-kind-words-13",
+    "categorySlug": "stream-of-kind-words",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Напиши коротке благословення для дружби, яка зібралася сьогодні тут.",
+      "en": "Write a short blessing for the friendships gathered here tonight."
+    }
+  },
+  {
+    "taskKey": "stream-of-kind-words-14",
+    "categorySlug": "stream-of-kind-words",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши, що для тебе означає «лагідна сила».",
+      "en": "Write what \"gentle strength\" means to you."
+    }
+  },
+  {
+    "taskKey": "stream-of-kind-words-15",
+    "categorySlug": "stream-of-kind-words",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 60,
+    "prompt": {
+      "uk": "За 60 секунд скажи три щирі компліменти трьом різним людям.",
+      "en": "In 60 seconds, give three sincere compliments to three different people."
+    }
+  },
+  {
+    "taskKey": "stream-of-kind-words-16",
+    "categorySlug": "stream-of-kind-words",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "gentle",
+    "timerSeconds": 45,
+    "prompt": {
+      "uk": "За 45 секунд поміть дві красиві деталі в залі і назви їх уголос.",
+      "en": "In 45 seconds, notice two beautiful details in the room and name them aloud."
+    }
+  },
+  {
+    "taskKey": "stream-of-kind-words-17",
+    "categorySlug": "stream-of-kind-words",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 60,
+    "prompt": {
+      "uk": "За 60 секунд подякуй двом людям за малі добрі дії, які ти сьогодні бачив.",
+      "en": "In 60 seconds, thank two people for small kind actions you noticed today."
+    }
+  },
+  {
+    "taskKey": "stream-of-kind-words-18",
+    "categorySlug": "stream-of-kind-words",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 45,
+    "prompt": {
+      "uk": "За 45 секунд назви чотири теплі слова, які пасують вірному шлюбу.",
+      "en": "In 45 seconds, name four warm words that suit a faithful marriage."
+    }
+  },
+  {
+    "taskKey": "stream-of-kind-words-19",
+    "categorySlug": "stream-of-kind-words",
+    "interactionType": "async_task",
+    "responseMode": "confirm",
+    "executionMode": "deferred",
+    "allowPromise": true,
+    "allowEarlyCompletion": false,
+    "difficulty": "bold",
+    "prompt": {
+      "uk": "До десерту підбадьор людину, яка сьогодні здається тихішою або сором'язливішою.",
+      "en": "Before dessert, encourage someone who seems quieter or more shy tonight."
+    }
+  },
+  {
+    "taskKey": "stream-of-kind-words-20",
+    "categorySlug": "stream-of-kind-words",
+    "interactionType": "async_task",
+    "responseMode": "confirm",
+    "executionMode": "deferred",
+    "allowPromise": true,
+    "allowEarlyCompletion": false,
+    "difficulty": "bold",
+    "prompt": {
+      "uk": "До завершення вечора надішли одне добре повідомлення рідній людині, якої тут немає.",
+      "en": "Before the evening ends, send one kind message to a family member who is not here."
+    }
+  },
+  {
+    "taskKey": "find-the-truth-01",
+    "categorySlug": "find-the-truth",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Спробуй вгадати, хто за твоїм столом подолав найдовшу дорогу сьогодні, і перевір це.",
+      "en": "Try to guess who at your table traveled the farthest today, then check if you are right."
+    }
+  },
+  {
+    "taskKey": "find-the-truth-02",
+    "categorySlug": "find-the-truth",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Знайди когось, хто пам'ятає своє перше враження від Бергена, і почуй його.",
+      "en": "Find someone who remembers their first impression of Bergen and hear it."
+    }
+  },
+  {
+    "taskKey": "find-the-truth-03",
+    "categorySlug": "find-the-truth",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Спробуй вгадати, хто за столом найбільше любить ранки, і перевір свою здогадку.",
+      "en": "Guess who at your table loves mornings the most and see if you are right."
+    }
+  },
+  {
+    "taskKey": "find-the-truth-04",
+    "categorySlug": "find-the-truth",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Запитай когось, чи це їхнє перше весілля в Норвегії.",
+      "en": "Ask someone whether this is their first wedding in Norway."
+    }
+  },
+  {
+    "taskKey": "find-the-truth-05",
+    "categorySlug": "find-the-truth",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Знайди гостя, який знає молодят найдовше, і запитай, з якого це часу.",
+      "en": "Find the guest who has known the couple the longest and ask since when."
+    }
+  },
+  {
+    "taskKey": "find-the-truth-06",
+    "categorySlug": "find-the-truth",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Спробуй вгадати, хто за столом обере чай замість кави, і перевір.",
+      "en": "Guess who at your table would choose tea over coffee and verify it."
+    }
+  },
+  {
+    "taskKey": "find-the-truth-07",
+    "categorySlug": "find-the-truth",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Знайди людину, з якою у вас є спільне хобі або інтерес.",
+      "en": "Find a person who shares a hobby or interest with you."
+    }
+  },
+  {
+    "taskKey": "find-the-truth-08",
+    "categorySlug": "find-the-truth",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Запитай гостя, яка пісня незмінно викликає в нього усмішку.",
+      "en": "Ask a guest which song always brings a smile."
+    }
+  },
+  {
+    "taskKey": "find-the-truth-09",
+    "categorySlug": "find-the-truth",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Напиши свою здогадку: яка щоденна звичка найкраще допомагає щасливому дому?",
+      "en": "Write your guess: which daily habit helps a happy home the most?"
+    }
+  },
+  {
+    "taskKey": "find-the-truth-10",
+    "categorySlug": "find-the-truth",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши, яка правда про дружбу стає яснішою з віком.",
+      "en": "Write what truth about friendship becomes clearer with age."
+    }
+  },
+  {
+    "taskKey": "find-the-truth-11",
+    "categorySlug": "find-the-truth",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Обери і напиши, що молодята, ймовірно, найбільше бережуть: мир, радість, віру чи служіння.",
+      "en": "Choose and write what the couple most likely protects most: peace, joy, faith, or service."
+    }
+  },
+  {
+    "taskKey": "find-the-truth-12",
+    "categorySlug": "find-the-truth",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Напиши одну річ, яку ти вже сьогодні дізнався про іншого гостя.",
+      "en": "Write one thing you already learned today about another guest."
+    }
+  },
+  {
+    "taskKey": "find-the-truth-13",
+    "categorySlug": "find-the-truth",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Напиши одне питання, яке допомогло б краще пізнати молодят.",
+      "en": "Write one question that would help you know the couple better."
+    }
+  },
+  {
+    "taskKey": "find-the-truth-14",
+    "categorySlug": "find-the-truth",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Заверши фразу: «Справжній друг - це той, хто...»",
+      "en": "Finish the phrase: \"A true friend is someone who...\""
+    }
+  },
+  {
+    "taskKey": "find-the-truth-15",
+    "categorySlug": "find-the-truth",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 60,
+    "prompt": {
+      "uk": "За 60 секунд знайди двох гостей з різних міст і дізнайся по одному факту про кожного.",
+      "en": "In 60 seconds, find two guests from different cities and learn one fact about each."
+    }
+  },
+  {
+    "taskKey": "find-the-truth-16",
+    "categorySlug": "find-the-truth",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "gentle",
+    "timerSeconds": 45,
+    "prompt": {
+      "uk": "За 45 секунд знайди людину зі спільним місяцем народження або тією ж першою літерою імені.",
+      "en": "In 45 seconds, find someone who shares your birth month or first initial."
+    }
+  },
+  {
+    "taskKey": "find-the-truth-17",
+    "categorySlug": "find-the-truth",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 60,
+    "prompt": {
+      "uk": "За 60 секунд дізнайся один новий факт про людину, що сидить по діагоналі від тебе.",
+      "en": "In 60 seconds, learn one new fact about the person sitting diagonally from you."
+    }
+  },
+  {
+    "taskKey": "find-the-truth-18",
+    "categorySlug": "find-the-truth",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 75,
+    "prompt": {
+      "uk": "За 75 секунд знайди гостя, який у шлюбі понад десять років, і почуй одну коротку думку.",
+      "en": "In 75 seconds, find a guest who has been married for more than ten years and hear one short insight."
+    }
+  },
+  {
+    "taskKey": "find-the-truth-19",
+    "categorySlug": "find-the-truth",
+    "interactionType": "async_task",
+    "responseMode": "confirm",
+    "executionMode": "deferred",
+    "allowPromise": true,
+    "allowEarlyCompletion": false,
+    "difficulty": "bold",
+    "prompt": {
+      "uk": "До завершення вечора дізнайся одну правдиву історію про те, як тут подружилися двоє гостей.",
+      "en": "Before the evening ends, learn one true story about how two guests here became friends."
+    }
+  },
+  {
+    "taskKey": "find-the-truth-20",
+    "categorySlug": "find-the-truth",
+    "interactionType": "async_task",
+    "responseMode": "confirm",
+    "executionMode": "deferred",
+    "allowPromise": true,
+    "allowEarlyCompletion": false,
+    "difficulty": "bold",
+    "prompt": {
+      "uk": "Перед відходом відкрий один спільний інтерес між вашим і ще одним столом.",
+      "en": "Before leaving, discover one shared interest between your table and another table."
+    }
+  },
+  {
+    "taskKey": "joyful-dilemma-01",
+    "categorySlug": "joyful-dilemma",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Обери: ранкова прогулянка чи вечірній чай як ідеальний сімейний час.",
+      "en": "Choose: a morning walk or evening tea as the ideal family time."
+    }
+  },
+  {
+    "taskKey": "joyful-dilemma-02",
+    "categorySlug": "joyful-dilemma",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Обери: рукописна записка чи несподівана допомога як кращий знак турботи.",
+      "en": "Choose: a handwritten note or unexpected help as the better sign of care."
+    }
+  },
+  {
+    "taskKey": "joyful-dilemma-03",
+    "categorySlug": "joyful-dilemma",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Обери: велике святкування чи маленька зустріч для відпочинку душі.",
+      "en": "Choose: a big celebration or a small gathering for the soul to rest."
+    }
+  },
+  {
+    "taskKey": "joyful-dilemma-04",
+    "categorySlug": "joyful-dilemma",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Обери: гірський краєвид чи морський вітер для сімейного фото.",
+      "en": "Choose: a mountain view or sea breeze for a family photo."
+    }
+  },
+  {
+    "taskKey": "joyful-dilemma-05",
+    "categorySlug": "joyful-dilemma",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Обери: заплановані вихідні чи спонтанна мандрівка.",
+      "en": "Choose: a planned weekend or a spontaneous outing."
+    }
+  },
+  {
+    "taskKey": "joyful-dilemma-06",
+    "categorySlug": "joyful-dilemma",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Обери: спочатку слухати чи чесно говорити, коли серце напружене.",
+      "en": "Choose: listening first or speaking honestly when the heart feels tense."
+    }
+  },
+  {
+    "taskKey": "joyful-dilemma-07",
+    "categorySlug": "joyful-dilemma",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Обери: один мудрий наставник чи троє життєрадісних друзів у важкий час.",
+      "en": "Choose: one wise mentor or three cheerful friends in a hard season."
+    }
+  },
+  {
+    "taskKey": "joyful-dilemma-08",
+    "categorySlug": "joyful-dilemma",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Обери: зберегти стару традицію чи започаткувати нову цього року.",
+      "en": "Choose: keep an old tradition or start a new one this year."
+    }
+  },
+  {
+    "taskKey": "joyful-dilemma-09",
+    "categorySlug": "joyful-dilemma",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Напиши, що для тебе сьогодні важливіше: спокій чи сюрприз, і чому.",
+      "en": "Write what matters more to you today: calm or surprise, and why."
+    }
+  },
+  {
+    "taskKey": "joyful-dilemma-10",
+    "categorySlug": "joyful-dilemma",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши свій вибір: тиха молитва чи розмова за чаєм, коли серцю важко.",
+      "en": "Write your choice: quiet prayer or conversation over tea when the heart feels heavy."
+    }
+  },
+  {
+    "taskKey": "joyful-dilemma-11",
+    "categorySlug": "joyful-dilemma",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Заверши фразу: «Для радісного дому я б обрав більше...»",
+      "en": "Finish the phrase: \"For a joyful home I would choose more...\""
+    }
+  },
+  {
+    "taskKey": "joyful-dilemma-12",
+    "categorySlug": "joyful-dilemma",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши, що ти подарував би молодій сім'ї: час, терпіння, сміливість чи сміх.",
+      "en": "Write what you would gift a young family: time, patience, courage, or laughter."
+    }
+  },
+  {
+    "taskKey": "joyful-dilemma-13",
+    "categorySlug": "joyful-dilemma",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Напиши свій вибір: спільний ранній сніданок чи повільний вечір разом, і чому.",
+      "en": "Write your choice: an early breakfast together or a slow evening together, and why."
+    }
+  },
+  {
+    "taskKey": "joyful-dilemma-14",
+    "categorySlug": "joyful-dilemma",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши, що важче, але дорожче: прощення чи послідовність.",
+      "en": "Write what is harder but more precious: forgiveness or consistency."
+    }
+  },
+  {
+    "taskKey": "joyful-dilemma-15",
+    "categorySlug": "joyful-dilemma",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 45,
+    "prompt": {
+      "uk": "За 45 секунд обери одне з чотирьох слів і поясни його сусіду: мир, довіра, доброта чи витривалість.",
+      "en": "In 45 seconds, choose one of four words and explain it to your neighbor: peace, trust, kindness, or perseverance."
+    }
+  },
+  {
+    "taskKey": "joyful-dilemma-16",
+    "categorySlug": "joyful-dilemma",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 60,
+    "prompt": {
+      "uk": "За 60 секунд запитай двох гостей, який сімейний ритуал вони зберегли б назавжди.",
+      "en": "In 60 seconds, ask two guests which family ritual they would keep forever."
+    }
+  },
+  {
+    "taskKey": "joyful-dilemma-17",
+    "categorySlug": "joyful-dilemma",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "gentle",
+    "timerSeconds": 45,
+    "prompt": {
+      "uk": "За 45 секунд обери кращий комплімент для сьогодні: «ти приносиш мир» чи «ти приносиш радість».",
+      "en": "In 45 seconds, choose the better compliment for today: \"you bring peace\" or \"you bring joy.\""
+    }
+  },
+  {
+    "taskKey": "joyful-dilemma-18",
+    "categorySlug": "joyful-dilemma",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 60,
+    "prompt": {
+      "uk": "За 60 секунд назви три щоденні вибори, які тихо будують любов.",
+      "en": "In 60 seconds, name three everyday choices that quietly build love."
+    }
+  },
+  {
+    "taskKey": "joyful-dilemma-19",
+    "categorySlug": "joyful-dilemma",
+    "interactionType": "async_task",
+    "responseMode": "confirm",
+    "executionMode": "deferred",
+    "allowPromise": true,
+    "allowEarlyCompletion": false,
+    "difficulty": "bold",
+    "prompt": {
+      "uk": "До завершення вечора запитай одруженого гостя, який малий вибір з роками виявляється найважливішим.",
+      "en": "Before the evening ends, ask a married guest which small choice becomes most important over the years."
+    }
+  },
+  {
+    "taskKey": "joyful-dilemma-20",
+    "categorySlug": "joyful-dilemma",
+    "interactionType": "async_task",
+    "responseMode": "confirm",
+    "executionMode": "deferred",
+    "allowPromise": true,
+    "allowEarlyCompletion": false,
+    "difficulty": "bold",
+    "prompt": {
+      "uk": "Пізніше цього вечора поміть один момент, де радість перемогла метушню, і занотуй його.",
+      "en": "Later tonight, notice one moment where joy won over fuss and write it down."
+    }
+  },
+  {
+    "taskKey": "similar-or-different-01",
+    "categorySlug": "similar-or-different",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Знайди одну річ, яку ти і сусід поруч однаково цінуєте в сімейному житті.",
+      "en": "Find one thing that you and the person next to you both value in family life."
+    }
+  },
+  {
+    "taskKey": "similar-or-different-02",
+    "categorySlug": "similar-or-different",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Знайди одну несподівану відмінність між собою і кимось за іншим столом.",
+      "en": "Find one unexpected difference between yourself and someone at another table."
+    }
+  },
+  {
+    "taskKey": "similar-or-different-03",
+    "categorySlug": "similar-or-different",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Запитай когось, чи у вас збігається улюблена пора року.",
+      "en": "Ask someone whether you share the same favorite season."
+    }
+  },
+  {
+    "taskKey": "similar-or-different-04",
+    "categorySlug": "similar-or-different",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Дізнайся, чи ви з іншим гостем обрали б море чи гори для відпочинку.",
+      "en": "Find out whether you and another guest would choose sea or mountains for rest."
+    }
+  },
+  {
+    "taskKey": "similar-or-different-05",
+    "categorySlug": "similar-or-different",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Відкрий, чи ти і ще один гість відновлюєтесь у тиші чи в розмові.",
+      "en": "Discover whether you and another guest recharge in quiet or in conversation."
+    }
+  },
+  {
+    "taskKey": "similar-or-different-06",
+    "categorySlug": "similar-or-different",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Дізнайся одну навичку, яку і ти, і ще хтось хочете розвивати.",
+      "en": "Find one skill that both you and another person want to develop."
+    }
+  },
+  {
+    "taskKey": "similar-or-different-07",
+    "categorySlug": "similar-or-different",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Знайди гостя, з яким у вас схожий темп спілкування: спокійний або жвавий.",
+      "en": "Find a guest whose pace of conversation is similar to yours: calm or lively."
+    }
+  },
+  {
+    "taskKey": "similar-or-different-08",
+    "categorySlug": "similar-or-different",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Відкрий одну цінність, яку ти поділяєш з кимось старшим за себе.",
+      "en": "Discover one value you share with someone older than you."
+    }
+  },
+  {
+    "taskKey": "similar-or-different-09",
+    "categorySlug": "similar-or-different",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Напиши одну схожість, яку ти сьогодні знайшов з новою людиною.",
+      "en": "Write one similarity you found today with someone new."
+    }
+  },
+  {
+    "taskKey": "similar-or-different-10",
+    "categorySlug": "similar-or-different",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Напиши одну відмінність, яка зробила розмову цікавішою.",
+      "en": "Write one difference that made a conversation more interesting."
+    }
+  },
+  {
+    "taskKey": "similar-or-different-11",
+    "categorySlug": "similar-or-different",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Заверши фразу: «Ми були різні, але відчули близькість, бо...»",
+      "en": "Finish the phrase: \"We were different, yet we felt close because...\""
+    }
+  },
+  {
+    "taskKey": "similar-or-different-12",
+    "categorySlug": "similar-or-different",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши, чого люди різних поколінь можуть навчити одне одного.",
+      "en": "Write what people from different generations can teach one another."
+    }
+  },
+  {
+    "taskKey": "similar-or-different-13",
+    "categorySlug": "similar-or-different",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Напиши одну спільну надію, яку ти почув сьогодні за столом.",
+      "en": "Write one shared hope you heard at your table today."
+    }
+  },
+  {
+    "taskKey": "similar-or-different-14",
+    "categorySlug": "similar-or-different",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши, що допомагає людям відчувати близькість навіть у відмінностях.",
+      "en": "Write what helps people feel close even in their differences."
+    }
+  },
+  {
+    "taskKey": "similar-or-different-15",
+    "categorySlug": "similar-or-different",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 60,
+    "prompt": {
+      "uk": "За 60 секунд знайди двох людей, які по-різному відпочивають, і почуй коротке пояснення кожного.",
+      "en": "In 60 seconds, find two people who rest differently and hear a short reason from each."
+    }
+  },
+  {
+    "taskKey": "similar-or-different-16",
+    "categorySlug": "similar-or-different",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "gentle",
+    "timerSeconds": 45,
+    "prompt": {
+      "uk": "За 45 секунд знайди гостя зі спільною першою літерою, сезоном народження або регіоном.",
+      "en": "In 45 seconds, find a guest who shares your first letter, birth season, or home region."
+    }
+  },
+  {
+    "taskKey": "similar-or-different-17",
+    "categorySlug": "similar-or-different",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 60,
+    "prompt": {
+      "uk": "За 60 секунд дізнайся одну схожість між вашим і ще одним столом.",
+      "en": "In 60 seconds, learn one similarity between your table and another table."
+    }
+  },
+  {
+    "taskKey": "similar-or-different-18",
+    "categorySlug": "similar-or-different",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 75,
+    "prompt": {
+      "uk": "За 75 секунд знайди трьох людей з різним ритмом дня і почуй по одній силі кожного.",
+      "en": "In 75 seconds, find three people with different daily rhythms and hear one strength from each."
+    }
+  },
+  {
+    "taskKey": "similar-or-different-19",
+    "categorySlug": "similar-or-different",
+    "interactionType": "async_task",
+    "responseMode": "confirm",
+    "executionMode": "deferred",
+    "allowPromise": true,
+    "allowEarlyCompletion": false,
+    "difficulty": "bold",
+    "prompt": {
+      "uk": "Перед відходом збери три спільні слова, які описують настрій вашого столу.",
+      "en": "Before leaving, collect three shared words that describe your table's mood."
+    }
+  },
+  {
+    "taskKey": "similar-or-different-20",
+    "categorySlug": "similar-or-different",
+    "interactionType": "async_task",
+    "responseMode": "confirm",
+    "executionMode": "deferred",
+    "allowPromise": true,
+    "allowEarlyCompletion": false,
+    "difficulty": "bold",
+    "prompt": {
+      "uk": "До завершення вечора познайом двох гостей, яким, на твою думку, буде легко порозумітися.",
+      "en": "Before the evening ends, introduce two guests who you think would get along easily."
+    }
+  },
+  {
+    "taskKey": "small-challenge-01",
+    "categorySlug": "small-challenge",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Принеси серветку або склянку людині поруч без зайвого шуму.",
+      "en": "Bring a napkin or a glass to someone nearby without making a fuss."
+    }
+  },
+  {
+    "taskKey": "small-challenge-02",
+    "categorySlug": "small-challenge",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Допоможи зробити трохи більше простору за столом для зручнішої розмови.",
+      "en": "Help make a little more space at the table for easier conversation."
+    }
+  },
+  {
+    "taskKey": "small-challenge-03",
+    "categorySlug": "small-challenge",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Зроби одне спокійне фото вашого столу і покажи його всім.",
+      "en": "Take one calm photo of your table and show it to everyone there."
+    }
+  },
+  {
+    "taskKey": "small-challenge-04",
+    "categorySlug": "small-challenge",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Встань, розправ плечі і запроси ще двох людей зробити це разом з тобою.",
+      "en": "Stand up, relax your shoulders, and invite two more people to do the same."
+    }
+  },
+  {
+    "taskKey": "small-challenge-05",
+    "categorySlug": "small-challenge",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Знайди і привітайся з людиною, яка сидить найдалі від тебе.",
+      "en": "Find and greet the person sitting farthest from you."
+    }
+  },
+  {
+    "taskKey": "small-challenge-06",
+    "categorySlug": "small-challenge",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Запитай одного гостя, чи не потрібна йому якась дрібна допомога просто зараз.",
+      "en": "Ask one guest whether they need any small help right now."
+    }
+  },
+  {
+    "taskKey": "small-challenge-07",
+    "categorySlug": "small-challenge",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Проведи одну повну хвилину, уважно слухаючи людину без перебивання.",
+      "en": "Spend one full minute listening to someone without interrupting."
+    }
+  },
+  {
+    "taskKey": "small-challenge-08",
+    "categorySlug": "small-challenge",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Запропонуй комусь зробити для них одне гарне фото.",
+      "en": "Offer to take one good photo for someone."
+    }
+  },
+  {
+    "taskKey": "small-challenge-09",
+    "categorySlug": "small-challenge",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Напиши один маленький виклик, який зазвичай покращує твій настрій.",
+      "en": "Write one tiny challenge that usually improves your mood."
+    }
+  },
+  {
+    "taskKey": "small-challenge-10",
+    "categorySlug": "small-challenge",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Напиши одну малу дію служіння, яка значить більше, ніж коштує.",
+      "en": "Write one small act of service that means more than it costs."
+    }
+  },
+  {
+    "taskKey": "small-challenge-11",
+    "categorySlug": "small-challenge",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Заверши фразу: «Простий спосіб полегшити атмосферу - це...»",
+      "en": "Finish the phrase: \"A simple way to lighten the room is...\""
+    }
+  },
+  {
+    "taskKey": "small-challenge-12",
+    "categorySlug": "small-challenge",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши, що допомагає тобі сповільнитися, коли навколо стає метушливо.",
+      "en": "Write what helps you slow down when things around you become busy."
+    }
+  },
+  {
+    "taskKey": "small-challenge-13",
+    "categorySlug": "small-challenge",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Напиши одну маленьку звичку, яка допомагає людям відчути, що їх бачать.",
+      "en": "Write one tiny habit that helps people feel seen."
+    }
+  },
+  {
+    "taskKey": "small-challenge-14",
+    "categorySlug": "small-challenge",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши, чому присутність інколи краща за ідеальні слова.",
+      "en": "Write why presence is sometimes better than perfect words."
+    }
+  },
+  {
+    "taskKey": "small-challenge-15",
+    "categorySlug": "small-challenge",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 60,
+    "prompt": {
+      "uk": "За 60 секунд дізнайся імена двох гостей, яких ти раніше не знав.",
+      "en": "In 60 seconds, learn the names of two guests you did not know before."
+    }
+  },
+  {
+    "taskKey": "small-challenge-16",
+    "categorySlug": "small-challenge",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "gentle",
+    "timerSeconds": 45,
+    "prompt": {
+      "uk": "За 45 секунд поміть і назви три красиві деталі в залі.",
+      "en": "In 45 seconds, notice and name three beautiful details in the room."
+    }
+  },
+  {
+    "taskKey": "small-challenge-17",
+    "categorySlug": "small-challenge",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 60,
+    "prompt": {
+      "uk": "За 60 секунд зроби одне маленьке коло турботи: стілець, вода або усмішка.",
+      "en": "In 60 seconds, make one small circle of care: a chair, water, or a smile."
+    }
+  },
+  {
+    "taskKey": "small-challenge-18",
+    "categorySlug": "small-challenge",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 75,
+    "prompt": {
+      "uk": "За 75 секунд почуй дві короткі надії на найближчий тиждень від охочих гостей.",
+      "en": "In 75 seconds, hear two short hopes for the coming week from willing guests."
+    }
+  },
+  {
+    "taskKey": "small-challenge-19",
+    "categorySlug": "small-challenge",
+    "interactionType": "async_task",
+    "responseMode": "confirm",
+    "executionMode": "deferred",
+    "allowPromise": true,
+    "allowEarlyCompletion": false,
+    "difficulty": "bold",
+    "prompt": {
+      "uk": "До десерту зроби одну непомітну корисну справу біля вашого столу.",
+      "en": "Before dessert, do one unseen helpful thing near your table."
+    }
+  },
+  {
+    "taskKey": "small-challenge-20",
+    "categorySlug": "small-challenge",
+    "interactionType": "async_task",
+    "responseMode": "confirm",
+    "executionMode": "deferred",
+    "allowPromise": true,
+    "allowEarlyCompletion": false,
+    "difficulty": "bold",
+    "prompt": {
+      "uk": "До завершення вечора допоможи одній людині зберегти спогад через фото або нотатку.",
+      "en": "Before the evening ends, help one person preserve a memory through a photo or note."
+    }
+  },
+  {
+    "taskKey": "wisdom-for-the-day-01",
+    "categorySlug": "wisdom-for-the-day",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Запитай старшого гостя про одне речення мудрості щодо миру в домі.",
+      "en": "Ask an older guest for one sentence of wisdom about peace at home."
+    }
+  },
+  {
+    "taskKey": "wisdom-for-the-day-02",
+    "categorySlug": "wisdom-for-the-day",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Поділися з людиною поруч одним віршем, приказкою або висловом, що тебе зміцнює.",
+      "en": "Share one verse, proverb, or saying with the person next to you that strengthens you."
+    }
+  },
+  {
+    "taskKey": "wisdom-for-the-day-03",
+    "categorySlug": "wisdom-for-the-day",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Назви одну рису, яка робить вибачення правдивим.",
+      "en": "Name one quality that makes an apology genuine."
+    }
+  },
+  {
+    "taskKey": "wisdom-for-the-day-04",
+    "categorySlug": "wisdom-for-the-day",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Скажи одне речення про терпіння, в яке ти віриш більше зараз, ніж п'ять років тому.",
+      "en": "Say one sentence about patience that you believe more now than five years ago."
+    }
+  },
+  {
+    "taskKey": "wisdom-for-the-day-05",
+    "categorySlug": "wisdom-for-the-day",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Скажи комусь одне тихе благословення на наступний тиждень.",
+      "en": "Speak one quiet blessing over someone's coming week."
+    }
+  },
+  {
+    "taskKey": "wisdom-for-the-day-06",
+    "categorySlug": "wisdom-for-the-day",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Запитай гостя, що допомагає йому берегти м'яке серце.",
+      "en": "Ask a guest what helps them keep a soft heart."
+    }
+  },
+  {
+    "taskKey": "wisdom-for-the-day-07",
+    "categorySlug": "wisdom-for-the-day",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Назви одну звичку, яка береже радість у важкі сезони.",
+      "en": "Name one habit that protects joy in hard seasons."
+    }
+  },
+  {
+    "taskKey": "wisdom-for-the-day-08",
+    "categorySlug": "wisdom-for-the-day",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Поділися однією річчю, якої тебе навчили сім'я або церква про вірність.",
+      "en": "Share one thing family or church taught you about faithfulness."
+    }
+  },
+  {
+    "taskKey": "wisdom-for-the-day-09",
+    "categorySlug": "wisdom-for-the-day",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши одну коротку пораду, яку молодятам варто пам'ятати в метушливі сезони.",
+      "en": "Write one short piece of advice the couple should remember in busy seasons."
+    }
+  },
+  {
+    "taskKey": "wisdom-for-the-day-10",
+    "categorySlug": "wisdom-for-the-day",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Заверши фразу: «Мир у домі росте, коли...»",
+      "en": "Finish the phrase: \"Peace in a home grows when...\""
+    }
+  },
+  {
+    "taskKey": "wisdom-for-the-day-11",
+    "categorySlug": "wisdom-for-the-day",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Напиши одне речення, яке могло б підказати шлях втомленому серцю.",
+      "en": "Write one sentence that could guide a tired heart."
+    }
+  },
+  {
+    "taskKey": "wisdom-for-the-day-12",
+    "categorySlug": "wisdom-for-the-day",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Напиши, що означає мудрість у звичайних буднях.",
+      "en": "Write what wisdom means in ordinary weekdays."
+    }
+  },
+  {
+    "taskKey": "wisdom-for-the-day-13",
+    "categorySlug": "wisdom-for-the-day",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши одну правду, яка стає яснішою з часом, а не з шумом.",
+      "en": "Write one truth that becomes clearer with time, not noise."
+    }
+  },
+  {
+    "taskKey": "wisdom-for-the-day-14",
+    "categorySlug": "wisdom-for-the-day",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши один практичний спосіб обрати лагідність під тиском.",
+      "en": "Write one practical way to choose gentleness under pressure."
+    }
+  },
+  {
+    "taskKey": "wisdom-for-the-day-15",
+    "categorySlug": "wisdom-for-the-day",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 60,
+    "prompt": {
+      "uk": "За 60 секунд збери дві короткі думки мудрості від двох різних гостей.",
+      "en": "In 60 seconds, gather two short pieces of wisdom from two different guests."
+    }
+  },
+  {
+    "taskKey": "wisdom-for-the-day-16",
+    "categorySlug": "wisdom-for-the-day",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "gentle",
+    "timerSeconds": 45,
+    "prompt": {
+      "uk": "За 45 секунд назви три слова, які мають жити в надійному домі.",
+      "en": "In 45 seconds, name three words that belong in a trustworthy home."
+    }
+  },
+  {
+    "taskKey": "wisdom-for-the-day-17",
+    "categorySlug": "wisdom-for-the-day",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "gentle",
+    "timerSeconds": 60,
+    "prompt": {
+      "uk": "За 60 секунд пригадай двох людей, які для тебе уособлюють вірність, і назви їх.",
+      "en": "In 60 seconds, recall two people who embody faithfulness for you and name them."
+    }
+  },
+  {
+    "taskKey": "wisdom-for-the-day-18",
+    "categorySlug": "wisdom-for-the-day",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 75,
+    "prompt": {
+      "uk": "За 75 секунд напиши або скажи чотири слова, якими хочеш позначити цей шлюб через роки.",
+      "en": "In 75 seconds, write or say four words you hope will describe this marriage in years to come."
+    }
+  },
+  {
+    "taskKey": "wisdom-for-the-day-19",
+    "categorySlug": "wisdom-for-the-day",
+    "interactionType": "async_task",
+    "responseMode": "confirm",
+    "executionMode": "deferred",
+    "allowPromise": true,
+    "allowEarlyCompletion": false,
+    "difficulty": "bold",
+    "prompt": {
+      "uk": "Перед відходом запитай старшого гостя, що допомогло йому вистояти у важкому сезоні.",
+      "en": "Before leaving, ask an older guest what helped them stand firm in a difficult season."
+    }
+  },
+  {
+    "taskKey": "wisdom-for-the-day-20",
+    "categorySlug": "wisdom-for-the-day",
+    "interactionType": "async_task",
+    "responseMode": "confirm",
+    "executionMode": "deferred",
+    "allowPromise": true,
+    "allowEarlyCompletion": false,
+    "difficulty": "bold",
+    "prompt": {
+      "uk": "До завершення вечора передай одну мудру думку людині, яка молодша за тебе.",
+      "en": "Before the evening ends, pass one wise thought to someone younger than you."
+    }
+  },
+  {
+    "taskKey": "in-their-style-01",
+    "categorySlug": "in-their-style",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Обери, що більше в їхньому стилі для тихого вечора: настільна гра чи довга прогулянка.",
+      "en": "Choose what feels more their style for a quiet evening: a board game or a long walk."
+    }
+  },
+  {
+    "taskKey": "in-their-style-02",
+    "categorySlug": "in-their-style",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Назви одну деталь сьогодні, яка дуже нагадує атмосферу молодят.",
+      "en": "Name one detail today that strongly reflects the couple's atmosphere."
+    }
+  },
+  {
+    "taskKey": "in-their-style-03",
+    "categorySlug": "in-their-style",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Обери, що більше пасує їхньому дому: тепле світло свічок чи відкрите денне світло.",
+      "en": "Choose what suits their home more: warm candlelight or open daylight."
+    }
+  },
+  {
+    "taskKey": "in-their-style-04",
+    "categorySlug": "in-their-style",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Спробуй вгадати, що для них у буднях важливіше: порядок чи спонтанність.",
+      "en": "Try to guess what matters more in their daily life: order or spontaneity."
+    }
+  },
+  {
+    "taskKey": "in-their-style-05",
+    "categorySlug": "in-their-style",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Скажи, яке слово пасує їм більше сьогодні: ніжність чи стійкість.",
+      "en": "Say which word fits them better today: tenderness or steadiness."
+    }
+  },
+  {
+    "taskKey": "in-their-style-06",
+    "categorySlug": "in-their-style",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Обери одну сімейну рису, яку вони, на твою думку, особливо берегтимуть.",
+      "en": "Choose one family quality you think they will protect especially well."
+    }
+  },
+  {
+    "taskKey": "in-their-style-07",
+    "categorySlug": "in-their-style",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Обери, що більше пасує їхньому столу: спільний десерт чи спільна історія.",
+      "en": "Choose what suits their table more: a shared dessert or a shared story."
+    }
+  },
+  {
+    "taskKey": "in-their-style-08",
+    "categorySlug": "in-their-style",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Назви одну буденну звичку, яка, на твою думку, приноситиме їм радість.",
+      "en": "Name one everyday habit that you think will bring them joy."
+    }
+  },
+  {
+    "taskKey": "in-their-style-09",
+    "categorySlug": "in-their-style",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши один підпис, який звучав би як їхній спосіб приймати людей.",
+      "en": "Write a caption that sounds like their way of welcoming people."
+    }
+  },
+  {
+    "taskKey": "in-their-style-10",
+    "categorySlug": "in-their-style",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Заверши фразу: «В їхньому стилі любов виглядає як...»",
+      "en": "Finish the phrase: \"In their style, love looks like...\""
+    }
+  },
+  {
+    "taskKey": "in-their-style-11",
+    "categorySlug": "in-their-style",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши, яку атмосферу, ймовірно, створюватиме їхній майбутній дім.",
+      "en": "Write what kind of atmosphere their future home will likely create."
+    }
+  },
+  {
+    "taskKey": "in-their-style-12",
+    "categorySlug": "in-their-style",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Напиши одну маленьку традицію, яка їм добре пасувала б.",
+      "en": "Write one small tradition that would suit them well."
+    }
+  },
+  {
+    "taskKey": "in-their-style-13",
+    "categorySlug": "in-their-style",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "warm",
+    "prompt": {
+      "uk": "Напиши, яка цінність, на твою думку, найбільше фарбує їхні стосунки.",
+      "en": "Write which value you think most colors their relationship."
+    }
+  },
+  {
+    "taskKey": "in-their-style-14",
+    "categorySlug": "in-their-style",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
+    "executionMode": "instant",
+    "allowPromise": false,
+    "allowEarlyCompletion": false,
+    "difficulty": "gentle",
+    "prompt": {
+      "uk": "Напиши коротке речення, що починається зі слів: «Їхня радість - це...»",
+      "en": "Write a short sentence beginning with: \"Their joy is...\""
+    }
+  },
+  {
+    "taskKey": "in-their-style-15",
+    "categorySlug": "in-their-style",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 60,
+    "prompt": {
+      "uk": "За 60 секунд запитай двох гостей, яке слово найкраще пасує молодятам: спокій, світло, щедрість чи вірність.",
+      "en": "In 60 seconds, ask two guests which word best fits the couple: calm, brightness, generosity, or faithfulness."
+    }
+  },
+  {
+    "taskKey": "in-their-style-16",
+    "categorySlug": "in-their-style",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "gentle",
+    "timerSeconds": 45,
+    "prompt": {
+      "uk": "За 45 секунд назви три деталі сьогодні, які могли б належати лише цій парі.",
+      "en": "In 45 seconds, name three details today that could belong only to this couple."
+    }
+  },
+  {
+    "taskKey": "in-their-style-17",
+    "categorySlug": "in-their-style",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 60,
+    "prompt": {
+      "uk": "За 60 секунд придумай дві домашні традиції, які їм пасували б.",
+      "en": "In 60 seconds, invent two home traditions that would suit them."
+    }
+  },
+  {
+    "taskKey": "in-their-style-18",
+    "categorySlug": "in-their-style",
+    "interactionType": "timer",
+    "responseMode": "confirm",
+    "executionMode": "timed",
+    "allowPromise": false,
+    "allowEarlyCompletion": true,
+    "difficulty": "warm",
+    "timerSeconds": 75,
+    "prompt": {
+      "uk": "За 75 секунд запитай людину, що добре їх знає, яка риса найчастіше проявляється в буднях.",
+      "en": "In 75 seconds, ask someone who knows them well which quality shows up most in daily life."
+    }
+  },
+  {
+    "taskKey": "in-their-style-19",
+    "categorySlug": "in-their-style",
+    "interactionType": "async_task",
+    "responseMode": "confirm",
+    "executionMode": "deferred",
+    "allowPromise": true,
+    "allowEarlyCompletion": false,
+    "difficulty": "bold",
+    "prompt": {
+      "uk": "До завершення вечора поміть один реальний момент, який відчувається абсолютно в їхньому стилі, і запиши його.",
+      "en": "Before the evening ends, notice one real moment that feels completely in their style and write it down."
+    }
+  },
+  {
+    "taskKey": "in-their-style-20",
+    "categorySlug": "in-their-style",
+    "interactionType": "async_task",
+    "responseMode": "confirm",
+    "executionMode": "deferred",
+    "allowPromise": true,
+    "allowEarlyCompletion": false,
+    "difficulty": "bold",
+    "prompt": {
+      "uk": "Пізніше цього вечора запитай близьку до молодят людину, яку тиху їхню звичку варто пам'ятати.",
+      "en": "Later tonight, ask someone close to the couple which quiet habit of theirs deserves to be remembered."
+    }
+  }
+]

@@ -1,13 +1,20 @@
 export { WEDDING_DATE, VENUE, COUPLE, DRESS_CODE } from "./wedding";
 export {
   GAMES,
-  WHEEL_OF_FORTUNE_SEGMENTS,
   getGameBySlug,
   getPlayableGames,
   getPlayableGameSlugs,
-  getWheelSegmentById,
   isGamePlayable,
 } from "./games";
+export {
+  WHEEL_CONTENT_CATEGORIES,
+  WHEEL_CONTENT_TASKS,
+  getWheelContentCategoryBySlug,
+  getWheelContentTaskByKey,
+  getWheelContentTasksByCategory,
+  getWheelContentSummary,
+  getWheelTaskXpConfig,
+} from "./wheel-content";
 export {
   SITE_NAME,
   SITE_ALTERNATE_NAME,
@@ -27,6 +34,12 @@ export type {
   GameSlug,
   GameStatus,
   GameCatalogItem,
-  WheelSegment,
-  WheelSegmentType,
 } from "./games";
+export type {
+  WheelCategoryDefinition,
+  WheelTaskDefinition,
+  WheelInteractionType,
+  WheelResponseMode,
+  WheelExecutionMode,
+  WheelDifficulty,
+} from "./wheel-content";

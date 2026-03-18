@@ -2,42 +2,46 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import type { SupportedLocale } from "@/shared/config";
 import {
-  InvalidWheelRoundResponseError,
+  InvalidWheelRoundStateError,
   PlayerProfileNotReadyError,
   requireAuthenticatedGameUser,
-  startWheelRound,
+  startWheelRoundTimer,
   SupabaseConfigurationError,
   UnauthorizedGameRequestError,
   WheelRoundAlreadyResolvedError,
   WheelRoundNotFoundError,
-  WheelTasksDepletedError,
 } from "@/features/game-session/server";
 
 export const runtime = "nodejs";
 
-const wheelStartSchema = z.object({
+const wheelTimerStartSchema = z.object({
   locale: z.enum(["uk", "en"]),
 });
 
-export async function POST(request: Request) {
+export async function POST(
+  request: Request,
+  context: { params: Promise<{ roundId: string }> }
+) {
   try {
     const user = await requireAuthenticatedGameUser(request);
+    const { roundId } = await context.params;
     const body = await request.json();
-    const result = wheelStartSchema.safeParse(body);
+    const result = wheelTimerStartSchema.safeParse(body);
 
-    if (!result.success) {
+    if (!result.success || !roundId) {
       return NextResponse.json(
-        { error: "Invalid wheel start payload.", code: "INVALID_DATA" },
+        { error: "Invalid wheel timer payload.", code: "INVALID_DATA" },
         { status: 400 }
       );
     }
 
-    const wheelRound = await startWheelRound({
+    const timerStart = await startWheelRoundTimer({
       playerId: user.id,
+      roundId,
       locale: result.data.locale as SupportedLocale,
     });
 
-    return NextResponse.json(wheelRound);
+    return NextResponse.json(timerStart);
   } catch (error) {
     if (error instanceof SupabaseConfigurationError) {
       return NextResponse.json(
@@ -69,16 +73,6 @@ export async function POST(request: Request) {
       );
     }
 
-    if (error instanceof WheelTasksDepletedError) {
-      return NextResponse.json(
-        {
-          error: "No wheel tasks remain for this player.",
-          code: "NO_TASKS_LEFT",
-        },
-        { status: 409 }
-      );
-    }
-
     if (error instanceof WheelRoundNotFoundError) {
       return NextResponse.json(
         {
@@ -99,19 +93,19 @@ export async function POST(request: Request) {
       );
     }
 
-    if (error instanceof InvalidWheelRoundResponseError) {
+    if (error instanceof InvalidWheelRoundStateError) {
       return NextResponse.json(
         {
-          error: "Wheel round response is invalid.",
+          error: "Wheel round state is invalid.",
           code: "INVALID_DATA",
         },
-        { status: 400 }
+        { status: 409 }
       );
     }
 
-    console.error("Wheel route error:", error);
+    console.error("Wheel timer route error:", error);
     return NextResponse.json(
-      { error: "Failed to start wheel round.", code: "PERSISTENCE_ERROR" },
+      { error: "Failed to start wheel timer.", code: "PERSISTENCE_ERROR" },
       { status: 500 }
     );
   }

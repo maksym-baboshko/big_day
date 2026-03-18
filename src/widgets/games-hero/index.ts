@@ -1,0 +1,1 @@
+export { GamesHeroSection } from "./GamesHeroSection";

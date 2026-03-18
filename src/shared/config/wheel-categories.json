@@ -1,0 +1,112 @@
+[
+  {
+    "slug": "treasure-of-memories",
+    "title": {
+      "uk": "Скарб спогадів",
+      "en": "Treasure of Memories"
+    },
+    "description": {
+      "uk": "Теплі згадки, малі історії та моменти, які хочеться берегти.",
+      "en": "Warm memories, small stories, and moments worth keeping."
+    }
+  },
+  {
+    "slug": "improvisation",
+    "title": {
+      "uk": "Імпровізація",
+      "en": "Improvisation"
+    },
+    "description": {
+      "uk": "Легкі творчі завдання, де важлива щирість, а не сценічність.",
+      "en": "Light creative prompts where sincerity matters more than performance."
+    }
+  },
+  {
+    "slug": "honest-or-action",
+    "title": {
+      "uk": "Відверто чи дія",
+      "en": "Honest or Action"
+    },
+    "description": {
+      "uk": "М'які виклики на щирість, сміливість і доброзичливу дію.",
+      "en": "Gentle prompts for honesty, courage, and kind action."
+    }
+  },
+  {
+    "slug": "stream-of-kind-words",
+    "title": {
+      "uk": "Потік добрих слів",
+      "en": "Stream of Kind Words"
+    },
+    "description": {
+      "uk": "Компліменти, підтримка і слова, після яких тепліше на серці.",
+      "en": "Compliments, encouragement, and words that leave warmth behind."
+    }
+  },
+  {
+    "slug": "find-the-truth",
+    "title": {
+      "uk": "Дізнайся правду",
+      "en": "Find the Truth"
+    },
+    "description": {
+      "uk": "Спостереження, здогадки і маленькі відкриття про людей довкола.",
+      "en": "Observations, guesses, and small discoveries about the people around you."
+    }
+  },
+  {
+    "slug": "joyful-dilemma",
+    "title": {
+      "uk": "Весела дилема",
+      "en": "Joyful Dilemma"
+    },
+    "description": {
+      "uk": "Добрі вибори між двома симпатичними варіантами.",
+      "en": "Kind choices between two equally delightful options."
+    }
+  },
+  {
+    "slug": "similar-or-different",
+    "title": {
+      "uk": "Схожі чи різні",
+      "en": "Similar or Different"
+    },
+    "description": {
+      "uk": "Пошук спільного, відмінного і несподіваних збігів між гостями.",
+      "en": "Finding common ground, differences, and surprising overlaps between guests."
+    }
+  },
+  {
+    "slug": "small-challenge",
+    "title": {
+      "uk": "Маленький виклик",
+      "en": "Small Challenge"
+    },
+    "description": {
+      "uk": "Короткі дії, які додають вечору руху, але не створюють метушні.",
+      "en": "Short actions that add momentum to the evening without turning it into a show."
+    }
+  },
+  {
+    "slug": "wisdom-for-the-day",
+    "title": {
+      "uk": "Мудрість на день",
+      "en": "Wisdom for the Day"
+    },
+    "description": {
+      "uk": "Спокійні думки, поради і слова, які хочеться забрати з собою.",
+      "en": "Calm reflections, advice, and words worth taking home."
+    }
+  },
+  {
+    "slug": "in-their-style",
+    "title": {
+      "uk": "В їх стилі",
+      "en": "In Their Style"
+    },
+    "description": {
+      "uk": "Завдання, натхненні характером, звичками і атмосферою молодят.",
+      "en": "Prompts inspired by the couple's character, habits, and atmosphere."
+    }
+  }
+]

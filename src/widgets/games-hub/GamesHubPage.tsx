@@ -9,6 +9,7 @@ import {
   type GameCatalogItem,
   type SupportedLocale,
 } from "@/shared/config";
+import { GamesHeroSection } from "@/widgets/games-hero";
 import { AnimatedReveal, Button } from "@/shared/ui";
 
 /* ═══════════════════════════════════════════════════
@@ -151,45 +152,26 @@ export function GamesHubPage() {
 
   return (
     <div className="relative">
-
       {/* ══════ HERO ══════ */}
-      <div className="relative mx-auto max-w-6xl px-5 pb-6 pt-10 md:px-8 md:pb-8 md:pt-16">
-        <div className="grid items-end gap-8 lg:grid-cols-[1fr_440px] lg:gap-10">
-          {/* Left: title + description */}
-          <AnimatedReveal direction="up" delay={0.04}>
-            <h1 className="heading-serif max-w-xl text-4xl leading-[0.96] text-text-primary md:text-5xl lg:text-6xl">
-              {t("title")}
-            </h1>
-            <p className="mt-4 max-w-md text-sm leading-relaxed text-text-secondary md:text-base">
-              {t("description")}
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {(["chip_quick", "chip_fun", "chip_no_signup"] as const).map(
-                (key) => (
-                  <span
-                    key={key}
-                    className="rounded-full border border-accent/14 px-3.5 py-1.5 text-[11px] uppercase tracking-[0.2em] text-text-secondary"
-                  >
-                    {t(key)}
-                  </span>
-                )
-              )}
-            </div>
-          </AnimatedReveal>
-
-          {/* Right: player session */}
-          <AnimatedReveal direction="up" delay={0.1}>
-            <PlayerSessionCard
-              session={session}
-              isHydrating={isHydrating}
-              isSaving={isSaving}
-              errorCode={errorCode}
-              onSave={registerPlayer}
-              onClear={clearPlayer}
-            />
-          </AnimatedReveal>
-        </div>
-      </div>
+      <GamesHeroSection
+        title={t("title")}
+        description={t("description")}
+        chips={[
+          t("chip_quick"),
+          t("chip_fun"),
+          t("chip_no_signup"),
+        ]}
+        rightSlot={
+          <PlayerSessionCard
+            session={session}
+            isHydrating={isHydrating}
+            isSaving={isSaving}
+            errorCode={errorCode}
+            onSave={registerPlayer}
+            onClear={clearPlayer}
+          />
+        }
+      />
 
       {/* ══════ ALL GAMES ══════ */}
       <div className="mx-auto max-w-6xl px-5 pb-10 pt-6 md:px-8 md:pb-14 md:pt-8">

@@ -3,41 +3,50 @@ import { z } from "zod";
 import type { SupportedLocale } from "@/shared/config";
 import {
   InvalidWheelRoundResponseError,
+  InvalidWheelRoundStateError,
   PlayerProfileNotReadyError,
   requireAuthenticatedGameUser,
-  startWheelRound,
+  resolveWheelRound,
   SupabaseConfigurationError,
   UnauthorizedGameRequestError,
   WheelRoundAlreadyResolvedError,
   WheelRoundNotFoundError,
-  WheelTasksDepletedError,
 } from "@/features/game-session/server";
 
 export const runtime = "nodejs";
 
-const wheelStartSchema = z.object({
+const wheelResolutionSchema = z.object({
   locale: z.enum(["uk", "en"]),
+  resolution: z.enum(["completed", "promised", "skipped"]),
+  responseText: z.string().trim().max(280).optional().nullable(),
 });
 
-export async function POST(request: Request) {
+export async function POST(
+  request: Request,
+  context: { params: Promise<{ roundId: string }> }
+) {
   try {
     const user = await requireAuthenticatedGameUser(request);
+    const { roundId } = await context.params;
     const body = await request.json();
-    const result = wheelStartSchema.safeParse(body);
+    const result = wheelResolutionSchema.safeParse(body);
 
-    if (!result.success) {
+    if (!result.success || !roundId) {
       return NextResponse.json(
-        { error: "Invalid wheel start payload.", code: "INVALID_DATA" },
+        { error: "Invalid wheel resolution payload.", code: "INVALID_DATA" },
         { status: 400 }
       );
     }
 
-    const wheelRound = await startWheelRound({
+    const resolution = await resolveWheelRound({
       playerId: user.id,
+      roundId,
       locale: result.data.locale as SupportedLocale,
+      resolution: result.data.resolution,
+      responseText: result.data.responseText ?? null,
     });
 
-    return NextResponse.json(wheelRound);
+    return NextResponse.json(resolution);
   } catch (error) {
     if (error instanceof SupabaseConfigurationError) {
       return NextResponse.json(
@@ -64,16 +73,6 @@ export async function POST(request: Request) {
         {
           error: "Player profile is not ready yet.",
           code: "PLAYER_NOT_FOUND",
-        },
-        { status: 409 }
-      );
-    }
-
-    if (error instanceof WheelTasksDepletedError) {
-      return NextResponse.json(
-        {
-          error: "No wheel tasks remain for this player.",
-          code: "NO_TASKS_LEFT",
         },
         { status: 409 }
       );
@@ -109,9 +108,19 @@ export async function POST(request: Request) {
       );
     }
 
-    console.error("Wheel route error:", error);
+    if (error instanceof InvalidWheelRoundStateError) {
+      return NextResponse.json(
+        {
+          error: "Wheel round state is invalid.",
+          code: "INVALID_DATA",
+        },
+        { status: 409 }
+      );
+    }
+
+    console.error("Wheel resolution route error:", error);
     return NextResponse.json(
-      { error: "Failed to start wheel round.", code: "PERSISTENCE_ERROR" },
+      { error: "Failed to resolve wheel round.", code: "PERSISTENCE_ERROR" },
       { status: 500 }
     );
   }

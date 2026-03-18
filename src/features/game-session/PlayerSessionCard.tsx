@@ -72,7 +72,7 @@ interface PlayerSessionCardProps {
   isSaving: boolean;
   errorCode: GameApiErrorCode | null;
   onSave: (nickname: string) => Promise<PlayerSessionSnapshot | null>;
-  onClear: () => void;
+  onClear: () => void | Promise<void>;
   compact?: boolean;
   className?: string;
 }
@@ -84,6 +84,7 @@ function resolveErrorMessage(
   if (!errorCode) return null;
   if (errorCode === "SUPABASE_NOT_CONFIGURED") return t("errors.storage_unavailable");
   if (errorCode === "PLAYER_NOT_FOUND") return t("errors.session_missing");
+  if (errorCode === "UNAUTHORIZED") return t("errors.session_missing");
   return t("errors.generic");
 }
 
@@ -103,6 +104,12 @@ export function PlayerSessionCard({
 
   const errorMessage = resolveErrorMessage(errorCode, t);
   const isSummaryVisible = session && !isEditing;
+  const normalizedNickname = nickname.trim().replace(/\s+/g, " ");
+  const normalizedSessionNickname = session
+    ? session.nickname.trim().replace(/\s+/g, " ")
+    : null;
+  const isUnchangedEdit =
+    Boolean(session) && normalizedNickname === normalizedSessionNickname;
 
   const cardClass = cn(
     "relative overflow-hidden rounded-[31px] bg-bg-primary p-6 shadow-[0_24px_60px_-40px_rgba(0,0,0,0.45)] md:p-7",
@@ -114,12 +121,16 @@ export function PlayerSessionCard({
     <div className="pointer-events-none absolute -right-8 top-8 h-24 w-24 rounded-full bg-accent/8 blur-3xl" />
   );
 
-  const linkBtnClass =
-    "cursor-pointer text-sm text-text-secondary transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary";
-
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const saved = await onSave(nickname.trim().replace(/\s+/g, " "));
+
+    if (session && isUnchangedEdit) {
+      setNickname(session.nickname);
+      setIsEditing(false);
+      return;
+    }
+
+    const saved = await onSave(normalizedNickname);
     if (saved) {
       setNickname(saved.nickname);
       setIsEditing(false);
@@ -133,16 +144,18 @@ export function PlayerSessionCard({
         <div className={cardClass}>
           {chrome}
           <div className="relative z-10 flex h-full flex-col justify-between animate-pulse">
+            {/* Top: small label + subtitle text */}
             <div className="space-y-2">
-              <div className="h-3 w-20 rounded-full bg-accent/20" />
-              <div className="h-8 w-36 rounded-full bg-accent/12" />
-              <div className="h-3.5 w-48 rounded-full bg-accent/8" />
+              <div className="h-2.5 w-20 rounded-full bg-accent/20" />
+              <div className="h-4 w-52 rounded-full bg-accent/12" />
             </div>
+            {/* Middle: input + helper */}
             <div>
-              <div className="h-11 rounded-2xl bg-accent/8" />
-              <div className="mt-2 h-3 w-40 rounded-full bg-accent/6" />
+              <div className="h-13 rounded-2xl bg-accent/8" />
+              <div className="mt-2 h-3 w-44 rounded-full bg-accent/6" />
             </div>
-            <div className="h-10 w-28 rounded-full bg-accent/12" />
+            {/* Bottom: full-width button */}
+            <div className="h-14 w-full rounded-full bg-accent/12" />
           </div>
         </div>
       </CardShell>
@@ -200,30 +213,28 @@ export function PlayerSessionCard({
             </div>
 
             {/* Bottom: actions */}
-            <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col items-center gap-3">
               <button
                 type="button"
-                onClick={() => {
-                  onClear();
-                  setNickname("");
-                  setIsEditing(false);
-                }}
-                className={linkBtnClass}
-              >
-                {t("reset_cta")}
-              </button>
-              <Button
-                type="button"
-                variant="secondary"
-                size="lg"
                 onClick={() => {
                   setNickname(session.nickname);
                   setIsEditing(true);
                 }}
-                className="w-full"
+                className="w-full cursor-pointer rounded-full border border-accent/20 bg-accent/10 px-8 py-4 text-lg font-medium text-text-primary transition-all duration-300 hover:border-accent/35 hover:bg-accent/16 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
               >
                 {t("edit_cta")}
-              </Button>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  void onClear();
+                  setNickname("");
+                  setIsEditing(false);
+                }}
+                className="cursor-pointer text-[11px] uppercase tracking-[0.2em] text-text-secondary/60 transition-colors duration-300 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                {t("reset_cta")}
+              </button>
             </div>
           </div>
         </div>
@@ -283,23 +294,13 @@ export function PlayerSessionCard({
           </div>
 
           {/* Bottom: actions */}
-          <div className="flex flex-col items-center gap-4">
-            {session ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setIsEditing(false);
-                  setNickname(session.nickname);
-                }}
-                className={linkBtnClass}
-              >
-                {t("cancel_cta")}
-              </button>
-            ) : null}
+          <div className="flex flex-col items-center gap-3">
             <Button
               type="submit"
               size="lg"
-              disabled={isSaving || nickname.trim().length < 2}
+              disabled={
+                isSaving || normalizedNickname.length < 2 || isUnchangedEdit
+              }
               className="w-full"
             >
               {isSaving
@@ -308,6 +309,18 @@ export function PlayerSessionCard({
                   ? t("update_cta")
                   : t("save_cta")}
             </Button>
+            {session ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsEditing(false);
+                  setNickname(session.nickname);
+                }}
+                className="cursor-pointer text-[11px] uppercase tracking-[0.2em] text-text-secondary/60 transition-colors duration-300 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                {t("cancel_cta")}
+              </button>
+            ) : null}
           </div>
         </form>
       </div>

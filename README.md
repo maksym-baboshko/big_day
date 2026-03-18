@@ -76,29 +76,35 @@ Notes:
 
 ## Wedding Game Hub and Supabase
 
-The game hub uses server-side route handlers and stores shared game data in Supabase.
-The browser does not talk to Supabase directly.
+The game hub stores shared game data in Supabase.
+The browser now uses a public Supabase key for anonymous auth, while route handlers keep using a server-only secret key for protected writes.
 
 Required environment variables:
 
 ```bash
-SUPABASE_URL=
-SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+SUPABASE_SECRET_KEY=
 ```
 
 Local setup flow:
 
 1. Create a Supabase project.
-2. Open the SQL Editor in Supabase.
-3. Run the script from `supabase/games_hub_schema.sql`.
-4. Add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to `.env.local`.
-5. Restart the Next.js dev server.
+2. Enable Anonymous sign-ins in Supabase Auth.
+3. Open the SQL Editor in Supabase.
+4. Run the script from `supabase/games_platform_schema.sql`.
+5. Run the script from `supabase/seed_wheel_content.sql`.
+6. Add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, and `SUPABASE_SECRET_KEY` to `.env.local`.
+7. Restart the Next.js dev server.
 
 Notes:
 
 - prepared images for games should stay in `public/images/games/...`
 - Supabase Storage is intentionally not used for the current MVP
-- the current MVP saves only finished interactions, not every click or draft change
+- the code also accepts `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` as fallbacks for older setups
+- the current slice bootstraps anonymous players and shared XP persistence; the full task lifecycle lands in the next wheel redesign slice
+- wheel content source files live in `src/shared/config/wheel-categories.json` and `src/shared/config/wheel-tasks.json`
+- regenerate `supabase/seed_wheel_content.sql` with `pnpm generate:wheel-content-seed` after editing wheel content
 
 ## Project structure
 
