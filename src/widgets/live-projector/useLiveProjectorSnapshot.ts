@@ -6,8 +6,10 @@ import { getSupabaseBrowserClient } from "@/features/game-session";
 import type { SupportedLocale } from "@/shared/config";
 
 const HERO_EVENT_DURATION_MS = 5000;
-const LIVE_POLL_INTERVAL_MS = 2000;
+const LIVE_POLL_INTERVAL_MS = 30_000;
 const LIVE_SNAPSHOT_URL = "/api/live";
+const LIVE_PROJECTOR_BROADCAST_CHANNEL = "live-projector-broadcast";
+const LIVE_PROJECTOR_BROADCAST_EVENT = "snapshot";
 
 interface UseLiveProjectorSnapshotResult {
   snapshot: LivePageApiResponse | null;
@@ -75,32 +77,8 @@ export function useLiveProjectorSnapshot(
     [showNextHeroEvent]
   );
 
-  const loadSnapshot = useCallback(async () => {
-    if (isRefreshingRef.current) {
-      return;
-    }
-
-    isRefreshingRef.current = true;
-
-    try {
-      const searchParams = new URLSearchParams({
-        leaderboardLimit: "10",
-        feedLimit: "5",
-        ts: Date.now().toString(),
-      });
-
-      const response = await fetch(`${LIVE_SNAPSHOT_URL}?${searchParams.toString()}`, {
-        method: "GET",
-        cache: "no-store",
-      });
-
-      if (!response.ok) {
-        setError(true);
-        setIsLoading(false);
-        return;
-      }
-
-      const nextSnapshot = (await response.json()) as LivePageApiResponse;
+  const applySnapshot = useCallback(
+    (nextSnapshot: LivePageApiResponse) => {
       const nextHeroEvents = nextSnapshot.feed.filter((event) => event.isHeroEvent);
 
       startTransition(() => {
@@ -127,13 +105,44 @@ export function useLiveProjectorSnapshot(
       }
 
       hasLoadedOnceRef.current = true;
+    },
+    [queueHeroEvents]
+  );
+
+  const loadSnapshot = useCallback(async () => {
+    if (isRefreshingRef.current) {
+      return;
+    }
+
+    isRefreshingRef.current = true;
+
+    try {
+      const searchParams = new URLSearchParams({
+        leaderboardLimit: "10",
+        feedLimit: "5",
+        ts: Date.now().toString(),
+      });
+
+      const response = await fetch(`${LIVE_SNAPSHOT_URL}?${searchParams.toString()}`, {
+        method: "GET",
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        setError(true);
+        setIsLoading(false);
+        return;
+      }
+
+      const nextSnapshot = (await response.json()) as LivePageApiResponse;
+      applySnapshot(nextSnapshot);
     } catch {
       setError(true);
       setIsLoading(false);
     } finally {
       isRefreshingRef.current = false;
     }
-  }, [queueHeroEvents]);
+  }, [applySnapshot]);
 
   useEffect(() => {
     void loadSnapshot();
@@ -168,7 +177,8 @@ export function useLiveProjectorSnapshot(
   useEffect(() => {
     try {
       const supabase = getSupabaseBrowserClient();
-      const channel = supabase
+
+      const realtimeChannel = supabase
         .channel(`live-projector-${locale}`)
         .on(
           "postgres_changes",
@@ -188,13 +198,25 @@ export function useLiveProjectorSnapshot(
           }
         });
 
+      const broadcastChannel = supabase
+        .channel(LIVE_PROJECTOR_BROADCAST_CHANNEL)
+        .on(
+          "broadcast",
+          { event: LIVE_PROJECTOR_BROADCAST_EVENT },
+          (event: { payload: LivePageApiResponse }) => {
+            applySnapshot(event.payload);
+          }
+        )
+        .subscribe();
+
       return () => {
-        void supabase.removeChannel(channel);
+        void supabase.removeChannel(realtimeChannel);
+        void supabase.removeChannel(broadcastChannel);
       };
     } catch {
       return undefined;
     }
-  }, [locale, loadSnapshot]);
+  }, [locale, loadSnapshot, applySnapshot]);
 
   return {
     snapshot,

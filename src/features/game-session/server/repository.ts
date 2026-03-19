@@ -584,6 +584,24 @@ async function emitRealtimeSignal(signal: {
   }
 }
 
+const LIVE_PROJECTOR_BROADCAST_CHANNEL = "live-projector-broadcast";
+const LIVE_PROJECTOR_BROADCAST_EVENT = "snapshot";
+
+async function broadcastLiveSnapshot() {
+  try {
+    const supabase = getSupabaseAdminClient();
+    const snapshot = await getLivePageSnapshot({ leaderboardLimit: 10, feedLimit: 5 });
+    const channel = supabase.channel(LIVE_PROJECTOR_BROADCAST_CHANNEL);
+    const result = await channel.httpSend(LIVE_PROJECTOR_BROADCAST_EVENT, snapshot);
+    await supabase.removeChannel(channel);
+    if (!result.success) {
+      console.error("Live snapshot broadcast failed:", result.error);
+    }
+  } catch (error) {
+    console.error("Live snapshot broadcast failed:", error);
+  }
+}
+
 function buildSelectableTaskGroups({
   categories,
   tasks,
@@ -802,6 +820,8 @@ export async function savePlayerProfile({
       playerId: authUserId,
     },
   });
+
+  void broadcastLiveSnapshot();
 
   return playerSnapshot;
 }
@@ -1474,6 +1494,8 @@ export async function resolveWheelRound({
         xpDelta,
       },
     });
+
+    void broadcastLiveSnapshot();
   }
 
   const playerSnapshot = await getPlayerSnapshotByPlayerId(playerId);
