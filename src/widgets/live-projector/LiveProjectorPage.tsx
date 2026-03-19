@@ -527,7 +527,7 @@ export function LiveProjectorPage() {
   const locale = useLocale() as SupportedLocale;
   const t = useTranslations("LivePage");
   const tGames = useTranslations("GamesCommon");
-  const { snapshot, isLoading, error, heroEvent } = useLiveProjectorSnapshot(locale);
+  const { snapshot, isLoading, error, heroEvent } = useLiveProjectorSnapshot();
 
   return (
     <section className="relative min-h-screen overflow-hidden bg-bg-primary text-text-primary">

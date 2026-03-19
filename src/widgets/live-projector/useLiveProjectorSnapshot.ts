@@ -3,8 +3,6 @@
 import { startTransition, useCallback, useEffect, useRef, useState } from "react";
 import type { LiveFeedEventSnapshot, LivePageApiResponse } from "@/features/game-session";
 import { getSupabaseBrowserClient } from "@/features/game-session";
-import type { SupportedLocale } from "@/shared/config";
-
 const HERO_EVENT_DURATION_MS = 5000;
 const LIVE_POLL_INTERVAL_MS = 30_000;
 const LIVE_SNAPSHOT_URL = "/api/live";
@@ -18,9 +16,7 @@ interface UseLiveProjectorSnapshotResult {
   heroEvent: LiveFeedEventSnapshot | null;
 }
 
-export function useLiveProjectorSnapshot(
-  locale: SupportedLocale
-): UseLiveProjectorSnapshotResult {
+export function useLiveProjectorSnapshot(): UseLiveProjectorSnapshotResult {
   const [snapshot, setSnapshot] = useState<LivePageApiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -178,26 +174,6 @@ export function useLiveProjectorSnapshot(
     try {
       const supabase = getSupabaseBrowserClient();
 
-      const realtimeChannel = supabase
-        .channel(`live-projector-${locale}`)
-        .on(
-          "postgres_changes",
-          {
-            event: "INSERT",
-            schema: "public",
-            table: "realtime_signals",
-            filter: "channel=eq.live-projector",
-          },
-          () => {
-            void loadSnapshot();
-          }
-        )
-        .subscribe((status) => {
-          if (status === "SUBSCRIBED") {
-            void loadSnapshot();
-          }
-        });
-
       const broadcastChannel = supabase
         .channel(LIVE_PROJECTOR_BROADCAST_CHANNEL)
         .on(
@@ -207,16 +183,19 @@ export function useLiveProjectorSnapshot(
             applySnapshot(event.payload);
           }
         )
-        .subscribe();
+        .subscribe((status) => {
+          if (status === "SUBSCRIBED") {
+            void loadSnapshot();
+          }
+        });
 
       return () => {
-        void supabase.removeChannel(realtimeChannel);
         void supabase.removeChannel(broadcastChannel);
       };
     } catch {
       return undefined;
     }
-  }, [locale, loadSnapshot, applySnapshot]);
+  }, [loadSnapshot, applySnapshot]);
 
   return {
     snapshot,
