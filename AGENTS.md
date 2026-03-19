@@ -47,11 +47,21 @@ src/
 │   ├── game-session/             # auth, local cache, shared contracts, server repository
 │   ├── language-switcher/
 │   ├── theme-switcher/
-│   └── wheel-of-fortune/
+│   └── wheel-of-fortune/         # WheelOfFortuneGame + extracted subcomponents
+│       ├── WheelOfFortuneGame.tsx
+│       ├── WheelChallengeOverlay.tsx
+│       ├── WheelLeaderboardCard.tsx
+│       ├── ConfettiPop.tsx
+│       └── wheel-helpers.ts      # shared constants, types, pure helpers
 ├── shared/
 │   ├── config/                   # wedding data, guests, game catalog, wheel content, metadata helpers
 │   ├── i18n/
 │   ├── lib/
+│   │   └── server/               # server-only utilities
+│   │       ├── deferred.ts       # after() + runDeferredTasks for Vercel serverless
+│   │       ├── game-api-error-handler.ts  # centralized error → HTTP response mapping
+│   │       ├── csp.ts
+│   │       └── rate-limit.ts
 │   └── ui/
 └── widgets/
     ├── invitation-page/
@@ -60,7 +70,14 @@ src/
     ├── games-hero/
     ├── games-shell/
     ├── games-wheel-page/
-    ├── live-projector/
+    ├── live-projector/            # decomposed projector page
+    │   ├── LiveProjectorPage.tsx  # composition root
+    │   ├── LiveClock.tsx
+    │   ├── FeedEventCard.tsx
+    │   ├── LeaderboardRow.tsx
+    │   ├── HeroEventOverlay.tsx
+    │   ├── live-projector-helpers.ts
+    │   └── useLiveProjectorSnapshot.ts
     ├── navbar/
     ├── not-found-page/
     └── invitation sections
@@ -98,11 +115,15 @@ Current RSVP payload shape:
 - other games remain catalog entries with `comingSoon` status in `src/shared/config/games.ts`
 - browser auth/session bootstrap lives in `src/features/game-session/auth-client.ts`
 - backend state remains authoritative; game logic and persistence live in `src/features/game-session/server`
+- timer remaining seconds are computed server-side in `repository-helpers.ts` — clients cannot influence resolution outcome
+- post-response work (broadcast, logging, realtime signals) uses deferred tasks via Next.js `after()` to guarantee execution on Vercel serverless
+- all game API routes use a centralized error handler (`handleGameApiError`) for consistent error → HTTP response mapping
 
 ### Live projector
 
 - `/live` reads from `/api/live`
-- the client uses polling plus Supabase realtime invalidation in `widgets/live-projector/useLiveProjectorSnapshot.ts`
+- the client receives live updates via Supabase Broadcast (WebSocket) with 30s polling as fallback in `widgets/live-projector/useLiveProjectorSnapshot.ts`
+- hero event deduplication uses a sliding window (200 IDs) to prevent unbounded memory growth during long sessions
 - the page is intended for projector/live usage and is marked `noindex`
 
 ---
@@ -206,6 +227,28 @@ Migration rules:
 
 ---
 
+## Server Patterns
+
+### Deferred tasks
+
+On Vercel serverless, the runtime may shut down immediately after the response is sent. Fire-and-forget (`void asyncFn()`) is unreliable. All post-response work must go through the deferred tasks pattern:
+
+1. Repository methods return `{ data, deferredTasks: DeferredTask[] }`
+2. Route handlers call `after(() => runDeferredTasks(tasks))` after sending the response
+3. `runDeferredTasks` uses `Promise.allSettled` so one failure does not block others
+
+This applies to: broadcast signals, activity logging, leaderboard notifications, and live snapshot pushes.
+
+### Centralized error handling
+
+Game API routes use `handleGameApiError()` from `@/shared/lib/server` instead of per-route `instanceof` chains. When adding a new error class, register it in `game-api-error-handler.ts` once.
+
+### Server-side timer computation
+
+`computeServerRemainingSeconds()` in `repository-helpers.ts` calculates the remaining time from `timer_last_started_at` and `timer_remaining_seconds`. Clients never submit remaining seconds for round resolution.
+
+---
+
 ## Key Rules
 
 - Never hardcode the wedding date; import `WEDDING_DATE`
@@ -216,6 +259,8 @@ Migration rules:
 - Treat `/invite/[slug]` and `/live` as intentionally non-indexed surfaces
 - Do not remove the current hydration-safe patterns in countdown, splash, language switcher, theme provider, or live snapshot refresh
 - Do not replace the server-authoritative wheel flow with client-side randomness or client-side score authority
+- Use the deferred tasks pattern for any post-response async work in API routes — never `void asyncFn()`
+- Register new game error types in `game-api-error-handler.ts` rather than adding `instanceof` checks in route files
 
 ---
 

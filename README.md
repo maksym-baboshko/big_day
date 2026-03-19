@@ -20,7 +20,9 @@ Big Day is a bilingual wedding website for Maksym and Diana with a built-in game
 - RSVP API with `zod` validation, honeypot field, rate limiting, and Resend or `mock` email delivery
 - Supabase-backed anonymous auth for games
 - player onboarding, leaderboard, live feed, and wheel round lifecycle
-- projector page backed by `/api/live` with realtime invalidation support
+- server-authoritative timer and score computation
+- deferred task execution via Next.js `after()` for reliable post-response work on Vercel serverless
+- projector page with Supabase Broadcast (WebSocket) live updates and polling fallback
 
 ## Tech stack
 
@@ -155,11 +157,12 @@ src/
 │   ├── game-session/             # auth, local cache, shared types, server repository
 │   ├── language-switcher/
 │   ├── theme-switcher/
-│   └── wheel-of-fortune/
+│   └── wheel-of-fortune/         # game UI + extracted subcomponents and helpers
 ├── shared/
 │   ├── config/                   # wedding data, guests, game catalog, wheel content, metadata helpers
 │   ├── i18n/
 │   ├── lib/
+│   │   └── server/               # deferred tasks, error handler, CSP, rate limiter
 │   └── ui/
 └── widgets/
     ├── invitation-page/
@@ -167,7 +170,7 @@ src/
     ├── games-hub/
     ├── games-shell/
     ├── games-wheel-page/
-    ├── live-projector/
+    ├── live-projector/            # decomposed: LiveClock, FeedEventCard, LeaderboardRow, HeroEventOverlay
     └── page sections
 ```
 
@@ -178,3 +181,5 @@ src/
 - Prefer CSS variable-based Tailwind classes instead of hardcoded component colors.
 - Use barrel exports where they already exist.
 - Treat `Countdown`, `Splash`, `LanguageSwitcher`, `ThemeProvider`, and `useLiveProjectorSnapshot` as hydration-sensitive code.
+- Use the deferred tasks pattern (`after()` + `runDeferredTasks`) for post-response async work in API routes.
+- Register new game error types in `game-api-error-handler.ts` — do not add `instanceof` chains in route files.
