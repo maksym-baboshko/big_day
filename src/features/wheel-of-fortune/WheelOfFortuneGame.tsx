@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useEffect, useEffectEvent, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   animate,
@@ -14,11 +14,8 @@ import {
   type SupportedLocale,
 } from "@/shared/config";
 import {
-  getSupabaseBrowserClient,
   getGameAuthAccessToken,
   type GameApiErrorCode,
-  type GameLeaderboardApiResponse,
-  type LeaderboardEntrySnapshot,
   type PlayerSessionSnapshot,
   type WheelRoundReadApiResponse,
   type WheelRoundResolution,
@@ -29,403 +26,32 @@ import {
 } from "@/features/game-session";
 import { hasMeaningfulGameResponseText, normalizeGameResponseText } from "@/features/game-session/response-text";
 import { cn } from "@/shared/lib";
+import { ConfettiPop } from "./ConfettiPop";
+import { WheelChallengeOverlay } from "./WheelChallengeOverlay";
+import { WheelLeaderboardCard } from "./WheelLeaderboardCard";
+import {
+  buildWheelRotation,
+  describeSlice,
+  getCategoryColor,
+  getCategoryIndex,
+  getDisplayRound,
+  getInteractionLabelKey,
+  getResolutionKey,
+  getStatusMessageKey,
+  getWheelErrorMessage,
+  polarToCartesian,
+  readApiErrorCode,
+  SEGMENT_PALETTE,
+  WHEEL_VISUAL_SEGMENT_COUNT,
+  wheelEase,
+  type RecentResultItem,
+  type ResolvedRound,
+} from "./wheel-helpers";
 
-const wheelEase = [0.22, 1, 0.36, 1] as const;
 const wheelDurationSeconds = 4.6;
-const WHEEL_VISUAL_SEGMENT_COUNT = WHEEL_CONTENT_CATEGORIES.length + 1;
-
-// Two-tone Art Deco palette: champagne gold ↔ deep bronze
-const SEGMENT_PALETTE = ["#caa76a", "#5c3e22"] as const;
-
-type ResolvedRound = WheelRoundResolveApiResponse["round"];
-
-interface RecentResultItem {
-  roundId: string;
-  prompt: string;
-  categorySlug: string;
-  categoryTitle: string;
-  resolution: WheelRoundResolution;
-  xpDelta: number;
-}
 
 interface WheelOfFortuneGameProps {
   onPlayerUpdate: (session: PlayerSessionSnapshot) => void;
-}
-
-function polarToCartesian(radius: number, deg: number) {
-  const rad = ((deg - 90) * Math.PI) / 180;
-  return { x: 50 + radius * Math.cos(rad), y: 50 + radius * Math.sin(rad) };
-}
-
-function describeSlice(startAngle: number, endAngle: number) {
-  const s = polarToCartesian(48.5, endAngle);
-  const e = polarToCartesian(48.5, startAngle);
-  const large = endAngle - startAngle <= 180 ? 0 : 1;
-  return `M 50 50 L ${s.x} ${s.y} A 48.5 48.5 0 ${large} 0 ${e.x} ${e.y} Z`;
-}
-
-function buildWheelRotation(
-  currentRotation: number,
-  selectedIndex: number,
-  segmentAngle: number
-) {
-  const norm = ((currentRotation % 360) + 360) % 360;
-  const target = selectedIndex * segmentAngle + segmentAngle / 2;
-  const delta = (360 - target - norm + 360) % 360;
-  return currentRotation + 5 * 360 + delta;
-}
-
-async function readApiErrorCode(res: Response): Promise<GameApiErrorCode> {
-  try {
-    const payload = (await res.json()) as { code?: GameApiErrorCode };
-    return payload.code ?? "PERSISTENCE_ERROR";
-  } catch {
-    return "PERSISTENCE_ERROR";
-  }
-}
-
-function ConfettiPop({ trigger }: { trigger: number }) {
-  return (
-    <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden">
-      {Array.from({ length: 18 }).map((_, i) => {
-        const angle = (i / 18) * Math.PI * 2;
-        const dist = 60 + ((trigger + i * 17) % 40);
-        return (
-          <motion.div
-            key={`${trigger}-${i}`}
-            initial={{ opacity: 1, scale: 0, x: 0, y: 0 }}
-            animate={{
-              opacity: [1, 1, 0],
-              scale: [0, 1.2, 0.6],
-              x: Math.cos(angle) * dist,
-              y: Math.sin(angle) * dist,
-            }}
-            transition={{ duration: 0.9, ease: "easeOut" }}
-            className="absolute h-2 w-2 rounded-full"
-            style={{
-              background: SEGMENT_PALETTE[i % SEGMENT_PALETTE.length],
-            }}
-          />
-        );
-      })}
-    </div>
-  );
-}
-
-function getAvatarMonogram(avatarKey: string, fallbackName: string) {
-  const keyMonogram = avatarKey
-    .split("-")
-    .map((part) => part.charAt(0).toUpperCase())
-    .join("")
-    .slice(0, 2);
-
-  if (keyMonogram.length > 0) {
-    return keyMonogram;
-  }
-
-  return fallbackName.trim().charAt(0).toUpperCase();
-}
-
-function WheelLeaderboardCard() {
-  const t = useTranslations("WheelOfFortune");
-  const tCommon = useTranslations("GamesCommon");
-  const [leaderboard, setLeaderboard] =
-    useState<GameLeaderboardApiResponse["leaderboard"] | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
-
-  const loadLeaderboard = useEffectEvent(async () => {
-    try {
-      const accessToken = await getGameAuthAccessToken();
-      const response = await fetch(
-        "/api/games/leaderboard?game=wheel-of-fortune&topLimit=5&radius=2",
-        {
-          method: "GET",
-          cache: "no-store",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        setHasError(true);
-        setIsLoading(false);
-        return;
-      }
-
-      const payload = (await response.json()) as GameLeaderboardApiResponse;
-
-      startTransition(() => {
-        setLeaderboard(payload.leaderboard);
-        setHasError(false);
-        setIsLoading(false);
-      });
-    } catch {
-      setHasError(true);
-      setIsLoading(false);
-    }
-  });
-
-  useEffect(() => {
-    void loadLeaderboard();
-  }, []);
-
-  useEffect(() => {
-    try {
-      const supabase = getSupabaseBrowserClient();
-      const channel = supabase
-        .channel("wheel-leaderboard")
-        .on(
-          "postgres_changes",
-          {
-            event: "INSERT",
-            schema: "public",
-            table: "realtime_signals",
-            filter: "channel=eq.game-leaderboard",
-          },
-          (payload) => {
-            const nextRecord =
-              payload.new && typeof payload.new === "object"
-                ? (payload.new as { game_slug?: string | null })
-                : null;
-
-            if (
-              nextRecord?.game_slug &&
-              nextRecord.game_slug !== "wheel-of-fortune"
-            ) {
-              return;
-            }
-
-            void loadLeaderboard();
-          }
-        )
-        .subscribe();
-
-      return () => {
-        void supabase.removeChannel(channel);
-      };
-    } catch {
-      return undefined;
-    }
-  }, []);
-
-  const currentPlayerId = leaderboard?.currentPlayerId ?? null;
-  const playerEntry = leaderboard?.playerEntry ?? null;
-  const showPlayerWindow =
-    Boolean(playerEntry) &&
-    Boolean(leaderboard?.playerWindow.length) &&
-    (playerEntry?.rank ?? 0) > (leaderboard?.top.length ?? 0);
-
-  function renderRow(entry: LeaderboardEntrySnapshot) {
-    const isCurrentPlayer = entry.playerId === currentPlayerId;
-
-    return (
-      <div
-        key={entry.playerId}
-        className={cn(
-          "flex items-center gap-3 rounded-2xl border px-4 py-3",
-          isCurrentPlayer
-            ? "border-accent/20 bg-accent/10"
-            : "border-accent/8 bg-bg-primary/40"
-        )}
-      >
-        <div className="w-7 shrink-0 text-center font-cinzel text-lg text-accent">
-          {entry.rank}
-        </div>
-        <div className="flex h-9 w-9 items-center justify-center rounded-full border border-accent/18 bg-accent/8 font-cinzel text-xs tracking-[0.16em] text-accent">
-          {getAvatarMonogram(entry.avatarKey, entry.nickname)}
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm text-text-primary">
-            {entry.nickname}
-            {isCurrentPlayer ? (
-              <span className="ml-2 text-[10px] uppercase tracking-[0.2em] text-accent">
-                {t("leaderboard_you")}
-              </span>
-            ) : null}
-          </p>
-        </div>
-        <div className="shrink-0 text-right">
-          <p className="font-cinzel text-xl text-text-primary">{entry.totalPoints}</p>
-          <p className="text-[9px] uppercase tracking-[0.2em] text-text-secondary/50">
-            {tCommon("points_unit")}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="rounded-3xl border border-accent/10 bg-bg-primary/40 p-5 backdrop-blur-sm">
-      <div className="flex items-center gap-3">
-        <p className="text-[10px] uppercase tracking-[0.32em] text-accent">
-          {t("leaderboard_label")}
-        </p>
-        <span className="h-px flex-1 bg-linear-to-r from-accent/20 to-transparent" />
-      </div>
-
-      {isLoading ? (
-        <div className="mt-4 space-y-2">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <div
-              key={index}
-              className="h-16 animate-pulse rounded-2xl border border-accent/8 bg-bg-primary/30"
-            />
-          ))}
-        </div>
-      ) : hasError ? (
-        <p className="mt-4 text-sm leading-relaxed text-text-secondary">
-          {t("leaderboard_error")}
-        </p>
-      ) : (
-        <div className="mt-4 space-y-4">
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.22em] text-text-secondary/55">
-              {t("leaderboard_top_label")}
-            </p>
-            {leaderboard?.top.length ? (
-              <div className="mt-3 space-y-2">{leaderboard.top.map(renderRow)}</div>
-            ) : (
-              <p className="mt-3 text-sm leading-relaxed text-text-secondary">
-                {t("leaderboard_empty")}
-              </p>
-            )}
-          </div>
-
-          {playerEntry ? (
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.22em] text-text-secondary/55">
-                {t("leaderboard_window_label")}
-              </p>
-              <div className="mt-3 rounded-2xl border border-accent/10 bg-bg-primary/30 px-4 py-3">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-accent/80">
-                  {t("leaderboard_rank_label")}
-                </p>
-                <div className="mt-2 flex items-baseline justify-between gap-3">
-                  <p className="font-cinzel text-3xl text-text-primary">
-                    #{playerEntry.rank}
-                  </p>
-                  <p className="font-cinzel text-2xl text-accent">
-                    {playerEntry.totalPoints}
-                  </p>
-                </div>
-              </div>
-
-              {showPlayerWindow ? (
-                <div className="mt-3 space-y-2">
-                  {leaderboard?.playerWindow.map(renderRow)}
-                </div>
-              ) : null}
-            </div>
-          ) : (
-            <p className="text-sm leading-relaxed text-text-secondary">
-              {t("leaderboard_unranked")}
-            </p>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function getCategoryIndex(categorySlug: string) {
-  return WHEEL_CONTENT_CATEGORIES.findIndex(
-    (category) => category.slug === categorySlug
-  );
-}
-
-function getCategoryColor(categorySlug: string) {
-  const categoryIndex = getCategoryIndex(categorySlug);
-  return SEGMENT_PALETTE[
-    (categoryIndex >= 0 ? categoryIndex : 0) % SEGMENT_PALETTE.length
-  ];
-}
-
-function getInteractionLabelKey(task: Pick<
-  WheelRoundSnapshot["task"],
-  "interactionType" | "responseMode"
->) {
-  if (task.responseMode === "choice") {
-    return "interaction_choice";
-  }
-
-  switch (task.interactionType) {
-    case "confirm":
-      return "interaction_confirm";
-    case "text_input":
-      return "interaction_text_input";
-    case "timer":
-      return "interaction_timer";
-    case "async_task":
-      return "interaction_async_task";
-  }
-}
-
-function getResolutionKey(resolution: WheelRoundResolution) {
-  switch (resolution) {
-    case "completed":
-      return "resolution_completed";
-    case "promised":
-      return "resolution_promised";
-    case "skipped":
-      return "resolution_skipped";
-  }
-}
-
-function getStatusMessageKey({
-  isPreparingRound,
-  isResolving,
-  isSpinning,
-}: {
-  isPreparingRound: boolean;
-  isResolving: boolean;
-  isSpinning: boolean;
-}) {
-  if (isPreparingRound) {
-    return "preparing_round";
-  }
-
-  if (isResolving) {
-    return "saving_result";
-  }
-
-  if (isSpinning) {
-    return "spinning_cta";
-  }
-
-  return null;
-}
-
-function getWheelErrorMessage(
-  errorCode: GameApiErrorCode | null,
-  t: (key: string, values?: Record<string, string | number>) => string
-) {
-  switch (errorCode) {
-    case "SUPABASE_NOT_CONFIGURED":
-      return t("errors.storage_unavailable");
-    case "RATE_LIMITED":
-      return t("errors.rate_limited");
-    case "NO_TASKS_LEFT":
-      return t("errors.no_tasks_left");
-    case "PLAYER_NOT_FOUND":
-    case "UNAUTHORIZED":
-      return t("errors.session_required");
-    case "ROUND_ALREADY_RESOLVED":
-    case "ROUND_NOT_FOUND":
-    case "INVALID_DATA":
-    case "PERSISTENCE_ERROR":
-      return t("errors.generic");
-    default:
-      return null;
-  }
-}
-
-function getDisplayRound(
-  activeRound: WheelRoundSnapshot | null,
-  resolvedRound: ResolvedRound | null
-) {
-  return resolvedRound ?? activeRound;
 }
 
 export function WheelOfFortuneGame({
@@ -661,8 +287,7 @@ export function WheelOfFortuneGame({
 
   async function resolveWheelRoundRequest(
     round: WheelRoundSnapshot,
-    resolution: WheelRoundResolution,
-    remainingSeconds?: number | null
+    resolution: WheelRoundResolution
   ) {
     const normalizedResponseText = normalizeGameResponseText(responseText);
     const accessToken = await getGameAuthAccessToken();
@@ -677,7 +302,6 @@ export function WheelOfFortuneGame({
         locale,
         resolution,
         responseText: responseText.trim().length > 0 ? responseText : null,
-        remainingSeconds,
       }),
     });
 
@@ -1008,11 +632,7 @@ export function WheelOfFortuneGame({
     try {
       const payload = await resolveWheelRoundRequest(
         activeRound,
-        resolution,
-        options?.remainingSeconds ??
-          timerRemaining ??
-          activeRound.timer?.remainingSeconds ??
-          null
+        resolution
       );
 
       if (!payload) {
@@ -1639,248 +1259,32 @@ export function WheelOfFortuneGame({
         </div>
       </div>
 
-      <AnimatePresence>
-        {isChallengeOpen && activeRound ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end justify-center bg-[rgba(8,12,17,0.66)] p-3 backdrop-blur-md md:items-center md:p-6"
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 28, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.98 }}
-              transition={{ duration: 0.24, ease: wheelEase }}
-              className="relative w-full max-w-2xl overflow-hidden rounded-4xl border border-accent/16 bg-bg-primary shadow-[0_32px_120px_-40px_rgba(0,0,0,0.8)]"
-            >
-              <div
-                className="absolute inset-x-0 top-0 h-1"
-                style={{
-                  background: `linear-gradient(90deg, transparent, ${getCategoryColor(
-                    activeRound.category.slug
-                  )}, transparent)`,
-                }}
-              />
-
-              <div className="p-5 md:p-8">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full border border-accent/20 bg-accent/8 px-3 py-1 text-[10px] uppercase tracking-[0.28em] text-accent">
-                    {t("overlay_label")}
-                  </span>
-                  <span className="rounded-full border border-text-secondary/20 bg-text-primary/6 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-text-secondary">
-                    {activeRound.category.title}
-                  </span>
-                  <span className="rounded-full border border-text-secondary/20 bg-text-primary/6 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-text-secondary">
-                    {t(getInteractionLabelKey(activeRound.task))}
-                  </span>
-                </div>
-
-                <h2 className="heading-serif mt-5 text-3xl leading-snug text-text-primary md:text-4xl">
-                  {activeRound.task.prompt}
-                </h2>
-
-                <p className="mt-3 max-w-xl text-sm leading-relaxed text-text-secondary md:text-base">
-                  {activeRound.task.details || activeRound.category.description}
-                </p>
-
-                <div
-                  className={cn(
-                    "mt-6 grid gap-3",
-                    canPromiseActiveRound ? "sm:grid-cols-3" : "sm:grid-cols-2"
-                  )}
-                >
-                  <div className="rounded-2xl border border-accent/10 bg-bg-secondary/40 p-4">
-                    <p className="text-[10px] uppercase tracking-[0.24em] text-text-secondary/65">
-                      {t(
-                        activeRound.task.responseMode === "choice"
-                          ? "overlay_choice_note"
-                          : "overlay_complete_note"
-                      )}
-                    </p>
-                    <p className="mt-2 font-cinzel text-2xl text-accent">
-                      +{activeRound.task.completionXp}
-                    </p>
-                  </div>
-                  {canPromiseActiveRound ? (
-                    <div className="rounded-2xl border border-accent/10 bg-bg-secondary/40 p-4">
-                      <p className="text-[10px] uppercase tracking-[0.24em] text-text-secondary/65">
-                        {t("overlay_promise_note")}
-                      </p>
-                      <p className="mt-2 font-cinzel text-2xl text-accent">
-                        +{activeRound.task.promiseXp}
-                      </p>
-                    </div>
-                  ) : null}
-                  <div className="rounded-2xl border border-accent/10 bg-bg-secondary/40 p-4">
-                    <p className="text-[10px] uppercase tracking-[0.24em] text-text-secondary/65">
-                      {t("overlay_skip_note")}
-                    </p>
-                    <p className="mt-2 font-cinzel text-2xl text-rose-300">
-                      {activeRound.task.skipPenaltyXp}
-                    </p>
-                  </div>
-                </div>
-
-                {activeRound.task.responseMode === "choice" ? (
-                  <div className="mt-6 space-y-3">
-                    <p className="text-[10px] uppercase tracking-[0.24em] text-text-secondary/65">
-                      {t("overlay_choice_label")}
-                    </p>
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      {(activeRound.task.choiceOptions ?? []).map((option) => {
-                        const isSelected = responseText === option;
-
-                        return (
-                          <button
-                            key={option}
-                            type="button"
-                            onClick={() => {
-                              setResponseText(option);
-                              setValidationMessage(null);
-                            }}
-                            aria-pressed={isSelected}
-                            className={cn(
-                              "rounded-2xl border px-4 py-3 text-left text-sm transition-colors duration-200",
-                              isSelected
-                                ? "border-accent/38 bg-accent/12 text-text-primary"
-                                : "border-accent/12 bg-bg-secondary/50 text-text-secondary hover:border-accent/24 hover:text-text-primary"
-                            )}
-                          >
-                            {option}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ) : activeRound.task.responseMode === "text_input" ? (
-                  <div className="mt-6 space-y-3">
-                    <label
-                      htmlFor="wheel-response"
-                      className="text-[10px] uppercase tracking-[0.24em] text-text-secondary/65"
-                    >
-                      {t("overlay_response_label")}
-                    </label>
-                    <textarea
-                      id="wheel-response"
-                      value={responseText}
-                      onChange={(event) => {
-                        setResponseText(event.target.value);
-                        setValidationMessage(null);
-                      }}
-                      placeholder={t("overlay_response_placeholder")}
-                      className="min-h-32 w-full rounded-2xl border border-accent/12 bg-bg-secondary/50 px-4 py-3 text-sm text-text-primary outline-none transition-colors duration-200 placeholder:text-text-secondary/45 focus:border-accent/30"
-                    />
-                  </div>
-                ) : null}
-
-                {activeRound.task.executionMode === "timed" ? (
-                  <div className="mt-6 rounded-2xl border border-accent/10 bg-bg-secondary/40 p-4">
-                    <p className="text-[10px] uppercase tracking-[0.24em] text-text-secondary/65">
-                      {t("overlay_timer_label")}
-                    </p>
-                    <div className="mt-3 flex items-end justify-between gap-4">
-                      <div>
-                        <p className="font-cinzel text-4xl text-text-primary">
-                          {String(timerRemaining ?? activeRound.task.timerSeconds ?? 0).padStart(2, "0")}
-                        </p>
-                        <p className="mt-1 text-sm text-text-secondary">
-                          {timerStatus === "idle"
-                            ? t("overlay_timer_start")
-                            : timerStatus === "running"
-                              ? t("overlay_timer_running")
-                              : timerStatus === "paused"
-                                ? t("overlay_timer_paused")
-                              : t("overlay_timer_complete")}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
-
-                {validationMessage && (
-                  <p className="mt-5 rounded-2xl border border-accent/14 bg-bg-secondary/50 px-4 py-3 text-sm text-text-secondary">
-                    {validationMessage}
-                  </p>
-                )}
-
-                {wheelError && (
-                  <p className="mt-5 rounded-2xl border border-accent/14 bg-bg-secondary/50 px-4 py-3 text-sm text-text-secondary">
-                    {wheelError}
-                  </p>
-                )}
-
-                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (
-                        isTimerRound &&
-                        (timerStatus === "idle" || timerStatus === "paused")
-                      ) {
-                        void handleBeginTimedTask();
-                        return;
-                      }
-
-                      void handleResolve("completed");
-                    }}
-                    disabled={
-                      isStartingTimer ||
-                      isResolving ||
-                      (isTimerRound &&
-                        timerStatus === "running" &&
-                        !activeRound?.task.allowEarlyCompletion)
-                    }
-                    className="rounded-full bg-accent px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-bg-primary transition-colors duration-200 hover:bg-accent-hover disabled:cursor-wait disabled:bg-accent/45"
-                  >
-                    {isStartingTimer
-                      ? t("overlay_timer_starting_cta")
-                      : isResolving
-                      ? t("overlay_resolving")
-                      : isTimerRound
-                        ? timerStatus === "idle"
-                          ? t("overlay_timer_begin_cta")
-                          : timerStatus === "paused"
-                            ? t("overlay_timer_resume_cta")
-                          : timerStatus === "running"
-                            ? canFinishTimedRoundEarly
-                              ? t("overlay_timer_finish_early_cta")
-                              : t("overlay_timer_running_cta")
-                            : activeRound.task.responseMode === "choice"
-                              ? t("overlay_choice_cta")
-                              : t("overlay_complete_cta")
-                        : activeRound.task.responseMode === "choice"
-                          ? t("overlay_choice_cta")
-                          : t("overlay_complete_cta")}
-                  </button>
-                  {canPromiseActiveRound ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        void handleResolve("promised");
-                      }}
-                      disabled={isStartingTimer || isResolving}
-                      className="rounded-full border border-accent/16 bg-bg-secondary/40 px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-text-primary transition-colors duration-200 hover:border-accent/28 disabled:cursor-wait disabled:opacity-60"
-                    >
-                      {t("overlay_promise_cta")}
-                    </button>
-                  ) : null}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      void handleResolve("skipped");
-                    }}
-                    disabled={isStartingTimer || isResolving}
-                    className="rounded-full border border-white/10 bg-transparent px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-text-secondary transition-colors duration-200 hover:border-white/20 hover:text-text-primary disabled:cursor-wait disabled:opacity-60"
-                  >
-                    {t("overlay_skip_cta")}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+      {activeRound ? (
+        <WheelChallengeOverlay
+          activeRound={activeRound}
+          isOpen={isChallengeOpen}
+          isStartingTimer={isStartingTimer}
+          isResolving={isResolving}
+          isTimerRound={isTimerRound}
+          timerStatus={timerStatus}
+          timerRemaining={timerRemaining}
+          canFinishTimedRoundEarly={canFinishTimedRoundEarly}
+          canPromise={canPromiseActiveRound}
+          responseText={responseText}
+          validationMessage={validationMessage}
+          wheelError={wheelError}
+          onResponseTextChange={(value) => {
+            setResponseText(value);
+            setValidationMessage(null);
+          }}
+          onBeginTimedTask={() => {
+            void handleBeginTimedTask();
+          }}
+          onResolve={(resolution) => {
+            void handleResolve(resolution);
+          }}
+        />
+      ) : null}
     </>
   );
 }

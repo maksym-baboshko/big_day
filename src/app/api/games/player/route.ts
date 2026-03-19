@@ -1,16 +1,14 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { z } from "zod";
 import {
   enforceRateLimit,
-  getRateLimitErrorPayload,
-  RateLimitExceededError,
+  handleGameApiError,
+  runDeferredTasks,
 } from "@/shared/lib/server";
 import {
   bootstrapPlayerProfile,
   savePlayerProfile,
   requireAuthenticatedGameUser,
-  SupabaseConfigurationError,
-  UnauthorizedGameRequestError,
 } from "@/features/game-session/server";
 
 export const runtime = "nodejs";
@@ -37,28 +35,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ player });
   } catch (error) {
-    if (error instanceof UnauthorizedGameRequestError) {
-      return NextResponse.json(
-        { error: "Unauthorized game request.", code: "UNAUTHORIZED" },
-        { status: 401 }
-      );
-    }
-
-    if (error instanceof SupabaseConfigurationError) {
-      return NextResponse.json(
-        {
-          error: "Supabase is not configured.",
-          code: "SUPABASE_NOT_CONFIGURED",
-        },
-        { status: 503 }
-      );
-    }
-
-    console.error("Games player GET error:", error);
-    return NextResponse.json(
-      { error: "Failed to read player session.", code: "PERSISTENCE_ERROR" },
-      { status: 500 }
-    );
+    return handleGameApiError(error, "Failed to read player session.");
   }
 }
 
@@ -83,46 +60,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const player = await savePlayerProfile({
+    const { player, deferredTasks } = await savePlayerProfile({
       authUserId: user.id,
       nickname: result.data.nickname,
       locale: result.data.locale,
     });
+    after(() => runDeferredTasks(deferredTasks ?? []));
     return NextResponse.json({ player });
   } catch (error) {
-    if (error instanceof UnauthorizedGameRequestError) {
-      return NextResponse.json(
-        { error: "Unauthorized game request.", code: "UNAUTHORIZED" },
-        { status: 401 }
-      );
-    }
-
-    if (error instanceof SupabaseConfigurationError) {
-      return NextResponse.json(
-        {
-          error: "Supabase is not configured.",
-          code: "SUPABASE_NOT_CONFIGURED",
-        },
-        { status: 503 }
-      );
-    }
-
-    if (error instanceof RateLimitExceededError) {
-      return NextResponse.json(
-        getRateLimitErrorPayload(error.retryAfterSeconds),
-        {
-          status: 429,
-          headers: {
-            "Retry-After": String(error.retryAfterSeconds),
-          },
-        }
-      );
-    }
-
-    console.error("Games player POST error:", error);
-    return NextResponse.json(
-      { error: "Failed to save player session.", code: "PERSISTENCE_ERROR" },
-      { status: 500 }
-    );
+    return handleGameApiError(error, "Failed to save player session.");
   }
 }

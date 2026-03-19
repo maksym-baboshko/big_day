@@ -229,6 +229,37 @@ export function clampRemainingSeconds(value: number, durationSeconds: number) {
   return Math.min(Math.max(Math.round(value), 0), durationSeconds);
 }
 
+export function computeServerRemainingSeconds(
+  round: Pick<
+    GameRoundRow,
+    | "timer_status"
+    | "timer_last_started_at"
+    | "timer_remaining_seconds"
+    | "timer_duration_seconds"
+  >,
+  taskTimerSeconds: number | null
+): number {
+  const durationSeconds =
+    round.timer_duration_seconds ?? taskTimerSeconds ?? 0;
+
+  if (durationSeconds <= 0) {
+    return 0;
+  }
+
+  if (round.timer_status === "running" && round.timer_last_started_at) {
+    const startedAt = new Date(round.timer_last_started_at).getTime();
+    const elapsed = (Date.now() - startedAt) / 1000;
+    const initial =
+      round.timer_remaining_seconds ?? durationSeconds;
+    return clampRemainingSeconds(initial - elapsed, durationSeconds);
+  }
+
+  return clampRemainingSeconds(
+    round.timer_remaining_seconds ?? durationSeconds,
+    durationSeconds
+  );
+}
+
 export function getCategorySpinAngle(
   categories: readonly WheelCategoryRow[],
   categoryId: string

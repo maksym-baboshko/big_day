@@ -8,6 +8,7 @@ const LIVE_POLL_INTERVAL_MS = 30_000;
 const LIVE_SNAPSHOT_URL = "/api/live";
 const LIVE_PROJECTOR_BROADCAST_CHANNEL = "live-projector-broadcast";
 const LIVE_PROJECTOR_BROADCAST_EVENT = "snapshot";
+const SEEN_HERO_IDS_MAX = 200;
 
 interface UseLiveProjectorSnapshotResult {
   snapshot: LivePageApiResponse | null;
@@ -27,6 +28,7 @@ export function useLiveProjectorSnapshot(): UseLiveProjectorSnapshotResult {
   const isRefreshingRef = useRef(false);
   const activeHeroEventIdRef = useRef<string | null>(null);
   const seenHeroEventIdsRef = useRef(new Set<string>());
+  const seenHeroEventIdsOrderRef = useRef<string[]>([]);
   const hasLoadedOnceRef = useRef(false);
 
   const showNextHeroEvent = useCallback(() => {
@@ -73,6 +75,18 @@ export function useLiveProjectorSnapshot(): UseLiveProjectorSnapshotResult {
     [showNextHeroEvent]
   );
 
+  function trackSeenHeroEventId(id: string) {
+    seenHeroEventIdsRef.current.add(id);
+    seenHeroEventIdsOrderRef.current.push(id);
+
+    while (seenHeroEventIdsOrderRef.current.length > SEEN_HERO_IDS_MAX) {
+      const oldest = seenHeroEventIdsOrderRef.current.shift();
+      if (oldest) {
+        seenHeroEventIdsRef.current.delete(oldest);
+      }
+    }
+  }
+
   const applySnapshot = useCallback(
     (nextSnapshot: LivePageApiResponse) => {
       const nextHeroEvents = nextSnapshot.feed.filter((event) => event.isHeroEvent);
@@ -89,14 +103,14 @@ export function useLiveProjectorSnapshot(): UseLiveProjectorSnapshotResult {
             return false;
           }
 
-          seenHeroEventIdsRef.current.add(event.id);
+          trackSeenHeroEventId(event.id);
           return true;
         });
 
         queueHeroEvents([...unseenHeroEvents].reverse());
       } else {
         nextHeroEvents.forEach((event) => {
-          seenHeroEventIdsRef.current.add(event.id);
+          trackSeenHeroEventId(event.id);
         });
       }
 

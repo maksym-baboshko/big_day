@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { GameSlug, SupportedLocale } from "@/shared/config";
+import type { DeferredTask } from "@/shared/lib/server";
 import type {
   GameLeaderboardSnapshot,
   WheelRoundResolution,
@@ -24,6 +25,7 @@ import {
   buildEventSnapshot,
   buildWeightedCategoryPool,
   clampRemainingSeconds,
+  computeServerRemainingSeconds,
   getAvatarKeyForPlayer,
   getCategorySpinAngle,
   getWheelRoundPayload,
@@ -587,13 +589,23 @@ async function emitRealtimeSignal(signal: {
 const LIVE_PROJECTOR_BROADCAST_CHANNEL = "live-projector-broadcast";
 const LIVE_PROJECTOR_BROADCAST_EVENT = "snapshot";
 
+let broadcastChannel: ReturnType<
+  ReturnType<typeof getSupabaseAdminClient>["channel"]
+> | null = null;
+
+function getBroadcastChannel() {
+  if (!broadcastChannel) {
+    const supabase = getSupabaseAdminClient();
+    broadcastChannel = supabase.channel(LIVE_PROJECTOR_BROADCAST_CHANNEL);
+  }
+  return broadcastChannel;
+}
+
 async function broadcastLiveSnapshot() {
   try {
-    const supabase = getSupabaseAdminClient();
     const snapshot = await getLivePageSnapshot({ leaderboardLimit: 10, feedLimit: 5 });
-    const channel = supabase.channel(LIVE_PROJECTOR_BROADCAST_CHANNEL);
+    const channel = getBroadcastChannel();
     const result = await channel.httpSend(LIVE_PROJECTOR_BROADCAST_EVENT, snapshot);
-    await supabase.removeChannel(channel);
     if (!result.success) {
       console.error("Live snapshot broadcast failed:", result.error);
     }
@@ -803,27 +815,20 @@ export async function savePlayerProfile({
     });
   }
 
-  void emitRealtimeSignal({
-    channel: "live-projector",
-    gameSlug: WHEEL_GAME_SLUG,
-    signalType: shouldLogJoin ? "player.joined" : "player.profile.updated",
-    payload: {
-      playerId: authUserId,
-    },
-  });
+  const deferredTasks: DeferredTask[] = [
+    () =>
+      emitRealtimeSignal({
+        channel: "game-leaderboard",
+        gameSlug: WHEEL_GAME_SLUG,
+        signalType: "player.profile.updated",
+        payload: {
+          playerId: authUserId,
+        },
+      }),
+    () => broadcastLiveSnapshot(),
+  ];
 
-  void emitRealtimeSignal({
-    channel: "game-leaderboard",
-    gameSlug: WHEEL_GAME_SLUG,
-    signalType: "player.profile.updated",
-    payload: {
-      playerId: authUserId,
-    },
-  });
-
-  void broadcastLiveSnapshot();
-
-  return playerSnapshot;
+  return { player: playerSnapshot, deferredTasks };
 }
 
 export async function getOpenWheelRound({
@@ -1126,14 +1131,17 @@ export async function startWheelRoundTimer({
     locale,
   });
 
-  void logActivityEvent({
-    sessionId: roundRecord.session_id,
-    playerId,
-    roundId,
-    eventType: "wheel.round.timer_started",
-    visibility: "private",
-    payload,
-  });
+  const deferredTasks: DeferredTask[] = [
+    () =>
+      logActivityEvent({
+        sessionId: roundRecord.session_id,
+        playerId,
+        roundId,
+        eventType: "wheel.round.timer_started",
+        visibility: "private",
+        payload,
+      }),
+  ];
 
   return {
     round: mapWheelRoundSnapshot({
@@ -1143,6 +1151,7 @@ export async function startWheelRoundTimer({
       task,
       locale,
     }),
+    deferredTasks,
   };
 }
 
@@ -1240,14 +1249,12 @@ export async function resolveWheelRound({
   locale,
   resolution,
   responseText,
-  remainingSeconds,
 }: {
   playerId: string;
   roundId: string;
   locale: SupportedLocale;
   resolution: WheelRoundResolution;
   responseText?: string | null;
-  remainingSeconds?: number | null;
 }) {
   const supabase = getSupabaseAdminClient();
   const profile = await getPlayerProfileById(playerId);
@@ -1297,12 +1304,7 @@ export async function resolveWheelRound({
   const timerDurationSeconds = round.timer_duration_seconds ?? task.timer_seconds ?? null;
   const synchronizedRemainingSeconds =
     task.execution_mode === "timed" && timerDurationSeconds
-      ? clampRemainingSeconds(
-          remainingSeconds ??
-            round.timer_remaining_seconds ??
-            timerDurationSeconds,
-          timerDurationSeconds
-        )
+      ? computeServerRemainingSeconds(round, task.timer_seconds)
       : null;
 
   const resolutionReason: WheelRoundResolutionReason =
@@ -1468,34 +1470,25 @@ export async function resolveWheelRound({
     throw new Error("Failed to read wheel round after atomic resolve.");
   }
 
+  const deferredTasks: DeferredTask[] = [];
+
   if (xpDelta !== 0) {
-    void emitRealtimeSignal({
-      channel: "live-projector",
-      gameSlug: WHEEL_GAME_SLUG,
-      signalType: "leaderboard.updated",
-      payload: {
-        playerId,
-        roundId,
-        resolution,
-        resolutionReason,
-        xpDelta,
-      },
-    });
-
-    void emitRealtimeSignal({
-      channel: "game-leaderboard",
-      gameSlug: WHEEL_GAME_SLUG,
-      signalType: "leaderboard.updated",
-      payload: {
-        playerId,
-        roundId,
-        resolution,
-        resolutionReason,
-        xpDelta,
-      },
-    });
-
-    void broadcastLiveSnapshot();
+    deferredTasks.push(
+      () =>
+        emitRealtimeSignal({
+          channel: "game-leaderboard",
+          gameSlug: WHEEL_GAME_SLUG,
+          signalType: "leaderboard.updated",
+          payload: {
+            playerId,
+            roundId,
+            resolution,
+            resolutionReason,
+            xpDelta,
+          },
+        }),
+      () => broadcastLiveSnapshot()
+    );
   }
 
   const playerSnapshot = await getPlayerSnapshotByPlayerId(playerId);
@@ -1518,5 +1511,6 @@ export async function resolveWheelRound({
       xpDelta,
       responseText: normalizedResponseText,
     },
+    deferredTasks,
   };
 }

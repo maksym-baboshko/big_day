@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { handleGameApiError } from "@/shared/lib/server";
 import {
   getGameLeaderboard,
   requireAuthenticatedGameUser,
-  SupabaseConfigurationError,
-  UnauthorizedGameRequestError,
 } from "@/features/game-session/server";
 
 export const runtime = "nodejs";
@@ -57,24 +56,6 @@ export async function GET(request: Request) {
       }
     );
   } catch (error) {
-    if (error instanceof UnauthorizedGameRequestError) {
-      return NextResponse.json(
-        { error: "Unauthorized game request.", code: "UNAUTHORIZED" },
-        { status: 401 }
-      );
-    }
-
-    if (error instanceof SupabaseConfigurationError) {
-      return NextResponse.json(
-        { error: "Supabase is not configured.", code: "SUPABASE_NOT_CONFIGURED" },
-        { status: 503 }
-      );
-    }
-
-    console.error("Games leaderboard route error:", error);
-    return NextResponse.json(
-      { error: "Failed to read game leaderboard.", code: "PERSISTENCE_ERROR" },
-      { status: 500 }
-    );
+    return handleGameApiError(error, "Failed to read game leaderboard.");
   }
 }
