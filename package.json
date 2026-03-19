@@ -9,11 +9,15 @@
     "generate:wheel-content-seed": "node scripts/generate-wheel-content-seed.mjs",
     "smoke:games": "node scripts/smoke-games-platform.mjs",
     "lint:classes": "node scripts/lint-canonical-classes.mjs",
-    "lint": "eslint && pnpm lint:classes"
+    "lint": "eslint && pnpm lint:classes",
+    "supabase:init": "pnpm exec supabase init",
+    "supabase:login": "pnpm exec supabase login",
+    "supabase:link": "pnpm exec supabase link",
+    "supabase:db:push": "pnpm exec supabase db push --linked",
+    "supabase:migration:new": "pnpm exec supabase migration new"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",
-    "@react-email/render": "^2.0.4",
     "@supabase/supabase-js": "^2.99.1",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
@@ -36,6 +40,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "supabase": "^2.81.3",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

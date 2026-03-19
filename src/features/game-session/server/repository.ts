@@ -122,24 +122,6 @@ async function getPlayerSnapshotByPlayerId(playerId: string) {
   return data ? mapPlayerSnapshot(data as LeaderboardGlobalViewRow) : null;
 }
 
-async function getGlobalLeaderboardEntryByPlayerId(playerId: string) {
-  const supabase = getSupabaseAdminClient();
-  const { data, error } = await supabase
-    .from("leaderboard_global_view")
-    .select(LEADERBOARD_GLOBAL_SELECT)
-    .eq("player_id", playerId)
-    .eq("onboarding_completed", true)
-    .not("nickname", "is", null)
-    .gt("total_points", 0)
-    .maybeSingle();
-
-  if (error) {
-    throw error;
-  }
-
-  return (data as LeaderboardGlobalViewRow | null) ?? null;
-}
-
 async function getPlayerProfileById(playerId: string) {
   const supabase = getSupabaseAdminClient();
   const { data, error } = await supabase
@@ -1254,7 +1236,7 @@ export async function resolveWheelRound({
     throw new PlayerProfileNotReadyError();
   }
 
-  const { round, assignment, category, task, session } = await getWheelRoundContext(
+  const { round, assignment, category, task } = await getWheelRoundContext(
     roundId,
     playerId
   );
@@ -1310,8 +1292,6 @@ export async function resolveWheelRound({
       : "manual_skip"
       : "not_applicable";
   const xpDelta = getWheelXpDelta(task, resolution, resolutionReason);
-  const previousLeaderboardEntry =
-    xpDelta > 0 ? await getGlobalLeaderboardEntryByPlayerId(playerId) : null;
   const resolvedAt = new Date().toISOString();
   const payload = getWheelRoundPayload({
     round: {
@@ -1466,32 +1446,6 @@ export async function resolveWheelRound({
   const updatedRoundRecord = await getWheelRoundById(normalizedResolvedRoundId, playerId);
   if (!updatedRoundRecord) {
     throw new Error("Failed to read wheel round after atomic resolve.");
-  }
-
-  const playerLeaderboardEntry = await getGlobalLeaderboardEntryByPlayerId(playerId);
-
-  if (
-    xpDelta > 0 &&
-    playerLeaderboardEntry?.rank === 1 &&
-    previousLeaderboardEntry?.rank !== 1
-  ) {
-    await logActivityEvent({
-      sessionId: session.id,
-      playerId,
-      roundId,
-      eventType: "leaderboard.new_top_player",
-      visibility: "feed",
-      payload: {
-        rank: 1,
-        previousRank: previousLeaderboardEntry?.rank ?? null,
-        heroEvent: true,
-      },
-      snapshotName: profile.display_name,
-      snapshotAvatarKey: profile.avatar_key,
-      snapshotPromptI18n: {},
-      snapshotAnswerText: null,
-      snapshotXpDelta: xpDelta,
-    });
   }
 
   if (xpDelta !== 0) {

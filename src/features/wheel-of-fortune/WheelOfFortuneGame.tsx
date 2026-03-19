@@ -1304,29 +1304,6 @@ export function WheelOfFortuneGame({
                     </svg>
                   </motion.div>
 
-                  {/* Rim shimmer — non-rotating arc sweeping around the bezel */}
-                  {(isSpinning || isPreparingRound) && (
-                    <svg
-                      className="pointer-events-none absolute inset-0 h-full w-full"
-                      viewBox="0 0 100 100"
-                      aria-hidden="true"
-                    >
-                      <motion.circle
-                        cx="50"
-                        cy="50"
-                        r="48.5"
-                        fill="none"
-                        stroke="var(--accent)"
-                        strokeWidth="1.2"
-                        strokeLinecap="round"
-                        strokeOpacity="0.75"
-                        strokeDasharray="48 259"
-                        animate={{ strokeDashoffset: [0, -307] }}
-                        transition={{ duration: 1.4, repeat: Infinity, ease: "linear" }}
-                      />
-                    </svg>
-                  )}
-
                   {/* Non-rotating hub ripple rings */}
                   {!isSpinning && !isPreparingRound && (
                     <div className="pointer-events-none absolute inset-0 flex items-center justify-center">

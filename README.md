@@ -1,13 +1,8 @@
 # Big Day
 
-Big Day is a bilingual wedding website for Maksym and Diana.
+Big Day is a bilingual wedding website for Maksym and Diana with a built-in games platform.
 
-The project now has two public surfaces:
-
-- the invitation experience at `/` and `/en`
-- the wedding games platform at `/games`, with a live projector view at `/live`
-
-## Current public routes
+## Public surface
 
 - `/` and `/en`: main invitation page
 - `/invite/[slug]`: personalized invitation pages with guest-specific copy and RSVP defaults
@@ -18,14 +13,14 @@ The project now has two public surfaces:
 ## What is implemented
 
 - Ukrainian and English locales via `next-intl`
-- Light and dark themes
-- Hydration-safe animated splash, countdown, and language/theme controls
-- Wedding sections: story, timeline, venue, dress code, gifts, RSVP
-- Personalized invitation cards with seat counts from `src/shared/config/guests.ts`
-- RSVP API with `zod` validation, honeypot field, rate limiting, and Resend/mock email delivery
+- light and dark themes
+- hydration-safe splash, countdown, and language/theme controls
+- invitation sections: story, timeline, venue, dress code, gifts, RSVP
+- personalized invitation pages backed by `src/shared/config/guests.ts`
+- RSVP API with `zod` validation, honeypot field, rate limiting, and Resend or `mock` email delivery
 - Supabase-backed anonymous auth for games
-- Player onboarding, leaderboard, live feed, and wheel round lifecycle
-- Projector page backed by `/api/live` plus Supabase realtime refresh
+- player onboarding, leaderboard, live feed, and wheel round lifecycle
+- projector page backed by `/api/live` with realtime invalidation support
 
 ## Tech stack
 
@@ -67,7 +62,7 @@ Notes:
 - `RSVP_DELIVERY_MODE=mock` logs the email payload instead of sending it
 - non-mock mode requires both `RESEND_API_KEY` and `RSVP_TO_EMAILS`
 
-### Games and live platform
+### Games runtime
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=
@@ -82,6 +77,16 @@ The code also accepts legacy fallbacks:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `SUPABASE_URL`
 
+### Supabase CLI workflow
+
+Optional, only if you want to manage remote schema changes from this repo:
+
+```bash
+SUPABASE_DB_PASSWORD=
+```
+
+Do not commit this value.
+
 ## Local setup
 
 ```bash
@@ -91,6 +96,33 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+For invitation-only work, that is enough.
+
+For games and live features, configure the Supabase runtime env vars above.
+
+## Database workflow
+
+This repo keeps both a baseline schema snapshot and incremental migrations:
+
+- `supabase/games_platform_schema.sql`: current baseline schema snapshot
+- `supabase/migrations/*.sql`: incremental changes to apply on top
+- `supabase/games_hub_schema.sql`: legacy snapshot, do not apply to the current setup
+
+When changing the database:
+
+- add a new migration under `supabase/migrations/`
+- update `supabase/games_platform_schema.sql` in the same change
+- keep applied migrations committed in the repo
+
+Typical CLI flow:
+
+```bash
+pnpm supabase:login
+pnpm supabase:link -- --project-ref <project-ref>
+pnpm exec supabase db push --linked --dry-run
+pnpm supabase:db:push
+```
+
 ## Useful commands
 
 ```bash
@@ -99,39 +131,43 @@ pnpm build
 pnpm lint
 pnpm smoke:games
 pnpm generate:wheel-content-seed
+pnpm supabase:login
+pnpm supabase:link
+pnpm supabase:db:push
+pnpm supabase:migration:new -- <name>
 ```
 
 `pnpm smoke:games` expects:
 
 - the Next.js app to be running locally
 - Supabase env vars to be configured
-- the schema from `supabase/games_platform_schema.sql` to be applied
+- the current schema to be applied in Supabase
 
 ## Project structure
 
 ```text
 src/
 ├── app/
-│   ├── [locale]/                 # invitation, games, live, invite pages
+│   ├── [locale]/                 # invitation, invite, games, live pages
 │   └── api/                      # rsvp, live, games APIs
 ├── features/
 │   ├── countdown/
-│   ├── game-session/             # auth, local session cache, shared client/server types
+│   ├── game-session/             # auth, local cache, shared types, server repository
 │   ├── language-switcher/
 │   ├── theme-switcher/
 │   └── wheel-of-fortune/
 ├── shared/
-│   ├── config/                   # wedding data, game catalog, wheel content, metadata helpers
+│   ├── config/                   # wedding data, guests, game catalog, wheel content, metadata helpers
 │   ├── i18n/
 │   ├── lib/
 │   └── ui/
 └── widgets/
-    ├── invitation-page/          # assembled invitation screen
+    ├── invitation-page/
+    ├── personal-invitation/
     ├── games-hub/
     ├── games-shell/
     ├── games-wheel-page/
     ├── live-projector/
-    ├── personal-invitation/
     └── page sections
 ```
 
@@ -141,11 +177,4 @@ src/
 - Keep `src/shared/i18n/messages/uk.json` and `en.json` in sync.
 - Prefer CSS variable-based Tailwind classes instead of hardcoded component colors.
 - Use barrel exports where they already exist.
-- Treat `Countdown`, `Splash`, `LanguageSwitcher`, and `ThemeProvider` as hydration-sensitive code.
-
-## Current product status
-
-- RSVP delivery is implemented and no longer a stub.
-- Personalized invite pages are implemented and statically generated.
-- The games hub is live, but only `wheel-of-fortune` is currently playable.
-- `/live` is meant for projector/live usage and is marked `noindex`.
+- Treat `Countdown`, `Splash`, `LanguageSwitcher`, `ThemeProvider`, and `useLiveProjectorSnapshot` as hydration-sensitive code.

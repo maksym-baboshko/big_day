@@ -2,4 +2,5 @@ onlyBuiltDependencies:
   - '@parcel/watcher'
   - '@swc/core'
   - sharp
+  - supabase
   - unrs-resolver

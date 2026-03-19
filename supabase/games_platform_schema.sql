@@ -1255,7 +1255,34 @@ language plpgsql
 as $$
 declare
   v_session_id uuid;
+  v_previous_leaderboard jsonb := '[]'::jsonb;
+  v_previous_top_player_id uuid;
+  v_current_top_player_id uuid;
+  v_current_top_player_name text;
+  v_current_top_player_avatar_key text;
+  v_current_top_player_previous_rank integer;
 begin
+  if coalesce(p_xp_delta, 0) <> 0 then
+    select coalesce(
+      jsonb_agg(
+        jsonb_build_object(
+          'player_id', player_id,
+          'rank', rank
+        )
+        order by rank asc, score_reached_at asc, player_id asc
+      ),
+      '[]'::jsonb
+    )
+    into v_previous_leaderboard
+    from public.leaderboard_global_view
+    where onboarding_completed = true
+      and nickname is not null
+      and total_points > 0;
+
+    select nullif(v_previous_leaderboard->0->>'player_id', '')::uuid
+      into v_previous_top_player_id;
+  end if;
+
   update public.game_rounds
   set
     status = 'resolved',
@@ -1339,6 +1366,70 @@ begin
       end,
       p_resolved_at
     from jsonb_array_elements(coalesce(p_activity_events, '[]'::jsonb)) as item;
+  end if;
+
+  if coalesce(p_xp_delta, 0) <> 0 then
+    select
+      player_id,
+      nickname,
+      avatar_key
+    into
+      v_current_top_player_id,
+      v_current_top_player_name,
+      v_current_top_player_avatar_key
+    from public.leaderboard_global_view
+    where onboarding_completed = true
+      and nickname is not null
+      and total_points > 0
+    order by rank asc, score_reached_at asc, player_id asc
+    limit 1;
+
+    if v_current_top_player_id is not null then
+      select (entry->>'rank')::integer
+      into v_current_top_player_previous_rank
+      from jsonb_array_elements(v_previous_leaderboard) as entry
+      where entry->>'player_id' = v_current_top_player_id::text
+      limit 1;
+    end if;
+
+    if v_current_top_player_id is not null
+      and v_current_top_player_id is distinct from v_previous_top_player_id
+      and coalesce(v_current_top_player_previous_rank, 0) <> 1 then
+      insert into public.activity_events (
+        session_id,
+        player_id,
+        game_slug,
+        round_id,
+        event_type,
+        visibility,
+        payload,
+        snapshot_name,
+        snapshot_avatar_key,
+        snapshot_prompt_i18n,
+        snapshot_answer_text,
+        snapshot_xp_delta,
+        created_at
+      )
+      values (
+        v_session_id,
+        v_current_top_player_id,
+        'wheel-of-fortune',
+        p_round_id,
+        'leaderboard.new_top_player',
+        'feed',
+        jsonb_build_object(
+          'rank', 1,
+          'previousRank', v_current_top_player_previous_rank,
+          'heroEvent', true
+        ),
+        v_current_top_player_name,
+        v_current_top_player_avatar_key,
+        '{}'::jsonb,
+        null,
+        case when v_current_top_player_id = p_player_id then p_xp_delta else null end,
+        p_resolved_at
+      );
+    end if;
   end if;
 
   update public.game_sessions
