@@ -19,6 +19,53 @@ import { broadcastLeaderboardSignal, broadcastLiveSnapshot } from "./broadcast-r
 
 export { PlayerProfileNotReadyError } from "./errors";
 
+/**
+ * Ensures the chosen display name is unique among all other players.
+ * If "Легенда" is taken, returns "Легенда #2"; if that's taken too, "Легенда #3", etc.
+ * Any #N suffix the user typed is stripped before resolving.
+ */
+async function resolveUniqueDisplayName(
+  supabase: ReturnType<typeof getSupabaseAdminClient>,
+  rawName: string,
+  excludePlayerId: string
+): Promise<string> {
+  // Strip any existing #N suffix the user might have typed
+  const baseName = rawName.replace(/\s+#\d+$/, "").trimEnd();
+  const baseNormalized = baseName.toLocaleLowerCase();
+
+  const { data } = await supabase
+    .from("player_profiles")
+    .select("display_name_normalized")
+    .neq("id", excludePlayerId)
+    .ilike("display_name_normalized", `${baseNormalized}%`);
+
+  if (!data || data.length === 0) {
+    return baseName;
+  }
+
+  // Keep only exact matches: baseName or "baseName #N"
+  const takenSet = new Set(
+    data
+      .map((row) => row.display_name_normalized)
+      .filter((name): name is string => {
+        if (!name) return false;
+        if (name === baseNormalized) return true;
+        const match = name.match(/^(.+?)\s+#(\d+)$/);
+        return !!(match && match[1] === baseNormalized);
+      })
+  );
+
+  if (!takenSet.has(baseNormalized)) {
+    return baseName;
+  }
+
+  let suffix = 2;
+  while (takenSet.has(`${baseNormalized} #${suffix}`)) {
+    suffix++;
+  }
+  return `${baseName} #${suffix}`;
+}
+
 export async function getPlayerProfileById(playerId: string) {
   const supabase = getSupabaseAdminClient();
   const { data, error } = await supabase
@@ -115,13 +162,14 @@ export async function savePlayerProfile({
   const supabase = getSupabaseAdminClient();
   const existingProfile = await getPlayerProfileById(authUserId);
   const normalizedNickname = normalizeDisplayName(nickname);
+  const finalDisplayName = await resolveUniqueDisplayName(supabase, normalizedNickname, authUserId);
   const shouldLogJoin = !existingProfile?.onboarding_completed;
 
   const { error } = await supabase.from("player_profiles").upsert(
     {
       id: authUserId,
-      display_name: normalizedNickname,
-      display_name_normalized: normalizedNickname.toLocaleLowerCase(),
+      display_name: finalDisplayName,
+      display_name_normalized: finalDisplayName.toLocaleLowerCase(),
       avatar_key: existingProfile?.avatar_key ?? getAvatarKeyForPlayer(authUserId),
       locale,
       onboarding_completed: true,
@@ -159,8 +207,14 @@ export async function savePlayerProfile({
   }
 
   const deferredTasks: DeferredTask[] = [
-    () => broadcastLeaderboardSignal(WHEEL_GAME_SLUG),
-    () => broadcastLiveSnapshot(),
+    {
+      label: "broadcast_leaderboard_signal",
+      run: () => broadcastLeaderboardSignal(WHEEL_GAME_SLUG),
+    },
+    {
+      label: "broadcast_live_snapshot",
+      run: () => broadcastLiveSnapshot(),
+    },
   ];
 
   return { player: playerSnapshot, deferredTasks };

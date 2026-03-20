@@ -2,29 +2,44 @@
 
 import { useEffect, useState } from "react";
 import type { SupportedLocale } from "@/shared/config";
-import { formatCurrentTime } from "./live-projector-helpers";
 
-export function LiveClock({ locale }: { locale: SupportedLocale }) {
-  const [time, setTime] = useState("00:00:00");
+function getTimeParts() {
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2, "0");
+  const mm = String(now.getMinutes()).padStart(2, "0");
+  const ss = String(now.getSeconds()).padStart(2, "0");
+  return { hh, mm, ss };
+}
+
+export function LiveClock({ locale: _locale }: { locale: SupportedLocale }) {
+  void _locale;
+  const [parts, setParts] = useState({ hh: "00", mm: "00", ss: "00" });
 
   useEffect(() => {
     const initialTickId = window.setTimeout(() => {
-      setTime(formatCurrentTime(locale));
+      setParts(getTimeParts());
     }, 0);
 
     const id = window.setInterval(() => {
-      setTime(formatCurrentTime(locale));
+      setParts(getTimeParts());
     }, 1000);
 
     return () => {
       window.clearTimeout(initialTickId);
       window.clearInterval(id);
     };
-  }, [locale]);
+  }, []);
 
   return (
-    <span className="font-cinzel tabular-nums text-2xl text-text-primary/55 md:text-3xl">
-      <time suppressHydrationWarning>{time}</time>
-    </span>
+    <time
+      suppressHydrationWarning
+      className="flex items-baseline gap-0 text-base font-medium tracking-widest text-text-secondary/70"
+    >
+      <span className="inline-block w-[2ch] text-center">{parts.hh}</span>
+      <span className="text-text-primary/30">:</span>
+      <span className="inline-block w-[2ch] text-center">{parts.mm}</span>
+      <span className="text-text-primary/20">:</span>
+      <span className="inline-block w-[2ch] text-center text-text-primary/30">{parts.ss}</span>
+    </time>
   );
 }

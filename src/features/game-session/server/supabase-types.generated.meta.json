@@ -1,0 +1,10 @@
+{
+  "schemaFingerprint": "c1d1b6d75fb2f79559277df2238f12a7826d45bfd66b95b788c4574811b3bd3a",
+  "sourceFiles": [
+    "supabase/games_platform_schema.sql",
+    "supabase/migrations/20260319_fix_leaderboard_new_top_player_event.sql",
+    "supabase/migrations/20260320115237_advance_wheel_session_cycle.sql",
+    "supabase/migrations/20260320135137_fix_function_search_paths.sql"
+  ],
+  "generatedWith": "manual-bootstrap"
+}

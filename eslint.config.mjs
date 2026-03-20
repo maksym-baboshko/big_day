@@ -19,6 +19,7 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
+    "coverage/**",
     "next-env.d.ts",
     // Git worktrees created by Claude Code — contain their own .next builds
     ".claude/**",

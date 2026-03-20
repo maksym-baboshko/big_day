@@ -1,13 +1,25 @@
 import "server-only";
 
-export type DeferredTask = () => Promise<void>;
+import { logServerError } from "./logger";
+
+export interface DeferredTask {
+  label: string;
+  run: () => Promise<void>;
+}
 
 export async function runDeferredTasks(tasks: DeferredTask[]): Promise<void> {
-  const results = await Promise.allSettled(tasks.map((task) => task()));
+  const results = await Promise.allSettled(tasks.map((task) => task.run()));
 
-  for (const result of results) {
+  for (const [index, result] of results.entries()) {
     if (result.status === "rejected") {
-      console.error("Deferred task failed:", result.reason);
+      logServerError({
+        scope: "deferred",
+        event: "task_failed",
+        context: {
+          label: tasks[index]?.label ?? "unknown",
+        },
+        error: result.reason,
+      });
     }
   }
 }

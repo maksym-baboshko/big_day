@@ -1,11 +1,15 @@
 import { after, NextResponse } from "next/server";
-import { z } from "zod";
-import type { SupportedLocale } from "@/shared/config";
 import {
+  createInvalidDataErrorResponse,
   enforceRateLimit,
+  getRequestId,
   handleGameApiError,
   runDeferredTasks,
 } from "@/shared/lib/server";
+import {
+  parseRoundId,
+  wheelTimerPayloadSchema,
+} from "@/features/game-session/api-contracts";
 import {
   requireAuthenticatedGameUser,
   startWheelRoundTimer,
@@ -13,14 +17,12 @@ import {
 
 export const runtime = "nodejs";
 
-const wheelTimerStartSchema = z.object({
-  locale: z.enum(["uk", "en"]),
-});
-
 export async function POST(
   request: Request,
   context: { params: Promise<{ roundId: string }> }
 ) {
+  const requestId = getRequestId(request);
+
   try {
     const user = await requireAuthenticatedGameUser(request);
     await enforceRateLimit({
@@ -31,25 +33,29 @@ export async function POST(
       authUserId: user.id,
     });
 
-    const { roundId } = await context.params;
-    const body = await request.json();
-    const result = wheelTimerStartSchema.safeParse(body);
+    const { roundId: rawRoundId } = await context.params;
+    const roundId = parseRoundId(rawRoundId);
+    const body = await request.json().catch(() => null);
+    const result = wheelTimerPayloadSchema.safeParse(body);
 
     if (!result.success || !roundId) {
-      return NextResponse.json(
-        { error: "Invalid wheel timer payload.", code: "INVALID_DATA" },
-        { status: 400 }
+      return createInvalidDataErrorResponse(
+        "Invalid wheel timer payload.",
+        requestId
       );
     }
 
     const { deferredTasks, ...timerStart } = await startWheelRoundTimer({
       playerId: user.id,
       roundId,
-      locale: result.data.locale as SupportedLocale,
+      locale: result.data.locale,
     });
     after(() => runDeferredTasks(deferredTasks ?? []));
     return NextResponse.json(timerStart);
   } catch (error) {
-    return handleGameApiError(error, "Failed to start wheel timer.");
+    return handleGameApiError(error, "Failed to start wheel timer.", {
+      requestId,
+      scope: "api.games.wheel.timer.start",
+    });
   }
 }

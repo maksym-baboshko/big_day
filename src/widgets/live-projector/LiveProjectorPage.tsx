@@ -1,6 +1,7 @@
 "use client";
 
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { MOTION_EASE } from "@/shared/lib";
 import { useLocale, useTranslations } from "next-intl";
 import type { SupportedLocale } from "@/shared/config";
 import { LanguageSwitcher } from "@/features/language-switcher";
@@ -24,7 +25,7 @@ export function LiveProjectorPage() {
       {/* Ambient gradient background */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_55%_at_-5%_-5%,color-mix(in_srgb,var(--accent)_9%,transparent),transparent),radial-gradient(ellipse_65%_50%_at_108%_108%,color-mix(in_srgb,var(--accent)_7%,transparent),transparent)]" />
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-400 flex-col gap-4 px-4 py-4 md:px-6 md:py-6">
+      <div className="relative z-10 flex min-h-screen flex-col gap-4 px-4 py-4 md:px-6 md:py-6">
 
         {/* ── Header ──────────────────────────────────────────────────── */}
         <header className="relative flex items-center rounded-4xl border border-accent/10 bg-bg-primary/55 px-6 py-4 shadow-[0_20px_56px_-36px_rgba(0,0,0,0.6)] backdrop-blur-sm">
@@ -40,7 +41,7 @@ export function LiveProjectorPage() {
               </span>
             </div>
             <div className="hidden h-5 w-px bg-accent/15 lg:block" />
-            <h1 className="heading-serif hidden leading-none text-text-primary lg:block lg:text-3xl">
+            <h1 className="hidden font-medium uppercase leading-none tracking-widest text-text-secondary/70 lg:block lg:text-xs">
               {t("title")}
             </h1>
           </div>
@@ -106,11 +107,12 @@ export function LiveProjectorPage() {
         </header>
 
         {/* ── Main grid ───────────────────────────────────────────────── */}
-        <div className="grid flex-1 gap-4 lg:grid-cols-[minmax(0,1.45fr)_minmax(340px,0.88fr)]">
+        <div className="grid flex-1 gap-4 lg:grid-cols-[minmax(0,4fr)_minmax(420px,1fr)]">
 
           {/* ─ Feed panel ─ */}
-          <div className="flex flex-col rounded-4xl border border-accent/10 bg-bg-primary/45 p-5 shadow-[0_28px_72px_-48px_rgba(0,0,0,0.65)] backdrop-blur-sm md:p-6">
-            <div className="mb-5 flex items-center gap-3">
+          <div className="flex flex-col gap-3">
+            {/* Title card */}
+            <div className="flex items-center gap-3 rounded-4xl border border-accent/10 bg-bg-primary/55 px-6 py-4 shadow-[0_20px_56px_-36px_rgba(0,0,0,0.6)] backdrop-blur-sm">
               <p className="shrink-0 text-[10px] uppercase tracking-[0.34em] text-accent">
                 {t("feed_label")}
               </p>
@@ -127,27 +129,43 @@ export function LiveProjectorPage() {
                 ))}
               </div>
             ) : error ? (
-              <div className="flex h-full min-h-64 items-center justify-center rounded-3xl border border-accent/10 bg-bg-secondary/22 px-6 text-center text-base text-text-secondary">
+              <div className="flex min-h-64 items-center justify-center rounded-3xl border border-accent/10 bg-bg-secondary/22 px-6 text-center text-base text-text-secondary">
                 {t("feed_error")}
               </div>
             ) : snapshot?.feed.length ? (
-              <div className="grid gap-3">
-                <AnimatePresence mode="popLayout" initial={false}>
-                  {snapshot.feed.map((event) => (
-                    <FeedEventCard key={event.id} event={event} locale={locale} />
-                  ))}
-                </AnimatePresence>
+              <div className="flex gap-3">
+                {[
+                  snapshot.feed.filter((_, i) => i % 2 === 0),
+                  snapshot.feed.filter((_, i) => i % 2 !== 0),
+                ].map((colEvents, colIdx) => (
+                  <div key={colIdx} className="flex flex-1 flex-col gap-3">
+                    <AnimatePresence mode="popLayout" initial={false}>
+                      {colEvents.map((event) => (
+                        <motion.div
+                          key={event.id}
+                          initial={{ opacity: 0, y: -16 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.97 }}
+                          transition={{ duration: 0.4, ease: MOTION_EASE }}
+                        >
+                          <FeedEventCard event={event} locale={locale} />
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </div>
+                ))}
               </div>
             ) : (
-              <div className="flex h-full min-h-64 items-center justify-center rounded-3xl border border-accent/10 bg-bg-secondary/22 px-6 text-center text-base text-text-secondary">
+              <div className="flex min-h-64 items-center justify-center rounded-3xl border border-accent/10 bg-bg-secondary/22 px-6 text-center text-base text-text-secondary">
                 {t("feed_empty")}
               </div>
             )}
           </div>
 
           {/* ─ Leaderboard panel ─ */}
-          <div className="flex flex-col rounded-4xl border border-accent/10 bg-bg-primary/45 p-5 shadow-[0_28px_72px_-48px_rgba(0,0,0,0.65)] backdrop-blur-sm md:p-6">
-            <div className="mb-5 flex items-center gap-3">
+          <div className="flex flex-col gap-3">
+            {/* Title card */}
+            <div className="flex items-center gap-3 rounded-4xl border border-accent/10 bg-bg-primary/55 px-6 py-4 shadow-[0_20px_56px_-36px_rgba(0,0,0,0.6)] backdrop-blur-sm">
               <p className="shrink-0 text-[10px] uppercase tracking-[0.34em] text-accent">
                 {t("leaderboard_label")}
               </p>
@@ -190,6 +208,9 @@ export function LiveProjectorPage() {
           </div>
         </div>
       </div>
+
+      {/* ── Bottom gradient — full-width fade masking overflowing cards ── */}
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 h-48 bg-linear-to-t from-bg-primary to-transparent" />
 
       {/* ── Hero event overlay ──────────────────────────────────────────── */}
       <AnimatePresence>

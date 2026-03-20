@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useReducer, useRef } from "react";
 import { useTranslations } from "next-intl";
 import type { SupportedLocale } from "@/shared/config";
 import {
@@ -28,6 +28,10 @@ import {
   type RecentResultItem,
   type ResolvedRound,
 } from "./wheel-helpers";
+import {
+  createInitialWheelGameState,
+  wheelGameReducer,
+} from "./wheel-game-reducer";
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -66,15 +70,13 @@ export interface UseWheelGameReturn {
   timerStatus: WheelTimerStatus;
   canFinishTimedRoundEarly: boolean;
   canPromiseActiveRound: boolean;
-  // Setters exposed for component animation coordination
-  setIsPreparingRound: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsSpinning: React.Dispatch<React.SetStateAction<boolean>>;
-  setErrorCode: React.Dispatch<React.SetStateAction<GameApiErrorCode | null>>;
   // Spin lifecycle hooks (called by the component around animation)
   beginSpin: () => void;
-  setPreparingDone: () => void;
+  completeSpinPreparation: () => void;
   finalizeSpinRound: (round: WheelRoundSnapshot) => void;
   clearPointerLand: () => void;
+  cancelSpin: () => void;
+  failSpin: (errorCode: GameApiErrorCode) => void;
   // API actions
   startRoundRequest: () => Promise<WheelRoundSnapshot | null>;
   handleBeginTimedTask: () => Promise<void>;
@@ -103,22 +105,29 @@ export function useWheelGame({
 
   // ── State ──────────────────────────────────────────────────────────────────
 
-  const [isPreparingRound, setIsPreparingRound] = useState(false);
-  const [isRestoringRound, setIsRestoringRound] = useState(false);
-  const [isSpinning, setIsSpinning] = useState(false);
-  const [isStartingTimer, setIsStartingTimer] = useState(false);
-  const [isResolving, setIsResolving] = useState(false);
-  const [activeRound, setActiveRound] = useState<WheelRoundSnapshot | null>(null);
-  const [resolvedRound, setResolvedRound] = useState<ResolvedRound | null>(null);
-  const [isChallengeOpen, setIsChallengeOpen] = useState(false);
-  const [recentResults, setRecentResults] = useState<RecentResultItem[]>([]);
-  const [responseText, setResponseTextRaw] = useState("");
-  const [validationMessage, setValidationMessage] = useState<string | null>(null);
-  const [errorCode, setErrorCode] = useState<GameApiErrorCode | null>(null);
-  const [confettiKey, setConfettiKey] = useState(0);
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [pointerLand, setPointerLand] = useState(false);
-  const [timerRemaining, setTimerRemaining] = useState<number | null>(null);
+  const [state, dispatch] = useReducer(
+    wheelGameReducer,
+    undefined,
+    createInitialWheelGameState
+  );
+  const {
+    isPreparingRound,
+    isRestoringRound,
+    isSpinning,
+    isStartingTimer,
+    isResolving,
+    activeRound,
+    resolvedRound,
+    isChallengeOpen,
+    recentResults,
+    responseText,
+    validationMessage,
+    errorCode,
+    confettiKey,
+    showConfetti,
+    pointerLand,
+    timerRemaining,
+  } = state;
 
   // ── Refs ───────────────────────────────────────────────────────────────────
 
@@ -175,17 +184,9 @@ export function useWheelGame({
     }
   }
 
-  function syncTimerState(round?: WheelRoundSnapshot | null) {
+  function syncTimerState(round?: WheelRoundSnapshot | ResolvedRound | null) {
     clearTimerTicker();
-    setTimerRemaining(
-      round?.timer?.remainingSeconds ?? round?.task.timerSeconds ?? null
-    );
-  }
-
-  function resetChallengeState(round?: WheelRoundSnapshot | null) {
-    setResponseTextRaw("");
-    setValidationMessage(null);
-    syncTimerState(round);
+    dispatch({ type: "timer_sync", round });
   }
 
   // ── API calls ──────────────────────────────────────────────────────────────
@@ -204,7 +205,7 @@ export function useWheelGame({
     });
 
     if (!res.ok) {
-      setErrorCode(await readApiErrorCode(res));
+      dispatch({ type: "error_set", errorCode: await readApiErrorCode(res) });
       return null;
     }
 
@@ -239,16 +240,22 @@ export function useWheelGame({
         round.task.responseMode === "text_input" &&
         !hasMeaningfulGameResponseText(normalizedResponseText)
       ) {
-        setValidationMessage(t("overlay_text_input_required"));
-        setErrorCode(null);
+        dispatch({
+          type: "validation_set",
+          message: t("overlay_text_input_required"),
+        });
+        dispatch({ type: "error_set", errorCode: null });
       } else if (
         nextErrorCode === "INVALID_DATA" &&
         round.task.responseMode === "choice"
       ) {
-        setValidationMessage(t("overlay_choice_required"));
-        setErrorCode(null);
+        dispatch({
+          type: "validation_set",
+          message: t("overlay_choice_required"),
+        });
+        dispatch({ type: "error_set", errorCode: null });
       } else {
-        setErrorCode(nextErrorCode);
+        dispatch({ type: "error_set", errorCode: nextErrorCode });
       }
       return null;
     }
@@ -272,7 +279,7 @@ export function useWheelGame({
     });
 
     if (!res.ok) {
-      setErrorCode(await readApiErrorCode(res));
+      dispatch({ type: "error_set", errorCode: await readApiErrorCode(res) });
       return null;
     }
 
@@ -285,22 +292,18 @@ export function useWheelGame({
 
   async function handleBeginTimedTask() {
     if (!activeRound || !isTimerRound || isStartingTimer || isResolving) return;
-    setValidationMessage(null);
-    setErrorCode(null);
-    setIsStartingTimer(true);
+    dispatch({ type: "timer_start_requested" });
 
     try {
       const round = await startTimerRequest(activeRound);
       if (!round) {
-        setIsStartingTimer(false);
+        dispatch({ type: "timer_start_finished" });
         return;
       }
-      setActiveRound(round);
+      dispatch({ type: "timer_started", round });
       syncTimerState(round);
-      setIsStartingTimer(false);
     } catch {
-      setErrorCode("PERSISTENCE_ERROR");
-      setIsStartingTimer(false);
+      dispatch({ type: "timer_start_failed", errorCode: "PERSISTENCE_ERROR" });
     }
   }
 
@@ -317,7 +320,10 @@ export function useWheelGame({
       activeRound.task.responseMode === "text_input" &&
       !hasMeaningfulGameResponseText(normalizedResponseText)
     ) {
-      setValidationMessage(t("overlay_text_input_required"));
+      dispatch({
+        type: "validation_set",
+        message: t("overlay_text_input_required"),
+      });
       return;
     }
 
@@ -326,7 +332,10 @@ export function useWheelGame({
       activeRound.task.responseMode === "choice" &&
       !activeRound.task.choiceOptions?.includes(normalizedResponseText)
     ) {
-      setValidationMessage(t("overlay_choice_required"));
+      dispatch({
+        type: "validation_set",
+        message: t("overlay_choice_required"),
+      });
       return;
     }
 
@@ -335,7 +344,10 @@ export function useWheelGame({
       activeRound.task.executionMode === "timed" &&
       timerStatus === "idle"
     ) {
-      setValidationMessage(t("overlay_timer_start"));
+      dispatch({
+        type: "validation_set",
+        message: t("overlay_timer_start"),
+      });
       return;
     }
 
@@ -348,9 +360,7 @@ export function useWheelGame({
       return;
     }
 
-    setValidationMessage(null);
-    setErrorCode(null);
-    setIsResolving(true);
+    dispatch({ type: "resolve_requested" });
 
     try {
       const payload = await resolveWheelRoundRequest(activeRound, resolution);
@@ -363,36 +373,29 @@ export function useWheelGame({
         ) {
           autoTimedOutRoundRef.current = null;
         }
-        setIsResolving(false);
+        dispatch({ type: "resolve_finished" });
         return;
       }
 
       autoTimedOutRoundRef.current = null;
       onPlayerUpdate(payload.player);
-      setResolvedRound(payload.round);
-      setActiveRound(payload.round);
-      setIsChallengeOpen(false);
-      setIsResolving(false);
+      dispatch({
+        type: "round_resolved",
+        round: payload.round,
+        recentResult: {
+          roundId: payload.round.roundId,
+          prompt: payload.round.task.prompt,
+          categorySlug: payload.round.category.slug,
+          categoryTitle: payload.round.category.title,
+          resolution: payload.round.resolution,
+          xpDelta: payload.round.xpDelta,
+        },
+      });
       syncTimerState(payload.round);
-      setShowConfetti(true);
-      setConfettiKey((key) => key + 1);
-      setRecentResults((prev) =>
-        [
-          {
-            roundId: payload.round.roundId,
-            prompt: payload.round.task.prompt,
-            categorySlug: payload.round.category.slug,
-            categoryTitle: payload.round.category.title,
-            resolution: payload.round.resolution,
-            xpDelta: payload.round.xpDelta,
-          },
-          ...prev,
-        ].slice(0, 4)
-      );
 
       if (confettiTimeoutRef.current) window.clearTimeout(confettiTimeoutRef.current);
       confettiTimeoutRef.current = window.setTimeout(() => {
-        setShowConfetti(false);
+        dispatch({ type: "confetti_hidden" });
       }, 1000);
     } catch {
       if (
@@ -402,8 +405,8 @@ export function useWheelGame({
       ) {
         autoTimedOutRoundRef.current = null;
       }
-      setErrorCode("PERSISTENCE_ERROR");
-      setIsResolving(false);
+      dispatch({ type: "error_set", errorCode: "PERSISTENCE_ERROR" });
+      dispatch({ type: "resolve_finished" });
     }
   }
 
@@ -472,9 +475,13 @@ export function useWheelGame({
       const elapsedSeconds = Math.floor(
         (Date.now() - timerAnchorRef.current.startedAtMs) / 1000
       );
-      setTimerRemaining(
-        Math.max(0, timerAnchorRef.current.initialRemaining - elapsedSeconds)
-      );
+      dispatch({
+        type: "timer_tick",
+        remainingSeconds: Math.max(
+          0,
+          timerAnchorRef.current.initialRemaining - elapsedSeconds
+        ),
+      });
     };
 
     tick();
@@ -534,7 +541,7 @@ export function useWheelGame({
     let cancelled = false;
     restoreAttemptedRef.current = true;
     queueMicrotask(() => {
-      if (!cancelled) setIsRestoringRound(true);
+      if (!cancelled) dispatch({ type: "restore_requested" });
     });
 
     void (async () => {
@@ -550,7 +557,10 @@ export function useWheelGame({
       );
 
       if (!res.ok) {
-        setErrorCode(await readApiErrorCode(res));
+        dispatch({
+          type: "restore_failed",
+          errorCode: await readApiErrorCode(res),
+        });
         return null;
       }
 
@@ -559,21 +569,17 @@ export function useWheelGame({
     })()
       .then((round) => {
         if (cancelled || !round) return;
-        setResolvedRound(null);
-        setActiveRound(round);
-        setIsChallengeOpen(true);
-        setResponseTextRaw("");
-        setValidationMessage(null);
+        dispatch({ type: "round_restored", round });
         clearTimerTicker();
-        setTimerRemaining(
-          round.timer?.remainingSeconds ?? round.task.timerSeconds ?? null
-        );
+        dispatch({ type: "timer_sync", round });
       })
       .catch(() => {
-        if (!cancelled) setErrorCode("PERSISTENCE_ERROR");
+        if (!cancelled) {
+          dispatch({ type: "restore_failed", errorCode: "PERSISTENCE_ERROR" });
+        }
       })
       .finally(() => {
-        if (!cancelled) setIsRestoringRound(false);
+        if (!cancelled) dispatch({ type: "restore_finished" });
       });
 
     return () => {
@@ -613,22 +619,16 @@ export function useWheelGame({
 
   /** Resets all stale state and marks the wheel as preparing + spinning. */
   function beginSpin() {
-    setErrorCode(null);
-    setResolvedRound(null);
-    setActiveRound(null);
-    setShowConfetti(false);
-    setPointerLand(false);
-    resetChallengeState(null);
-    setIsPreparingRound(true);
-    setIsSpinning(true);
+    clearTimerTicker();
+    dispatch({ type: "spin_requested" });
   }
 
   /**
    * Signals that the server round has arrived and preparation is done.
    * The component continues by starting the spin animation.
    */
-  function setPreparingDone() {
-    setIsPreparingRound(false);
+  function completeSpinPreparation() {
+    dispatch({ type: "spin_preparation_completed" });
   }
 
   /**
@@ -636,21 +636,24 @@ export function useWheelGame({
    * Commits the round to state and opens the challenge overlay.
    */
   function finalizeSpinRound(round: WheelRoundSnapshot) {
-    setIsSpinning(false);
-    setPointerLand(true);
-    setActiveRound(round);
-    setIsChallengeOpen(true);
-    resetChallengeState(round);
+    dispatch({ type: "spin_round_finalized", round });
   }
 
   /** Clears the pointer bounce after its animation. */
   function clearPointerLand() {
-    setPointerLand(false);
+    dispatch({ type: "pointer_land_cleared" });
+  }
+
+  function cancelSpin() {
+    dispatch({ type: "spin_cancelled" });
+  }
+
+  function failSpin(errorCode: GameApiErrorCode) {
+    dispatch({ type: "spin_failed", errorCode });
   }
 
   function setResponseText(value: string) {
-    setResponseTextRaw(value);
-    setValidationMessage(null);
+    dispatch({ type: "response_text_changed", value });
   }
 
   // ── Return ─────────────────────────────────────────────────────────────────
@@ -683,15 +686,13 @@ export function useWheelGame({
     timerStatus,
     canFinishTimedRoundEarly,
     canPromiseActiveRound,
-    // Setters for animation coordination
-    setIsPreparingRound,
-    setIsSpinning,
-    setErrorCode,
     // Spin lifecycle
     beginSpin,
-    setPreparingDone,
+    completeSpinPreparation,
     finalizeSpinRound,
     clearPointerLand,
+    cancelSpin,
+    failSpin,
     // API actions
     startRoundRequest,
     handleBeginTimedTask,

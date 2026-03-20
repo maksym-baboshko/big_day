@@ -1,15 +1,21 @@
 import { NextResponse } from "next/server";
 import {
+  createApiErrorResponse,
+  createInvalidDataErrorResponse,
   enforceRateLimit,
   getRateLimitErrorPayload,
+  getRequestId,
+  logServerError,
   RateLimitExceededError,
 } from "@/shared/lib/server";
-import { rsvpSchema } from "@/widgets/rsvp/model";
+import { rsvpSubmissionPayloadSchema } from "@/widgets/rsvp/model/api-contracts";
 import { getRsvpEmailConfig, sendRsvpNotification } from "@/widgets/rsvp/server";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
+  const requestId = getRequestId(request);
+
   try {
     await enforceRateLimit({
       request,
@@ -18,13 +24,13 @@ export async function POST(request: Request) {
       windowSeconds: 15 * 60,
     });
 
-    const body = await request.json();
-    const result = rsvpSchema.safeParse(body);
+    const body = await request.json().catch(() => null);
+    const result = rsvpSubmissionPayloadSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: "Invalid data" },
-        { status: 400 }
+      return createInvalidDataErrorResponse(
+        "Invalid RSVP payload.",
+        requestId
       );
     }
 
@@ -35,41 +41,49 @@ export async function POST(request: Request) {
     const emailConfig = getRsvpEmailConfig();
 
     if (!emailConfig) {
-      console.error("RSVP API is missing required Resend configuration.");
-      return NextResponse.json(
-        { error: "RSVP is not configured", code: "RSVP_NOT_CONFIGURED" },
-        { status: 503 }
-      );
+      logServerError({
+        scope: "api.rsvp.submit",
+        event: "missing_email_config",
+        requestId,
+      });
+
+      return createApiErrorResponse({
+        status: 503,
+        error: "RSVP is not configured",
+        code: "RSVP_NOT_CONFIGURED",
+        requestId,
+      });
     }
 
     const emailId = await sendRsvpNotification(result.data, emailConfig);
 
     return NextResponse.json({ success: true, id: emailId });
   } catch (error) {
-    console.error("RSVP API error:", error);
     const errorMessage =
       error instanceof Error ? error.message : "Internal Server Error";
 
     if (error instanceof RateLimitExceededError) {
-      return NextResponse.json(
-        getRateLimitErrorPayload(error.retryAfterSeconds),
-        {
-          status: 429,
-          headers: {
-            "Retry-After": String(error.retryAfterSeconds),
-          },
-        }
-      );
+      return createApiErrorResponse({
+        status: 429,
+        ...getRateLimitErrorPayload(error.retryAfterSeconds, requestId),
+      });
     }
 
-    return NextResponse.json(
-      {
-        error:
-          process.env.NODE_ENV === "development"
-            ? errorMessage
-            : "Internal Server Error",
-      },
-      { status: 500 }
-    );
+    logServerError({
+      scope: "api.rsvp.submit",
+      event: "unhandled_route_error",
+      requestId,
+      error,
+    });
+
+    return createApiErrorResponse({
+      status: 500,
+      error:
+        process.env.NODE_ENV === "development"
+          ? errorMessage
+          : "Internal Server Error",
+      code: "PERSISTENCE_ERROR",
+      requestId,
+    });
   }
 }

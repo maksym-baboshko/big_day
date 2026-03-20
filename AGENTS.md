@@ -28,6 +28,7 @@ This repository contains:
 | Animation | Framer Motion 12 |
 | i18n | next-intl 4 |
 | Forms | react-hook-form + zod + @hookform/resolvers |
+| Testing | Vitest + React Testing Library |
 | Backend services | Supabase + Resend |
 | Utilities | clsx + tailwind-merge via `cn()` |
 
@@ -46,7 +47,12 @@ src/
 │   ├── countdown/
 │   ├── game-session/             # auth, local cache, shared contracts, server repositories
 │   │   └── server/
-│   │       ├── wheel-round-repository.ts   # open/start/timer/resolve round
+│   │       ├── wheel-round-repository.ts   # barrel for wheel round lifecycle modules
+│   │       ├── wheel-round-shared.ts       # shared wheel lifecycle helpers + errors
+│   │       ├── wheel-round-read-repository.ts
+│   │       ├── wheel-round-start-repository.ts
+│   │       ├── wheel-round-timer-repository.ts
+│   │       ├── wheel-round-resolve-repository.ts
 │   │       ├── player-repository.ts        # profile bootstrap & save
 │   │       ├── leaderboard-repository.ts   # leaderboard + live snapshot
 │   │       ├── broadcast-repository.ts     # Supabase Broadcast signals
@@ -62,7 +68,8 @@ src/
 │   ├── theme-switcher/
 │   └── wheel-of-fortune/         # WheelOfFortuneGame + hook + extracted subcomponents
 │       ├── WheelOfFortuneGame.tsx  # animation + JSX only
-│       ├── useWheelGame.ts         # all state, API calls, timer, restore logic
+│       ├── useWheelGame.ts         # reducer-backed state, API calls, timer, restore logic
+│       ├── wheel-game-reducer.ts   # wheel reducer + command transitions
 │       ├── WheelChallengeOverlay.tsx
 │       ├── WheelLeaderboardCard.tsx
 │       ├── ConfettiPop.tsx
@@ -112,7 +119,7 @@ Barrel exports are already used across the repo. Prefer importing from the barre
 - `/invite/[slug]` renders guest-specific copy and seat count
 - personalized invite pages prefill RSVP defaults from the guest entry
 - `src/app/api/rsvp/route.ts` is implemented and uses `rsvpSchema`
-- the RSVP API rate-limits submissions, uses a honeypot `website` field, and sends via Resend or `mock` mode
+- the RSVP API rate-limits submissions, uses a honeypot `website` field that short-circuits bot-like submissions, and sends via Resend or `mock` mode
 
 Current RSVP payload shape:
 
@@ -214,6 +221,8 @@ Supported fallbacks still exist in code for older setups:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `SUPABASE_URL`
 
+For repo-local games work and `pnpm smoke:games`, anonymous sign-ins stay enabled in `supabase/config.toml`.
+
 Supabase CLI workflow on this machine:
 
 ```bash
@@ -230,6 +239,8 @@ Useful Supabase files:
 - `supabase/seed_wheel_content.sql`
 - `supabase/reset_runtime_data.sql`
 - `supabase/verify_games_platform_setup.sql`
+- `src/features/game-session/server/supabase-types.generated.ts`
+- `src/features/game-session/server/supabase-types.generated.meta.json`
 - `supabase/games_hub_schema.sql` is legacy and should not be applied to the current setup
 
 Migration rules:
@@ -237,6 +248,7 @@ Migration rules:
 - `supabase/games_platform_schema.sql` is the baseline schema snapshot
 - incremental database changes go into `supabase/migrations/*.sql`
 - when schema changes, update both the baseline snapshot and add a new migration in the same change
+- refresh generated DB types with `pnpm supabase:types:generate -- --local` or `--linked`
 - applied migrations stay committed in the repo; do not delete them after pushing
 - prefer the repo-local CLI via `pnpm exec supabase` or the `pnpm supabase:*` scripts
 - if Supabase CLI is authenticated and local `SUPABASE_DB_PASSWORD` is set, the agent may link the project and run remote migration commands without extra product-level setup
@@ -255,14 +267,60 @@ On Vercel serverless, the runtime may shut down immediately after the response i
 3. `runDeferredTasks` uses `Promise.allSettled` so one failure does not block others
 
 This applies to: broadcast signals, activity logging, leaderboard notifications, and live snapshot pushes.
+Each deferred task is labeled as `{ label, run }`, so failures remain attributable in structured logs.
 
 ### Centralized error handling
 
 Game API routes use `handleGameApiError()` from `@/shared/lib/server` instead of per-route `instanceof` chains. When adding a new error class, register it in `game-api-error-handler.ts` once.
 
+### Unified error envelopes and request IDs
+
+All `/api/games/*`, `/api/live`, and `/api/rsvp` error responses share the same shape:
+
+- `error: string`
+- `code: string`
+- `requestId: string`
+- `retryAfterSeconds?: number`
+
+Request IDs come from `x-request-id`, then `x-vercel-id`, then `crypto.randomUUID()`.
+
+### Structured server logging
+
+Prefer `logServerInfo()` and `logServerError()` from `@/shared/lib/server` over direct `console.error` / `console.log` in server code.
+Structured log payloads include `scope`, `event`, `requestId`, optional `context`, and serialized error details.
+
 ### Server-side timer computation
 
 `computeServerRemainingSeconds()` in `repository-helpers.ts` calculates the remaining time from `timer_last_started_at` and `timer_remaining_seconds`. Clients never submit remaining seconds for round resolution.
+
+### Live projector resilience
+
+`useLiveProjectorSnapshot.ts` keeps polling active at all times.
+Supabase Broadcast invalidates the snapshot immediately, `SUBSCRIBED` forces a refresh, and retryable realtime statuses (`CHANNEL_ERROR`, `TIMED_OUT`, `CLOSED`) degrade to polling with bounded retry backoff.
+Hero-event dedupe uses a sliding 200-ID window to prevent duplicate overlays and unbounded memory growth during long projector sessions.
+
+---
+
+## Quality Gates
+
+Minimum local verification before considering the repo ready:
+
+```bash
+pnpm lint
+pnpm test
+pnpm test:e2e
+pnpm supabase:types:check
+pnpm build
+pnpm smoke:games
+```
+
+`pnpm smoke:games` is self-contained by default: it starts a temporary local Next.js server when `SMOKE_BASE_URL` is not set, then runs the games smoke flow against that server.
+`pnpm test:e2e` and `pnpm test:e2e:ci` both rebuild the app before Playwright starts its dedicated production server, so local browser tests cannot accidentally use a stale `.next` build.
+Run `pnpm verify:env` before smoke-related work to validate the required Supabase runtime env and local anonymous-auth config.
+`pnpm smoke:games` reports named steps and, on failure, includes the failing step, the last successful step, relevant HTTP status/payload context, and recent managed-server logs when available.
+CI additionally runs `pnpm test:coverage` to enforce coverage thresholds on the current safety-net surface.
+CI also runs `pnpm exec playwright test` after a separate build step for browser-level RSVP, games, wheel, and live-feed verification.
+CI also runs `pnpm supabase:types:check -- --verify-output --local` after resetting local Supabase to catch DB type drift.
 
 ---
 
@@ -286,10 +344,17 @@ Game API routes use `handleGameApiError()` from `@/shared/lib/server` instead of
 
 ```bash
 pnpm dev
-pnpm build
+pnpm test
+pnpm test:coverage
+pnpm test:e2e
+pnpm test:e2e:ci
+pnpm verify:env
 pnpm lint
+pnpm build
 pnpm smoke:games
 pnpm generate:wheel-content-seed
+pnpm supabase:types:check
+pnpm supabase:types:generate -- --local
 pnpm supabase:login
 pnpm supabase:link
 pnpm supabase:db:push

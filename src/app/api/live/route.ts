@@ -1,31 +1,34 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
+import { liveSnapshotQuerySchema } from "@/features/game-session/api-contracts";
 import {
   getLivePageSnapshot,
   SupabaseConfigurationError,
 } from "@/features/game-session/server";
+import {
+  createApiErrorResponse,
+  createInvalidDataErrorResponse,
+  getRequestId,
+  logServerError,
+} from "@/shared/lib/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-const liveQuerySchema = z.object({
-  leaderboardLimit: z.coerce.number().int().min(1).max(10).optional(),
-  feedLimit: z.coerce.number().int().min(1).max(10).optional(),
-});
-
 export async function GET(request: Request) {
+  const requestId = getRequestId(request);
+
   try {
     const { searchParams } = new URL(request.url);
-    const result = liveQuerySchema.safeParse({
+    const result = liveSnapshotQuerySchema.safeParse({
       leaderboardLimit: searchParams.get("leaderboardLimit") ?? undefined,
       feedLimit: searchParams.get("feedLimit") ?? undefined,
     });
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: "Invalid live snapshot query.", code: "INVALID_DATA" },
-        { status: 400 }
+      return createInvalidDataErrorResponse(
+        "Invalid live snapshot query.",
+        requestId
       );
     }
 
@@ -41,16 +44,26 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     if (error instanceof SupabaseConfigurationError) {
-      return NextResponse.json(
-        { error: "Supabase is not configured.", code: "SUPABASE_NOT_CONFIGURED" },
-        { status: 503 }
-      );
+      return createApiErrorResponse({
+        status: 503,
+        error: "Supabase is not configured.",
+        code: "SUPABASE_NOT_CONFIGURED",
+        requestId,
+      });
     }
 
-    console.error("Live snapshot route error:", error);
-    return NextResponse.json(
-      { error: "Failed to read live snapshot.", code: "PERSISTENCE_ERROR" },
-      { status: 500 }
-    );
+    logServerError({
+      scope: "api.live.read",
+      event: "unhandled_route_error",
+      requestId,
+      error,
+    });
+
+    return createApiErrorResponse({
+      status: 500,
+      error: "Failed to read live snapshot.",
+      code: "PERSISTENCE_ERROR",
+      requestId,
+    });
   }
 }

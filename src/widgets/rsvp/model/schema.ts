@@ -17,7 +17,7 @@ export const rsvpSchema = z
     guests: z.coerce.number().int().min(1).max(10).optional(),
     dietary: optionalTextField(500),
     message: optionalTextField(1000),
-    website: z.string().max(0).optional().default(""),
+    website: z.string().trim().max(500).optional().default(""),
   })
   .superRefine((data, ctx) => {
     if (data.attending === "yes" && !data.guests) {

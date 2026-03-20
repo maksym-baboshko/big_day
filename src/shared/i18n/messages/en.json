@@ -348,7 +348,7 @@
     "eyebrow": "Live feed of the evening",
     "title": "Live feed",
     "description": "Top 10 players, fresh XP, and the brightest promises of the evening in one live screen.",
-    "leaderboard_label": "Leaderboard",
+    "leaderboard_label": "Leaderboard rankings",
     "feed_label": "Live moments",
     "leaderboard_empty": "The ranking will wake up as soon as players start collecting XP.",
     "leaderboard_error": "The leaderboard could not be loaded.",

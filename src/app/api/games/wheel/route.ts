@@ -1,7 +1,14 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
-import type { SupportedLocale } from "@/shared/config";
-import { enforceRateLimit, handleGameApiError } from "@/shared/lib/server";
+import {
+  createInvalidDataErrorResponse,
+  enforceRateLimit,
+  getRequestId,
+  handleGameApiError,
+} from "@/shared/lib/server";
+import {
+  parseRequiredGameLocale,
+  wheelStartPayloadSchema,
+} from "@/features/game-session/api-contracts";
 import {
   getOpenWheelRound,
   requireAuthenticatedGameUser,
@@ -10,25 +17,17 @@ import {
 
 export const runtime = "nodejs";
 
-const wheelStartSchema = z.object({
-  locale: z.enum(["uk", "en"]),
-});
-
-function getLocaleFromRequest(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const result = z.enum(["uk", "en"]).safeParse(searchParams.get("locale"));
-
-  return result.success ? (result.data as SupportedLocale) : null;
-}
-
 export async function GET(request: Request) {
+  const requestId = getRequestId(request);
+
   try {
-    const locale = getLocaleFromRequest(request);
+    const { searchParams } = new URL(request.url);
+    const locale = parseRequiredGameLocale(searchParams.get("locale"));
 
     if (!locale) {
-      return NextResponse.json(
-        { error: "Invalid wheel read payload.", code: "INVALID_DATA" },
-        { status: 400 }
+      return createInvalidDataErrorResponse(
+        "Invalid wheel read payload.",
+        requestId
       );
     }
 
@@ -52,11 +51,16 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    return handleGameApiError(error, "Failed to read wheel round.");
+    return handleGameApiError(error, "Failed to read wheel round.", {
+      requestId,
+      scope: "api.games.wheel.read",
+    });
   }
 }
 
 export async function POST(request: Request) {
+  const requestId = getRequestId(request);
+
   try {
     const user = await requireAuthenticatedGameUser(request);
     await enforceRateLimit({
@@ -67,23 +71,26 @@ export async function POST(request: Request) {
       authUserId: user.id,
     });
 
-    const body = await request.json();
-    const result = wheelStartSchema.safeParse(body);
+    const body = await request.json().catch(() => null);
+    const result = wheelStartPayloadSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: "Invalid wheel start payload.", code: "INVALID_DATA" },
-        { status: 400 }
+      return createInvalidDataErrorResponse(
+        "Invalid wheel start payload.",
+        requestId
       );
     }
 
     const wheelRound = await startWheelRound({
       playerId: user.id,
-      locale: result.data.locale as SupportedLocale,
+      locale: result.data.locale,
     });
 
     return NextResponse.json(wheelRound);
   } catch (error) {
-    return handleGameApiError(error, "Failed to start wheel round.");
+    return handleGameApiError(error, "Failed to start wheel round.", {
+      requestId,
+      scope: "api.games.wheel.start",
+    });
   }
 }

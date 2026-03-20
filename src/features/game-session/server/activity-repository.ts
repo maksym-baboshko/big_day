@@ -1,6 +1,7 @@
 import "server-only";
 
-import type { JsonValue } from "./types";
+import { logServerError } from "@/shared/lib/server";
+import type { ActivityEventType, ActivityVisibility, JsonValue } from "./types";
 import { getSupabaseAdminClient } from "./supabase";
 import { WHEEL_GAME_SLUG } from "./queries";
 
@@ -8,8 +9,8 @@ export async function logActivityEvent(event: {
   sessionId?: string | null;
   playerId: string | null;
   roundId?: string | null;
-  eventType: string;
-  visibility: "private" | "feed";
+  eventType: ActivityEventType;
+  visibility: ActivityVisibility;
   payload: JsonValue;
   snapshotName?: string | null;
   snapshotAvatarKey?: string | null;
@@ -34,6 +35,16 @@ export async function logActivityEvent(event: {
   });
 
   if (error) {
-    console.error("Activity event insert failed:", error);
+    logServerError({
+      scope: "activity-repository",
+      event: "activity_event_insert_failed",
+      context: {
+        eventType: event.eventType,
+        playerId: event.playerId,
+        roundId: event.roundId ?? null,
+        visibility: event.visibility,
+      },
+      error,
+    });
   }
 }

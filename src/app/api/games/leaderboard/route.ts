@@ -1,21 +1,21 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
-import { enforceRateLimit, handleGameApiError } from "@/shared/lib/server";
+import {
+  createInvalidDataErrorResponse,
+  enforceRateLimit,
+  getRequestId,
+  handleGameApiError,
+} from "@/shared/lib/server";
+import { leaderboardQuerySchema } from "@/features/game-session";
 import {
   getGameLeaderboard,
   requireAuthenticatedGameUser,
 } from "@/features/game-session/server";
-import { GAME_SLUG_ENUM } from "@/shared/config";
 
 export const runtime = "nodejs";
 
-const leaderboardQuerySchema = z.object({
-  game: z.enum(GAME_SLUG_ENUM),
-  topLimit: z.coerce.number().int().min(1).max(10).optional(),
-  radius: z.coerce.number().int().min(1).max(3).optional(),
-});
-
 export async function GET(request: Request) {
+  const requestId = getRequestId(request);
+
   try {
     const user = await requireAuthenticatedGameUser(request);
     await enforceRateLimit({
@@ -34,9 +34,9 @@ export async function GET(request: Request) {
     });
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: "Invalid leaderboard query.", code: "INVALID_DATA" },
-        { status: 400 }
+      return createInvalidDataErrorResponse(
+        "Invalid leaderboard query.",
+        requestId
       );
     }
 
@@ -56,6 +56,9 @@ export async function GET(request: Request) {
       }
     );
   } catch (error) {
-    return handleGameApiError(error, "Failed to read game leaderboard.");
+    return handleGameApiError(error, "Failed to read game leaderboard.", {
+      requestId,
+      scope: "api.games.leaderboard.get",
+    });
   }
 }

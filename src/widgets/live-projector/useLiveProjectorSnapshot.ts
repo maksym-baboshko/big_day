@@ -3,12 +3,21 @@
 import { startTransition, useCallback, useEffect, useRef, useState } from "react";
 import type { LiveFeedEventSnapshot, LivePageApiResponse } from "@/features/game-session";
 import { getSupabaseBrowserClient } from "@/features/game-session";
-const HERO_EVENT_DURATION_MS = 5000;
-const LIVE_POLL_INTERVAL_MS = 30_000;
+import {
+  collectUnseenHeroEvents,
+  filterQueueableHeroEvents,
+  getRealtimeRetryDelay,
+  HERO_EVENT_DURATION_MS,
+  LIVE_POLL_INTERVAL_MS,
+  shouldRetryRealtimeStatus,
+} from "./live-projector-helpers";
+
 const LIVE_SNAPSHOT_URL = "/api/live";
 const LIVE_PROJECTOR_BROADCAST_CHANNEL = "live-projector-broadcast";
 const LIVE_PROJECTOR_BROADCAST_EVENT = "snapshot";
-const SEEN_HERO_IDS_MAX = 200;
+
+const FEED_LIMIT = 16;
+const LEADERBOARD_LIMIT = 15;
 
 interface UseLiveProjectorSnapshotResult {
   snapshot: LivePageApiResponse | null;
@@ -22,6 +31,7 @@ export function useLiveProjectorSnapshot(): UseLiveProjectorSnapshotResult {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const [heroEvent, setHeroEvent] = useState<LiveFeedEventSnapshot | null>(null);
+
   const heroTimeoutRef = useRef<number | null>(null);
   const heroQueueRef = useRef<LiveFeedEventSnapshot[]>([]);
   const pollIntervalRef = useRef<number | null>(null);
@@ -30,6 +40,15 @@ export function useLiveProjectorSnapshot(): UseLiveProjectorSnapshotResult {
   const seenHeroEventIdsRef = useRef(new Set<string>());
   const seenHeroEventIdsOrderRef = useRef<string[]>([]);
   const hasLoadedOnceRef = useRef(false);
+  const supabaseClientRef = useRef<ReturnType<
+    typeof getSupabaseBrowserClient
+  > | null>(null);
+  const broadcastChannelRef = useRef<ReturnType<
+    ReturnType<typeof getSupabaseBrowserClient>["channel"]
+  > | null>(null);
+  const realtimeRetryTimeoutRef = useRef<number | null>(null);
+  const realtimeRetryAttemptRef = useRef(0);
+  const subscribeToRealtimeRef = useRef<() => void>(() => {});
 
   const showNextHeroEvent = useCallback(() => {
     if (heroTimeoutRef.current) {
@@ -57,9 +76,10 @@ export function useLiveProjectorSnapshot(): UseLiveProjectorSnapshotResult {
       }
 
       const queuedHeroIds = new Set(heroQueueRef.current.map((event) => event.id));
-      const uniqueHeroEvents = nextHeroEvents.filter(
-        (event) =>
-          event.id !== activeHeroEventIdRef.current && !queuedHeroIds.has(event.id)
+      const uniqueHeroEvents = filterQueueableHeroEvents(
+        nextHeroEvents,
+        activeHeroEventIdRef.current,
+        queuedHeroIds
       );
 
       if (uniqueHeroEvents.length === 0) {
@@ -75,18 +95,6 @@ export function useLiveProjectorSnapshot(): UseLiveProjectorSnapshotResult {
     [showNextHeroEvent]
   );
 
-  function trackSeenHeroEventId(id: string) {
-    seenHeroEventIdsRef.current.add(id);
-    seenHeroEventIdsOrderRef.current.push(id);
-
-    while (seenHeroEventIdsOrderRef.current.length > SEEN_HERO_IDS_MAX) {
-      const oldest = seenHeroEventIdsOrderRef.current.shift();
-      if (oldest) {
-        seenHeroEventIdsRef.current.delete(oldest);
-      }
-    }
-  }
-
   const applySnapshot = useCallback(
     (nextSnapshot: LivePageApiResponse) => {
       const nextHeroEvents = nextSnapshot.feed.filter((event) => event.isHeroEvent);
@@ -98,20 +106,19 @@ export function useLiveProjectorSnapshot(): UseLiveProjectorSnapshotResult {
       });
 
       if (hasLoadedOnceRef.current) {
-        const unseenHeroEvents = nextHeroEvents.filter((event) => {
-          if (seenHeroEventIdsRef.current.has(event.id)) {
-            return false;
-          }
-
-          trackSeenHeroEventId(event.id);
-          return true;
-        });
+        const unseenHeroEvents = collectUnseenHeroEvents(
+          nextHeroEvents,
+          seenHeroEventIdsRef.current,
+          seenHeroEventIdsOrderRef.current
+        );
 
         queueHeroEvents([...unseenHeroEvents].reverse());
       } else {
-        nextHeroEvents.forEach((event) => {
-          trackSeenHeroEventId(event.id);
-        });
+        collectUnseenHeroEvents(
+          nextHeroEvents,
+          seenHeroEventIdsRef.current,
+          seenHeroEventIdsOrderRef.current
+        );
       }
 
       hasLoadedOnceRef.current = true;
@@ -128,8 +135,8 @@ export function useLiveProjectorSnapshot(): UseLiveProjectorSnapshotResult {
 
     try {
       const searchParams = new URLSearchParams({
-        leaderboardLimit: "10",
-        feedLimit: "5",
+        leaderboardLimit: LEADERBOARD_LIMIT.toString(),
+        feedLimit: FEED_LIMIT.toString(),
         ts: Date.now().toString(),
       });
 
@@ -153,6 +160,81 @@ export function useLiveProjectorSnapshot(): UseLiveProjectorSnapshotResult {
       isRefreshingRef.current = false;
     }
   }, [applySnapshot]);
+
+  const clearRealtimeRetry = useCallback(() => {
+    if (!realtimeRetryTimeoutRef.current) {
+      return;
+    }
+
+    window.clearTimeout(realtimeRetryTimeoutRef.current);
+    realtimeRetryTimeoutRef.current = null;
+  }, []);
+
+  const removeRealtimeChannel = useCallback(() => {
+    const channel = broadcastChannelRef.current;
+    const supabase = supabaseClientRef.current;
+
+    broadcastChannelRef.current = null;
+
+    if (!channel || !supabase) {
+      return;
+    }
+
+    void supabase.removeChannel(channel);
+  }, []);
+
+  const scheduleRealtimeRetry = useCallback(() => {
+    if (realtimeRetryTimeoutRef.current) {
+      return;
+    }
+
+    realtimeRetryAttemptRef.current += 1;
+    const retryDelay = getRealtimeRetryDelay(realtimeRetryAttemptRef.current);
+
+    realtimeRetryTimeoutRef.current = window.setTimeout(() => {
+      realtimeRetryTimeoutRef.current = null;
+      subscribeToRealtimeRef.current();
+    }, retryDelay);
+  }, []);
+
+  const subscribeToRealtime = useCallback(() => {
+    try {
+      const supabase = supabaseClientRef.current ?? getSupabaseBrowserClient();
+      supabaseClientRef.current = supabase;
+      removeRealtimeChannel();
+
+      const broadcastChannel = supabase
+        .channel(LIVE_PROJECTOR_BROADCAST_CHANNEL)
+        .on(
+          "broadcast",
+          { event: LIVE_PROJECTOR_BROADCAST_EVENT },
+          () => {
+            void loadSnapshot();
+          }
+        )
+        .subscribe((status) => {
+          if (status === "SUBSCRIBED") {
+            realtimeRetryAttemptRef.current = 0;
+            clearRealtimeRetry();
+            void loadSnapshot();
+            return;
+          }
+
+          if (!shouldRetryRealtimeStatus(status)) {
+            return;
+          }
+
+          removeRealtimeChannel();
+          scheduleRealtimeRetry();
+        });
+
+      broadcastChannelRef.current = broadcastChannel;
+    } catch {
+      scheduleRealtimeRetry();
+    }
+  }, [clearRealtimeRetry, loadSnapshot, removeRealtimeChannel, scheduleRealtimeRetry]);
+
+  subscribeToRealtimeRef.current = subscribeToRealtime;
 
   useEffect(() => {
     void loadSnapshot();
@@ -185,31 +267,13 @@ export function useLiveProjectorSnapshot(): UseLiveProjectorSnapshotResult {
   }, [loadSnapshot]);
 
   useEffect(() => {
-    try {
-      const supabase = getSupabaseBrowserClient();
+    subscribeToRealtime();
 
-      const broadcastChannel = supabase
-        .channel(LIVE_PROJECTOR_BROADCAST_CHANNEL)
-        .on(
-          "broadcast",
-          { event: LIVE_PROJECTOR_BROADCAST_EVENT },
-          (event: { payload: LivePageApiResponse }) => {
-            applySnapshot(event.payload);
-          }
-        )
-        .subscribe((status) => {
-          if (status === "SUBSCRIBED") {
-            void loadSnapshot();
-          }
-        });
-
-      return () => {
-        void supabase.removeChannel(broadcastChannel);
-      };
-    } catch {
-      return undefined;
-    }
-  }, [loadSnapshot, applySnapshot]);
+    return () => {
+      clearRealtimeRetry();
+      removeRealtimeChannel();
+    };
+  }, [clearRealtimeRetry, removeRealtimeChannel, subscribeToRealtime]);
 
   return {
     snapshot,

@@ -1,6 +1,8 @@
 import "server-only";
 
+import type { ConsumeRateLimitWindowResult } from "@/features/game-session/server/types";
 import { getSupabaseAdminClient } from "@/features/game-session/server/supabase";
+import { createApiErrorPayload } from "./api-error-response";
 
 export class RateLimitExceededError extends Error {
   retryAfterSeconds: number;
@@ -12,19 +14,16 @@ export class RateLimitExceededError extends Error {
   }
 }
 
-export function getRateLimitErrorPayload(retryAfterSeconds: number) {
-  return {
+export function getRateLimitErrorPayload(
+  retryAfterSeconds: number,
+  requestId: string
+) {
+  return createApiErrorPayload({
     error: "Too many requests.",
-    code: "RATE_LIMITED" as const,
+    code: "RATE_LIMITED",
+    requestId,
     retryAfterSeconds,
-  };
-}
-
-interface RateLimitResult {
-  allowed: boolean;
-  current_count: number;
-  remaining: number;
-  retry_after_seconds: number;
+  });
 }
 
 interface EnforceRateLimitOptions {
@@ -92,7 +91,7 @@ export async function enforceRateLimit({
     throw error;
   }
 
-  const result = data as RateLimitResult | null;
+  const result = data as ConsumeRateLimitWindowResult | null;
 
   if (!result) {
     throw new Error("Rate limit function did not return a result.");

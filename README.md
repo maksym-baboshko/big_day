@@ -110,11 +110,14 @@ This repo keeps both a baseline schema snapshot and incremental migrations:
 - `supabase/games_platform_schema.sql`: current baseline schema snapshot
 - `supabase/migrations/*.sql`: incremental changes to apply on top
 - `supabase/games_hub_schema.sql`: legacy snapshot, do not apply to the current setup
+- `src/features/game-session/server/supabase-types.generated.ts`: committed DB type surface
+- `src/features/game-session/server/supabase-types.generated.meta.json`: schema fingerprint for drift checks
 
 When changing the database:
 
 - add a new migration under `supabase/migrations/`
 - update `supabase/games_platform_schema.sql` in the same change
+- refresh generated types with `pnpm supabase:types:generate -- --local` or `--linked`
 - keep applied migrations committed in the repo
 
 Typical CLI flow:
@@ -130,21 +133,69 @@ pnpm supabase:db:push
 
 ```bash
 pnpm dev
+pnpm test
+pnpm test:coverage
+pnpm test:e2e
+pnpm verify:env
 pnpm build
 pnpm lint
 pnpm smoke:games
 pnpm generate:wheel-content-seed
+pnpm supabase:types:check
+pnpm supabase:types:generate -- --local
 pnpm supabase:login
 pnpm supabase:link
 pnpm supabase:db:push
 pnpm supabase:migration:new -- <name>
 ```
 
-`pnpm smoke:games` expects:
+`pnpm smoke:games` starts a temporary local Next.js server automatically when `SMOKE_BASE_URL` is not set.
+`pnpm test:e2e` and `pnpm test:e2e:ci` both rebuild the app before Playwright starts its dedicated production server, so local browser tests cannot accidentally run against a stale `.next` build.
 
-- the Next.js app to be running locally
+It still expects:
+
 - Supabase env vars to be configured
 - the current schema to be applied in Supabase
+
+If you want to target an already running app instead, set `SMOKE_BASE_URL`.
+Run `pnpm verify:env` before smoke-related work to validate the required Supabase runtime env and local anonymous-auth config.
+
+## Quality gates
+
+The minimum local release-readiness checks for this repo are:
+
+```bash
+pnpm lint
+pnpm test
+pnpm test:e2e
+pnpm supabase:types:check
+pnpm build
+pnpm smoke:games
+```
+
+CI additionally runs `pnpm test:coverage` to enforce coverage thresholds on the current safety-net surface, `pnpm exec playwright test` after a separate `pnpm build` step for Chromium browser coverage, and `pnpm supabase:types:check -- --verify-output --local` to verify the committed types still match the migrated schema.
+
+## API contracts and observability
+
+- `/api/games/*`, `/api/live`, and `/api/rsvp` share the same error envelope: `error`, `code`, `requestId`, and optional `retryAfterSeconds`.
+- Route handlers derive `requestId` from `x-request-id`, then `x-vercel-id`, then fall back to `crypto.randomUUID()`.
+- Server-side logging goes through the structured logger helpers in `src/shared/lib/server/logger.ts`; prefer `logServerInfo()` and `logServerError()` over ad-hoc `console.error`.
+- Deferred work is labeled. Repository methods return `DeferredTask[]` as `{ label, run }`, so post-response failures remain attributable in logs.
+
+## Test layers
+
+- `pnpm test`: unit and route-level Vitest coverage.
+- `pnpm test:coverage`: the same Vitest surface with enforced coverage thresholds.
+- `pnpm test:e2e`: Playwright browser tests for RSVP submit, player onboarding, wheel resolve, and live feed refresh, always with a fresh build.
+- `pnpm test:e2e:ci`: the same Playwright surface, also with a fresh build when run locally.
+- `pnpm smoke:games`: self-contained API smoke coverage against a temporary local Next.js server, with named-step reporting (`cleanup_before`, `auth`, `health_check`, `bootstrap_player`, `save_player`, `start_round`, optional `start_timer`, `resolve_round`, `leaderboard`, `live_snapshot`, `cleanup_after`).
+
+## Live projector behavior
+
+- Polling remains active at all times.
+- Supabase Broadcast invalidates the snapshot immediately, and `SUBSCRIBED` forces a refresh.
+- Realtime `CHANNEL_ERROR`, `TIMED_OUT`, and `CLOSED` statuses degrade to polling and trigger bounded retry backoff instead of breaking the page.
+- Hero-event dedupe uses a sliding 200-ID window to prevent duplicate overlays and unbounded memory growth during long sessions.
 
 ## Project structure
 

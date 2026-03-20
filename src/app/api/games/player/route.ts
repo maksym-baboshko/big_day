@@ -1,10 +1,15 @@
 import { after, NextResponse } from "next/server";
-import { z } from "zod";
 import {
+  createInvalidDataErrorResponse,
   enforceRateLimit,
+  getRequestId,
   handleGameApiError,
   runDeferredTasks,
 } from "@/shared/lib/server";
+import {
+  parseDefaultedGameLocale,
+  playerPayloadSchema,
+} from "@/features/game-session/api-contracts";
 import {
   bootstrapPlayerProfile,
   savePlayerProfile,
@@ -13,21 +18,21 @@ import {
 
 export const runtime = "nodejs";
 
-const playerPayloadSchema = z.object({
-  nickname: z
-    .string()
-    .trim()
-    .min(2)
-    .max(40)
-    .transform((value) => value.replace(/\s+/g, " ")),
-  locale: z.enum(["uk", "en"]).default("uk"),
-});
-
 export async function GET(request: Request) {
+  const requestId = getRequestId(request);
+
   try {
     const user = await requireAuthenticatedGameUser(request);
+    await enforceRateLimit({
+      request,
+      scope: "games.player.read",
+      limit: 60,
+      windowSeconds: 10 * 60,
+      authUserId: user.id,
+    });
+
     const { searchParams } = new URL(request.url);
-    const locale = z.enum(["uk", "en"]).catch("uk").parse(searchParams.get("locale"));
+    const locale = parseDefaultedGameLocale(searchParams.get("locale"));
     const player = await bootstrapPlayerProfile({
       authUserId: user.id,
       locale,
@@ -35,11 +40,16 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ player });
   } catch (error) {
-    return handleGameApiError(error, "Failed to read player session.");
+    return handleGameApiError(error, "Failed to read player session.", {
+      requestId,
+      scope: "api.games.player.read",
+    });
   }
 }
 
 export async function POST(request: Request) {
+  const requestId = getRequestId(request);
+
   try {
     const user = await requireAuthenticatedGameUser(request);
     await enforceRateLimit({
@@ -50,13 +60,13 @@ export async function POST(request: Request) {
       authUserId: user.id,
     });
 
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
     const result = playerPayloadSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: "Invalid player payload.", code: "INVALID_DATA" },
-        { status: 400 }
+      return createInvalidDataErrorResponse(
+        "Invalid player payload.",
+        requestId
       );
     }
 
@@ -68,6 +78,9 @@ export async function POST(request: Request) {
     after(() => runDeferredTasks(deferredTasks ?? []));
     return NextResponse.json({ player });
   } catch (error) {
-    return handleGameApiError(error, "Failed to save player session.");
+    return handleGameApiError(error, "Failed to save player session.", {
+      requestId,
+      scope: "api.games.player.save",
+    });
   }
 }

@@ -106,8 +106,7 @@ export function WheelOfFortuneGame({
         // errorCode was already set inside startRoundRequest
         spinAnimationRef.current?.stop();
         spinAnimationRef.current = null;
-        game.setIsPreparingRound(false);
-        game.setIsSpinning(false);
+        game.cancelSpin();
         return;
       }
 
@@ -125,7 +124,7 @@ export function WheelOfFortuneGame({
         ease: wheelEase,
       });
 
-      game.setPreparingDone();
+      game.completeSpinPreparation();
 
       spinTimeoutRef.current = window.setTimeout(() => {
         game.finalizeSpinRound(round);
@@ -136,9 +135,7 @@ export function WheelOfFortuneGame({
     } catch {
       spinAnimationRef.current?.stop();
       spinAnimationRef.current = null;
-      game.setErrorCode("PERSISTENCE_ERROR");
-      game.setIsPreparingRound(false);
-      game.setIsSpinning(false);
+      game.failSpin("PERSISTENCE_ERROR");
     }
   }
 

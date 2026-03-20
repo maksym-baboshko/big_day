@@ -1,14 +1,16 @@
 import "server-only";
 
+import { logServerError } from "@/shared/lib/server";
 import type { GameSlug } from "@/shared/config";
+import type { RealtimeSignalType } from "./types";
 import { getSupabaseAdminClient } from "./supabase";
 import { getLivePageSnapshot } from "./leaderboard-repository";
 
 const LIVE_PROJECTOR_BROADCAST_CHANNEL = "live-projector-broadcast";
-const LIVE_PROJECTOR_BROADCAST_EVENT = "snapshot";
+const LIVE_PROJECTOR_BROADCAST_EVENT: RealtimeSignalType = "snapshot";
 
 const WHEEL_LEADERBOARD_BROADCAST_CHANNEL = "wheel-leaderboard-broadcast";
-const WHEEL_LEADERBOARD_BROADCAST_EVENT = "updated";
+const WHEEL_LEADERBOARD_BROADCAST_EVENT: RealtimeSignalType = "updated";
 
 let liveProjectorChannel: ReturnType<
   ReturnType<typeof getSupabaseAdminClient>["channel"]
@@ -41,7 +43,15 @@ export async function broadcastLiveSnapshot() {
   try {
     snapshot = await getLivePageSnapshot({ leaderboardLimit: 10, feedLimit: 5 });
   } catch (error) {
-    console.error("[broadcast] live-projector snapshot query failed", { error });
+    logServerError({
+      scope: "broadcast-repository",
+      event: "live_snapshot_query_failed",
+      context: {
+        channel: LIVE_PROJECTOR_BROADCAST_CHANNEL,
+        broadcastEvent: LIVE_PROJECTOR_BROADCAST_EVENT,
+      },
+      error,
+    });
     return;
   }
 
@@ -51,16 +61,24 @@ export async function broadcastLiveSnapshot() {
       snapshot
     );
     if (!result.success) {
-      console.error("[broadcast] live-projector httpSend rejected", {
-        channel: LIVE_PROJECTOR_BROADCAST_CHANNEL,
-        event: LIVE_PROJECTOR_BROADCAST_EVENT,
+      logServerError({
+        scope: "broadcast-repository",
+        event: "live_snapshot_http_send_rejected",
+        context: {
+          channel: LIVE_PROJECTOR_BROADCAST_CHANNEL,
+          broadcastEvent: LIVE_PROJECTOR_BROADCAST_EVENT,
+        },
         error: result.error,
       });
     }
   } catch (error) {
-    console.error("[broadcast] live-projector httpSend threw", {
-      channel: LIVE_PROJECTOR_BROADCAST_CHANNEL,
-      event: LIVE_PROJECTOR_BROADCAST_EVENT,
+    logServerError({
+      scope: "broadcast-repository",
+      event: "live_snapshot_http_send_threw",
+      context: {
+        channel: LIVE_PROJECTOR_BROADCAST_CHANNEL,
+        broadcastEvent: LIVE_PROJECTOR_BROADCAST_EVENT,
+      },
       error,
     });
   }
@@ -73,18 +91,26 @@ export async function broadcastLeaderboardSignal(gameSlug: GameSlug) {
       { gameSlug }
     );
     if (!result.success) {
-      console.error("[broadcast] wheel-leaderboard httpSend rejected", {
-        channel: WHEEL_LEADERBOARD_BROADCAST_CHANNEL,
-        event: WHEEL_LEADERBOARD_BROADCAST_EVENT,
-        gameSlug,
+      logServerError({
+        scope: "broadcast-repository",
+        event: "leaderboard_http_send_rejected",
+        context: {
+          channel: WHEEL_LEADERBOARD_BROADCAST_CHANNEL,
+          broadcastEvent: WHEEL_LEADERBOARD_BROADCAST_EVENT,
+          gameSlug,
+        },
         error: result.error,
       });
     }
   } catch (error) {
-    console.error("[broadcast] wheel-leaderboard httpSend threw", {
-      channel: WHEEL_LEADERBOARD_BROADCAST_CHANNEL,
-      event: WHEEL_LEADERBOARD_BROADCAST_EVENT,
-      gameSlug,
+    logServerError({
+      scope: "broadcast-repository",
+      event: "leaderboard_http_send_threw",
+      context: {
+        channel: WHEEL_LEADERBOARD_BROADCAST_CHANNEL,
+        broadcastEvent: WHEEL_LEADERBOARD_BROADCAST_EVENT,
+        gameSlug,
+      },
       error,
     });
   }

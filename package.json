@@ -6,10 +6,20 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ci": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "pnpm build && playwright test",
+    "test:e2e:ci": "pnpm build && playwright test",
+    "cleanup:test-data": "node scripts/cleanup-automated-test-data.mjs",
+    "verify:env": "node scripts/verify-env.mjs",
     "generate:wheel-content-seed": "node scripts/generate-wheel-content-seed.mjs",
     "smoke:games": "node scripts/smoke-games-platform.mjs",
     "lint:classes": "node scripts/lint-canonical-classes.mjs",
     "lint": "eslint && pnpm lint:classes",
+    "supabase:types:generate": "node scripts/supabase-types.mjs generate",
+    "supabase:types:check": "node scripts/supabase-types.mjs check",
     "supabase:init": "pnpm exec supabase init",
     "supabase:login": "pnpm exec supabase login",
     "supabase:link": "pnpm exec supabase link",
@@ -34,14 +44,21 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^4.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "jsdom": "^29.0.1",
     "supabase": "^2.81.3",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.0"
   }
 }

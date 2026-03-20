@@ -1,6 +1,5 @@
 import "server-only";
 
-import { NextResponse } from "next/server";
 import {
   InvalidWheelRoundResponseError,
   InvalidWheelRoundStateError,
@@ -11,6 +10,8 @@ import {
   WheelRoundNotFoundError,
   WheelTasksDepletedError,
 } from "@/features/game-session/server";
+import { createApiErrorResponse } from "./api-error-response";
+import { logServerError } from "./logger";
 import { getRateLimitErrorPayload, RateLimitExceededError } from "./rate-limit";
 
 const ERROR_MAP: ReadonlyArray<{
@@ -69,34 +70,48 @@ const ERROR_MAP: ReadonlyArray<{
   },
 ];
 
+interface HandleGameApiErrorOptions {
+  requestId: string;
+  scope: string;
+}
+
 export function handleGameApiError(
   error: unknown,
-  fallbackMessage: string
-): NextResponse {
+  fallbackMessage: string,
+  options: HandleGameApiErrorOptions
+) {
   if (error instanceof RateLimitExceededError) {
-    return NextResponse.json(
-      getRateLimitErrorPayload(error.retryAfterSeconds),
-      {
-        status: 429,
-        headers: {
-          "Retry-After": String(error.retryAfterSeconds),
-        },
-      }
-    );
+    return createApiErrorResponse({
+      status: 429,
+      ...getRateLimitErrorPayload(error.retryAfterSeconds, options.requestId),
+    });
   }
 
   for (const entry of ERROR_MAP) {
     if (error instanceof entry.errorClass) {
-      return NextResponse.json(
-        { error: entry.message, code: entry.code },
-        { status: entry.status }
-      );
+      return createApiErrorResponse({
+        status: entry.status,
+        error: entry.message,
+        code: entry.code,
+        requestId: options.requestId,
+      });
     }
   }
 
-  console.error(fallbackMessage, error);
-  return NextResponse.json(
-    { error: fallbackMessage, code: "PERSISTENCE_ERROR" },
-    { status: 500 }
-  );
+  logServerError({
+    scope: options.scope,
+    event: "unhandled_api_error",
+    requestId: options.requestId,
+    context: {
+      fallbackMessage,
+    },
+    error,
+  });
+
+  return createApiErrorResponse({
+    status: 500,
+    error: fallbackMessage,
+    code: "PERSISTENCE_ERROR",
+    requestId: options.requestId,
+  });
 }

@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { GameSessionRow } from "./types";
+import type { GameSessionRow, GameSessionUpdateInput } from "./types";
 import { getSupabaseAdminClient } from "./supabase";
 import { GAME_SESSION_SELECT, WHEEL_GAME_SLUG } from "./queries";
 
@@ -76,7 +76,7 @@ export async function getOrCreateWheelSession(playerId: string) {
 
 export async function updateWheelSession(
   sessionId: string,
-  patch: Record<string, unknown>
+  patch: GameSessionUpdateInput
 ) {
   const supabase = getSupabaseAdminClient();
   const { data, error } = await supabase

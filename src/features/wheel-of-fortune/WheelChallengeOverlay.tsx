@@ -54,6 +54,10 @@ export function WheelChallengeOverlay({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          role="dialog"
+          aria-modal="true"
+          aria-label={t("overlay_label")}
+          data-testid="wheel-challenge-overlay"
           className="fixed inset-0 z-50 flex items-end justify-center bg-[rgba(8,12,17,0.66)] p-3 backdrop-blur-md md:items-center md:p-6"
         >
           <motion.div
