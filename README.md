@@ -23,6 +23,7 @@ Big Day is a bilingual wedding website for Maksym and Diana with a built-in game
 - server-authoritative timer and score computation
 - deferred task execution via Next.js `after()` for reliable post-response work on Vercel serverless
 - projector page with Supabase Broadcast (WebSocket) live updates and polling fallback
+- rate limiting on every game API endpoint (GET and POST) per authenticated user
 
 ## Tech stack
 
@@ -154,10 +155,10 @@ src/
 │   └── api/                      # rsvp, live, games APIs
 ├── features/
 │   ├── countdown/
-│   ├── game-session/             # auth, local cache, shared types, server repository
+│   ├── game-session/             # auth, local cache, shared types, domain-scoped server repositories
 │   ├── language-switcher/
 │   ├── theme-switcher/
-│   └── wheel-of-fortune/         # game UI + extracted subcomponents and helpers
+│   └── wheel-of-fortune/         # game UI, useWheelGame hook, extracted subcomponents and helpers
 ├── shared/
 │   ├── config/                   # wedding data, guests, game catalog, wheel content, metadata helpers
 │   ├── i18n/
@@ -180,6 +181,6 @@ src/
 - Keep `src/shared/i18n/messages/uk.json` and `en.json` in sync.
 - Prefer CSS variable-based Tailwind classes instead of hardcoded component colors.
 - Use barrel exports where they already exist.
-- Treat `Countdown`, `Splash`, `LanguageSwitcher`, `ThemeProvider`, and `useLiveProjectorSnapshot` as hydration-sensitive code.
+- Treat `Countdown`, `Splash`, `LanguageSwitcher`, `ThemeProvider`, `useLiveProjectorSnapshot`, and `useWheelGame` as hydration-sensitive code.
 - Use the deferred tasks pattern (`after()` + `runDeferredTasks`) for post-response async work in API routes.
 - Register new game error types in `game-api-error-handler.ts` — do not add `instanceof` chains in route files.
