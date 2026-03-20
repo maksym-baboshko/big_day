@@ -701,6 +701,13 @@ export interface GamesDatabase {
       };
     };
     Functions: {
+      advance_wheel_session_cycle: {
+        Args: {
+          p_session_id: string;
+          p_current_cycle: number;
+        };
+        Returns: GameSessionRow[];
+      };
       start_wheel_round_atomic: {
         Args: {
           p_session_id: string;

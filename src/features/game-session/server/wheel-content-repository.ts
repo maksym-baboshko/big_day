@@ -11,7 +11,7 @@ import {
   WHEEL_CATEGORY_SELECT,
   WHEEL_TASK_SELECT,
 } from "./queries";
-import { updateWheelSession } from "./wheel-session-repository";
+import { getWheelSessionById } from "./wheel-session-repository";
 
 export async function getActiveWheelCategories() {
   const supabase = getSupabaseAdminClient();
@@ -138,19 +138,56 @@ export async function ensureWheelSessionCycle(
   session: GameSessionRow,
   totalTaskCount: number
 ) {
-  let cycleNumber = session.current_cycle;
-  let cycleHistory = await getWheelHistoryForCycle(session.id, cycleNumber);
+  const cycleNumber = session.current_cycle;
+  const cycleHistory = await getWheelHistoryForCycle(session.id, cycleNumber);
 
   if (cycleHistory.length < totalTaskCount) {
     return { session, cycleNumber, cycleHistory };
   }
 
-  const updatedSession = await updateWheelSession(session.id, {
-    current_cycle: session.current_cycle + 1,
-  });
+  // All tasks in this cycle are exhausted — atomically advance the counter.
+  // The WHERE clause acts as an optimistic lock: only the first concurrent
+  // request whose snapshot matches wins. The losing request receives 0 rows
+  // and re-queries the session to read the already-advanced cycle.
+  const supabase = getSupabaseAdminClient();
+  const { data: advanced, error } = await supabase.rpc(
+    "advance_wheel_session_cycle",
+    {
+      p_session_id: session.id,
+      p_current_cycle: session.current_cycle,
+    }
+  );
 
-  cycleNumber = updatedSession.current_cycle;
-  cycleHistory = [];
+  if (error) {
+    throw error;
+  }
 
-  return { session: updatedSession, cycleNumber, cycleHistory };
+  if (advanced && advanced.length > 0) {
+    // This request won the optimistic lock — use the atomically-updated session.
+    const updatedSession = advanced[0] as GameSessionRow;
+    return {
+      session: updatedSession,
+      cycleNumber: updatedSession.current_cycle,
+      cycleHistory: [] as typeof cycleHistory,
+    };
+  }
+
+  // Another concurrent request already advanced the cycle.
+  // Re-fetch the current session state and its (empty) history.
+  const freshSession = await getWheelSessionById(session.id);
+
+  if (!freshSession) {
+    throw new Error("Session not found after concurrent cycle advance.");
+  }
+
+  const freshHistory = await getWheelHistoryForCycle(
+    freshSession.id,
+    freshSession.current_cycle
+  );
+
+  return {
+    session: freshSession,
+    cycleNumber: freshSession.current_cycle,
+    cycleHistory: freshHistory,
+  };
 }

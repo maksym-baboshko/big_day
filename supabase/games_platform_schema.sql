@@ -1002,6 +1002,28 @@ begin
 end;
 $$;
 
+-- ---------------------------------------------------------------------------
+-- advance_wheel_session_cycle
+-- ---------------------------------------------------------------------------
+
+create or replace function public.advance_wheel_session_cycle(
+  p_session_id uuid,
+  p_current_cycle integer
+)
+returns setof public.game_sessions
+language sql
+security definer
+set search_path = public
+as $$
+  update public.game_sessions
+  set current_cycle = current_cycle + 1
+  where id            = p_session_id
+    and current_cycle = p_current_cycle
+  returning *;
+$$;
+
+-- ---------------------------------------------------------------------------
+
 drop function if exists public.consume_rate_limit_window(text, text, integer, integer, timestamptz);
 
 create or replace function public.consume_rate_limit_window(
