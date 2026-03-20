@@ -433,14 +433,6 @@ export function WheelOfFortuneGame({
         return;
       }
 
-      const nextRemaining = Math.max(
-        0,
-        timerRemainingRef.current ??
-          activeRound.timer?.remainingSeconds ??
-          activeRound.task.timerSeconds ??
-          0
-      );
-
       void fetch(`/api/games/wheel/${activeRound.roundId}/timer/pause`, {
         method: "POST",
         keepalive: true,
@@ -448,10 +440,7 @@ export function WheelOfFortuneGame({
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({
-          locale,
-          remainingSeconds: nextRemaining,
-        }),
+        body: JSON.stringify({ locale }),
       }).catch(() => {});
     };
 

@@ -11,7 +11,6 @@ export const runtime = "nodejs";
 
 const wheelTimerPauseSchema = z.object({
   locale: z.enum(["uk", "en"]),
-  remainingSeconds: z.number().int().min(0).optional().nullable(),
 });
 
 export async function POST(
@@ -43,7 +42,6 @@ export async function POST(
       playerId: user.id,
       roundId,
       locale: result.data.locale as SupportedLocale,
-      remainingSeconds: result.data.remainingSeconds ?? null,
     });
 
     return NextResponse.json(timerPause);

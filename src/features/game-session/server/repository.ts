@@ -688,13 +688,15 @@ async function updateRunningRoundToPaused(
 
   const supabase = getSupabaseAdminClient();
   const pausedAt = new Date().toISOString();
+  // Compute actual remaining time server-side to account for elapsed time
+  // since timer_last_started_at. Without this, a player who refreshes while
+  // the timer is running gets the old remaining time restored (free extra time).
+  const computedRemaining = computeServerRemainingSeconds(round, null);
   const { data, error } = await supabase
     .from("game_rounds")
     .update({
-      timer_status:
-        (round.timer_remaining_seconds ?? round.timer_duration_seconds ?? 0) <= 0
-          ? "done"
-          : "paused",
+      timer_status: computedRemaining <= 0 ? "done" : "paused",
+      timer_remaining_seconds: computedRemaining,
       timer_last_started_at: null,
       timer_last_paused_at: pausedAt,
       timer_last_sync_at: pausedAt,
@@ -1159,12 +1161,10 @@ export async function pauseWheelRoundTimer({
   playerId,
   roundId,
   locale,
-  remainingSeconds,
 }: {
   playerId: string;
   roundId: string;
   locale: SupportedLocale;
-  remainingSeconds?: number | null;
 }) {
   const supabase = getSupabaseAdminClient();
   const profile = await getPlayerProfileById(playerId);
@@ -1199,8 +1199,11 @@ export async function pauseWheelRoundTimer({
   }
 
   const durationSeconds = round.timer_duration_seconds ?? task.timer_seconds;
+  // Always compute remaining time server-side. Accepting a client-supplied
+  // value here would let any player pause with an inflated remainingSeconds,
+  // then resume or resolve with extra time.
   const nextRemainingSeconds = clampRemainingSeconds(
-    remainingSeconds ?? round.timer_remaining_seconds ?? durationSeconds,
+    computeServerRemainingSeconds(round, task.timer_seconds),
     durationSeconds
   );
   const pausedAt = new Date().toISOString();
@@ -1306,6 +1309,18 @@ export async function resolveWheelRound({
     task.execution_mode === "timed" && timerDurationSeconds
       ? computeServerRemainingSeconds(round, task.timer_seconds)
       : null;
+
+  // Reject successful resolutions submitted after the timer has expired.
+  // Early completion (remaining > 0) is still accepted. Without this guard,
+  // a client can POST resolution: "completed" after the countdown reaches
+  // zero and still receive XP instead of a timeout penalty.
+  if (
+    (resolution === "completed" || resolution === "promised") &&
+    task.execution_mode === "timed" &&
+    synchronizedRemainingSeconds === 0
+  ) {
+    throw new InvalidWheelRoundStateError();
+  }
 
   const resolutionReason: WheelRoundResolutionReason =
     resolution === "skipped"
