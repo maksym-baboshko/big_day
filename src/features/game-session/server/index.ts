@@ -1,13 +1,19 @@
 export {
   bootstrapPlayerProfile,
+  savePlayerProfile,
+} from "./player-repository";
+
+export {
   getGameLeaderboard,
   getGlobalLeaderboard,
   getLivePageSnapshot,
+} from "./leaderboard-repository";
+
+export {
   getOpenWheelRound,
-  savePlayerProfile,
   startWheelRound,
-  pauseWheelRoundTimer,
   startWheelRoundTimer,
+  pauseWheelRoundTimer,
   resolveWheelRound,
   PlayerProfileNotReadyError,
   WheelTasksDepletedError,
@@ -15,6 +21,7 @@ export {
   WheelRoundAlreadyResolvedError,
   InvalidWheelRoundResponseError,
   InvalidWheelRoundStateError,
-} from "./repository";
+} from "./wheel-round-repository";
+
 export { SupabaseConfigurationError } from "./config";
 export { UnauthorizedGameRequestError, requireAuthenticatedGameUser } from "./auth";

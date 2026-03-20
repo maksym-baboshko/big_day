@@ -1,6 +1,7 @@
 export { WEDDING_DATE, VENUE, COUPLE, DRESS_CODE } from "./wedding";
 export {
   GAMES,
+  GAME_SLUG_ENUM,
   getGameBySlug,
   getPlayableGames,
   getPlayableGameSlugs,

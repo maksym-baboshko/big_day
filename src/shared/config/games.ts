@@ -97,6 +97,10 @@ export const GAMES: GameCatalogItem[] = [
   },
 ];
 
+// Typed tuple of all game slugs — use this for Zod enums instead of
+// duplicating the list across route files.
+export const GAME_SLUG_ENUM = GAMES.map((g) => g.slug) as [GameSlug, ...GameSlug[]];
+
 export function getGameBySlug(slug: string) {
   return GAMES.find((game) => game.slug === slug);
 }

@@ -26,10 +26,43 @@ function getSupabaseBrowserConfig() {
     throw new SupabaseBrowserConfigurationError();
   }
 
-  return {
-    url,
-    publishableKey,
-  };
+  return { url, publishableKey };
+}
+
+/**
+ * Removes a Supabase session from localStorage if its access token is already
+ * expired. When the SDK finds an expired session it immediately calls
+ * _callRefreshToken() during createClient(), which logs an AuthApiError if
+ * the refresh token is no longer valid (e.g. after a project reset or token
+ * rotation). Clearing the entry before createClient() prevents that network
+ * round-trip and the resulting console.error / Next.js dev overlay noise.
+ *
+ * Only the access-token expiry is checked here (no network call). If the
+ * refresh token is invalidated server-side but the access token is still
+ * within its window, getGameAuthAccessToken() handles it via getUser().
+ */
+function pruneExpiredSessionFromStorage(supabaseUrl: string) {
+  if (typeof window === "undefined") return;
+
+  try {
+    const projectRef = new URL(supabaseUrl).hostname.split(".")[0];
+    const key = `sb-${projectRef}-auth-token`;
+    const raw = localStorage.getItem(key);
+
+    if (!raw) return;
+
+    const parsed = JSON.parse(raw) as { expires_at?: number };
+
+    if (
+      typeof parsed.expires_at === "number" &&
+      Date.now() / 1000 >= parsed.expires_at
+    ) {
+      localStorage.removeItem(key);
+    }
+  } catch {
+    // Any storage or parse error is safe to ignore — createClient() proceeds
+    // normally and getGameAuthAccessToken() handles stale sessions via getUser().
+  }
 }
 
 export function getSupabaseBrowserClient() {
@@ -38,6 +71,9 @@ export function getSupabaseBrowserClient() {
   }
 
   const { url, publishableKey } = getSupabaseBrowserConfig();
+
+  // Clear expired sessions before the SDK can attempt a doomed refresh.
+  pruneExpiredSessionFromStorage(url);
 
   browserClient = createClient(url, publishableKey, {
     auth: {
@@ -68,29 +104,34 @@ async function signInAnonymously(supabase: SupabaseClient) {
 
 export async function getGameAuthAccessToken() {
   const supabase = getSupabaseBrowserClient();
-  const {
-    data: { session },
-    error: sessionError,
-  } = await supabase.auth.getSession();
 
-  if (sessionError) {
-    throw sessionError;
+  let accessToken: string | null = null;
+
+  try {
+    const { data, error } = await supabase.auth.getSession();
+
+    // AuthApiError from getSession() means the stored refresh token is
+    // invalid (e.g. project reset, token rotated). Clear it and re-auth.
+    if (error) throw error;
+
+    accessToken = data.session?.access_token ?? null;
+  } catch {
+    await supabase.auth.signOut({ scope: "local" }).catch(() => {});
+    return signInAnonymously(supabase);
   }
 
-  if (session?.access_token) {
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser(session.access_token);
+  if (accessToken) {
+    const { data: { user }, error: userError } = await supabase.auth.getUser(accessToken);
 
     if (!userError && user) {
-      return session.access_token;
+      return accessToken;
     }
 
-    const { error: signOutError } = await supabase.auth.signOut({ scope: "local" });
-    if (signOutError) {
-      console.warn("Failed to clear stale Supabase session:", signOutError);
-    }
+    // Access token exists in storage but is not recognised by the server
+    // (e.g. refresh token was rotated away since this tab was last open).
+    await supabase.auth.signOut({ scope: "local" }).catch((e: unknown) => {
+      console.warn("Failed to clear stale Supabase session:", e);
+    });
   }
 
   return signInAnonymously(supabase);

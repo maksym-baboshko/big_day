@@ -33,6 +33,14 @@ export async function GET(request: Request) {
     }
 
     const user = await requireAuthenticatedGameUser(request);
+    await enforceRateLimit({
+      request,
+      scope: "games.wheel.read",
+      limit: 30,
+      windowSeconds: 10 * 60,
+      authUserId: user.id,
+    });
+
     const wheelRound = await getOpenWheelRound({
       playerId: user.id,
       locale,

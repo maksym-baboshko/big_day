@@ -1,24 +1,16 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { handleGameApiError } from "@/shared/lib/server";
+import { enforceRateLimit, handleGameApiError } from "@/shared/lib/server";
 import {
   getGameLeaderboard,
   requireAuthenticatedGameUser,
 } from "@/features/game-session/server";
+import { GAME_SLUG_ENUM } from "@/shared/config";
 
 export const runtime = "nodejs";
 
-const GAME_SLUGS = [
-  "wheel-of-fortune",
-  "baby-detective",
-  "secret-missions",
-  "roast",
-  "time-machine",
-  "advice-booth",
-] as const;
-
 const leaderboardQuerySchema = z.object({
-  game: z.enum(GAME_SLUGS),
+  game: z.enum(GAME_SLUG_ENUM),
   topLimit: z.coerce.number().int().min(1).max(10).optional(),
   radius: z.coerce.number().int().min(1).max(3).optional(),
 });
@@ -26,6 +18,14 @@ const leaderboardQuerySchema = z.object({
 export async function GET(request: Request) {
   try {
     const user = await requireAuthenticatedGameUser(request);
+    await enforceRateLimit({
+      request,
+      scope: "games.leaderboard.read",
+      limit: 60,
+      windowSeconds: 10 * 60,
+      authUserId: user.id,
+    });
+
     const { searchParams } = new URL(request.url);
     const result = leaderboardQuerySchema.safeParse({
       game: searchParams.get("game"),
