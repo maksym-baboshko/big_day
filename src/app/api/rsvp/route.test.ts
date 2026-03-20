@@ -89,6 +89,27 @@ describe("POST /api/rsvp", () => {
     expect(sendRsvpNotification).not.toHaveBeenCalled();
   });
 
+  it("rejects malformed RSVP JSON", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/rsvp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-request-id": "request-rsvp-malformed",
+        },
+        body: "{",
+      })
+    );
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
+      error: "Invalid RSVP payload.",
+      code: "INVALID_DATA",
+      requestId: "request-rsvp-malformed",
+    });
+    expect(sendRsvpNotification).not.toHaveBeenCalled();
+  });
+
   it("returns 503 when email delivery is not configured", async () => {
     getRsvpEmailConfig.mockReturnValue(null);
 

@@ -126,4 +126,26 @@ describe("POST /api/games/wheel/[roundId]/timer", () => {
     });
     expect(runDeferredTasks).toHaveBeenCalledTimes(1);
   });
+
+  it("rejects malformed timer JSON", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/games/wheel/round-1/timer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-request-id": "request-wheel-timer-malformed",
+        },
+        body: "{",
+      }),
+      { params: Promise.resolve({ roundId: "round-1" }) }
+    );
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
+      error: "Invalid wheel timer payload.",
+      code: "INVALID_DATA",
+      requestId: "request-wheel-timer-malformed",
+    });
+    expect(startWheelRoundTimer).not.toHaveBeenCalled();
+  });
 });

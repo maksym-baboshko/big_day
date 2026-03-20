@@ -121,4 +121,25 @@ describe("wheel route", () => {
       locale: "en",
     });
   });
+
+  it("rejects malformed POST JSON before starting a round", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/games/wheel", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-request-id": "request-wheel-start-malformed",
+        },
+        body: "{",
+      })
+    );
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
+      error: "Invalid wheel start payload.",
+      code: "INVALID_DATA",
+      requestId: "request-wheel-start-malformed",
+    });
+    expect(startWheelRound).not.toHaveBeenCalled();
+  });
 });

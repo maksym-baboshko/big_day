@@ -125,6 +125,27 @@ describe("GET /api/games/player", () => {
     expect(savePlayerProfile).not.toHaveBeenCalled();
   });
 
+  it("rejects malformed POST JSON before saving", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/games/player", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-request-id": "request-player-save-malformed",
+        },
+        body: "{",
+      })
+    );
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
+      error: "Invalid player payload.",
+      code: "INVALID_DATA",
+      requestId: "request-player-save-malformed",
+    });
+    expect(savePlayerProfile).not.toHaveBeenCalled();
+  });
+
   it("runs deferred tasks after a successful save", async () => {
     const response = await POST(
       new Request("http://localhost/api/games/player", {

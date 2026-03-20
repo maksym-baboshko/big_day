@@ -111,4 +111,26 @@ describe("POST /api/games/wheel/[roundId]/timer/pause", () => {
       })
     );
   });
+
+  it("rejects malformed pause JSON", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/games/wheel/round-1/timer/pause", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-request-id": "request-wheel-timer-pause-malformed",
+        },
+        body: "{",
+      }),
+      { params: Promise.resolve({ roundId: "round-1" }) }
+    );
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
+      error: "Invalid wheel timer pause payload.",
+      code: "INVALID_DATA",
+      requestId: "request-wheel-timer-pause-malformed",
+    });
+    expect(pauseWheelRoundTimer).not.toHaveBeenCalled();
+  });
 });

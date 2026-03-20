@@ -134,4 +134,26 @@ describe("POST /api/games/wheel/[roundId]", () => {
     expect(afterMock).toHaveBeenCalledTimes(1);
     expect(runDeferredTasks).toHaveBeenCalledTimes(1);
   });
+
+  it("rejects malformed resolution JSON", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/games/wheel/round-1", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-request-id": "request-wheel-resolve-malformed",
+        },
+        body: "{",
+      }),
+      { params: Promise.resolve({ roundId: "round-1" }) }
+    );
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
+      error: "Invalid wheel resolution payload.",
+      code: "INVALID_DATA",
+      requestId: "request-wheel-resolve-malformed",
+    });
+    expect(resolveWheelRound).not.toHaveBeenCalled();
+  });
 });
