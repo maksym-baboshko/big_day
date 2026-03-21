@@ -30,6 +30,15 @@ const COL1: GhostCardDef[] = [
   { height: 160, hasPrompt: true,  promptLines: 2, hasAnswer: false, hasXp: true,  delay: 14.4 },
 ];
 
+// Mobile — single column, same interval as COL1
+const COL_MOBILE: GhostCardDef[] = [
+  { height: 168, hasPrompt: true,  promptLines: 2, hasAnswer: true,  hasXp: true,  delay: 0    },
+  { height: 92,  hasPrompt: false, promptLines: 2, hasAnswer: false, hasXp: false, delay: 3.6  },
+  { height: 178, hasPrompt: true,  promptLines: 3, hasAnswer: true,  hasXp: true,  delay: 7.2  },
+  { height: 92,  hasPrompt: false, promptLines: 2, hasAnswer: false, hasXp: false, delay: 10.8 },
+  { height: 160, hasPrompt: true,  promptLines: 2, hasAnswer: false, hasXp: true,  delay: 14.4 },
+];
+
 // Column 2 — offset by half-interval (1.8s) so the two columns interleave
 const COL2: GhostCardDef[] = [
   { height: 92,  hasPrompt: false, promptLines: 2, hasAnswer: false, hasXp: false, delay: 1.8  },
@@ -93,6 +102,19 @@ export function FeedEmptyState() {
 
   return (
     <div className="relative flex min-h-[400px] flex-col items-center justify-center overflow-hidden rounded-3xl border border-accent/20 bg-bg-secondary/30 px-8 py-16 text-center lg:min-h-0 lg:flex-1">
+
+      {/* Ghost cards — single column, mobile only */}
+      <div
+        className="pointer-events-none absolute inset-0 block lg:hidden"
+        style={{
+          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 9%, black 88%, transparent 100%)",
+          maskImage:        "linear-gradient(to bottom, transparent 0%, black 9%, black 88%, transparent 100%)",
+        }}
+      >
+        <div className="relative h-full overflow-hidden px-3">
+          {COL_MOBILE.map((card, i) => <GhostCard key={i} {...card} />)}
+        </div>
+      </div>
 
       {/* Ghost cards — 2 columns, desktop only */}
       <div
