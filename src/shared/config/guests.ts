@@ -171,6 +171,13 @@ export const guests: Guest[] = [
     vocative: { uk: 'Родино Фень', en: 'Fen Family' },
     formName: { uk: 'Аліна Фень', en: 'Alina Fen' },
     seats: 4
+  },
+  {
+    slug: 'illya-kaleniuk',
+    name: { uk: 'Каленюк Ілля Валентинович', en: 'Kaleniuk Illia Valentynovych' },
+    vocative: { uk: 'Ілля Валентиновичу', en: 'Kaleniuk Illia Valentynovych' },
+    formName: { uk: 'Каленюк Ілля Валентинович', en: 'Kaleniuk Illia Valentynovych' },
+    seats: 2
   }
 ];
 
