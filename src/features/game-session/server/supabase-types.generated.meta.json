@@ -1,8 +1,12 @@
 {
-  "schemaFingerprint": "753fd78705f6c78454fd0083d0b61f5b8c4e8b5cb67d84acd8d454e48c6a886f",
+  "schemaFingerprint": "36840158fe209488349578847a6dfd22a302e26a21f0ecd6030fe23fa5c191d7",
   "sourceFiles": [
     "supabase/games_platform_schema.sql",
-    "supabase/migrations/20260318000000_games_platform_baseline.sql",
+    "supabase/migrations/20260318000000_games_platform_baseline_core.sql",
+    "supabase/migrations/20260318000100_games_platform_start_wheel_round_atomic.sql",
+    "supabase/migrations/20260318000200_games_platform_resolve_wheel_round_atomic.sql",
+    "supabase/migrations/20260318000300_games_platform_set_updated_at.sql",
+    "supabase/migrations/20260318000400_games_platform_runtime_views_and_permissions.sql",
     "supabase/migrations/20260319_fix_leaderboard_new_top_player_event.sql",
     "supabase/migrations/20260320115237_advance_wheel_session_cycle.sql",
     "supabase/migrations/20260320135137_fix_function_search_paths.sql"
