@@ -232,7 +232,7 @@ export function buildActivityEvents({
     });
   }
 
-  if (xpDelta > 0 && !shouldPublishCompletedResponse) {
+  if (xpDelta > 0 && resolution !== "promised" && !shouldPublishCompletedResponse) {
     events.push({
       event_type: "xp.awarded",
       visibility: "feed",

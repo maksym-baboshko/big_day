@@ -1,16 +1,13 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { MOTION_EASE } from "@/shared/lib";
 
 // Equal duration + evenly distributed delays = gapless conveyor belt per column.
 // 18s ÷ 5 cards = 3.6s between each.
 const CARD_DURATION = 18;
-
-// Glitch timing: 3.1s calm + 0.84s burst = 3.94s cycle.
-const GLITCH_DURATION = 3.94;
-const GLITCH_TIMES = [0, 0.787, 0.822, 0.857, 0.893, 0.929, 0.964, 1.0];
-const glitchT = { duration: GLITCH_DURATION, repeat: Infinity, ease: "linear" as const, times: GLITCH_TIMES };
+const EMPTY_STATE_FADE_DURATION = 0.9;
 
 type GhostCardDef = {
   height: number;
@@ -20,6 +17,15 @@ type GhostCardDef = {
   hasXp: boolean;
   delay: number;
 };
+
+type FeedEmptyStateVariant = "empty" | "loading";
+
+interface FeedEmptyStateProps {
+  variant?: FeedEmptyStateVariant;
+}
+
+const FEED_EMPTY_STATE_HEADLINE_CLASS_NAME =
+  "heading-serif text-[clamp(22px,4vw,48px)] tracking-[0.03em] text-text-primary";
 
 // Column 1 — starts immediately; alternates full ↔ compact
 const COL1: GhostCardDef[] = [
@@ -50,11 +56,14 @@ const COL2: GhostCardDef[] = [
 
 function GhostCard({ height, hasPrompt, promptLines, hasAnswer, hasXp, delay }: GhostCardDef) {
   return (
-    <motion.div
-      className="absolute w-full overflow-hidden rounded-3xl border border-accent/10 bg-accent/5 backdrop-blur-[2px]"
-      style={{ height, bottom: -height }}
-      animate={{ y: [0, -1900] }}
-      transition={{ duration: CARD_DURATION, delay, repeat: Infinity, ease: "linear" }}
+    <div
+      className="live-feed-card-scroll absolute w-full overflow-hidden rounded-3xl border border-accent/10 bg-accent/5 backdrop-blur-[2px]"
+      style={{
+        height,
+        bottom: -height,
+        animationDuration: `${CARD_DURATION}s`,
+        animationDelay: `-${delay}s`,
+      }}
     >
       <div className="absolute inset-y-0 left-0 w-[3px] rounded-l-3xl bg-accent/22" />
       <div className="py-4 pl-7 pr-5">
@@ -93,86 +102,116 @@ function GhostCard({ height, hasPrompt, promptLines, hasAnswer, hasXp, delay }: 
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
-export function FeedEmptyState() {
+export function FeedEmptyState({ variant = "empty" }: FeedEmptyStateProps) {
   const t = useTranslations("LivePage");
+  const isLoading = variant === "loading";
 
   return (
-    <div className="relative flex min-h-[400px] flex-col items-center justify-center overflow-hidden rounded-3xl border border-accent/20 bg-bg-secondary/30 px-8 py-16 text-center lg:min-h-0 lg:flex-1">
+    <div className="relative flex min-h-[620px] flex-col items-center justify-center overflow-hidden rounded-3xl border border-accent/20 bg-bg-secondary/30 px-8 py-16 text-center lg:min-h-0 lg:flex-1">
 
-      {/* Ghost cards — single column, mobile only */}
-      <div
-        className="pointer-events-none absolute inset-0 block lg:hidden"
-        style={{
-          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 9%, black 88%, transparent 100%)",
-          maskImage:        "linear-gradient(to bottom, transparent 0%, black 9%, black 88%, transparent 100%)",
-        }}
-      >
-        <div className="relative h-full overflow-hidden px-3">
-          {COL_MOBILE.map((card, i) => <GhostCard key={i} {...card} />)}
-        </div>
-      </div>
+      <AnimatePresence initial={false}>
+        {isLoading ? null : (
+          <motion.div
+            key="ghost-cards"
+            className="pointer-events-none absolute inset-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: EMPTY_STATE_FADE_DURATION, ease: MOTION_EASE }}
+          >
+            {/* Ghost cards — single column, mobile only */}
+            <div
+              className="absolute inset-0 block lg:hidden"
+              style={{
+                WebkitMaskImage:
+                  "linear-gradient(to bottom, transparent 0%, black 9%, black 88%, transparent 100%)",
+                maskImage:
+                  "linear-gradient(to bottom, transparent 0%, black 9%, black 88%, transparent 100%)",
+              }}
+            >
+              <div className="relative h-full overflow-hidden px-3">
+                {COL_MOBILE.map((card, i) => <GhostCard key={i} {...card} />)}
+              </div>
+            </div>
 
-      {/* Ghost cards — 2 columns, desktop only */}
-      <div
-        className="pointer-events-none absolute inset-0 hidden gap-3 px-3 lg:flex"
-        style={{
-          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 9%, black 88%, transparent 100%)",
-          maskImage:        "linear-gradient(to bottom, transparent 0%, black 9%, black 88%, transparent 100%)",
-        }}
-      >
-        <div className="relative flex-1 overflow-hidden">
-          {COL1.map((card, i) => <GhostCard key={i} {...card} />)}
-        </div>
-        <div className="relative flex-1 overflow-hidden">
-          {COL2.map((card, i) => <GhostCard key={i} {...card} />)}
-        </div>
-      </div>
+            {/* Ghost cards — 2 columns, desktop only */}
+            <div
+              className="absolute inset-0 hidden gap-3 px-3 lg:flex"
+              style={{
+                WebkitMaskImage:
+                  "linear-gradient(to bottom, transparent 0%, black 9%, black 88%, transparent 100%)",
+                maskImage:
+                  "linear-gradient(to bottom, transparent 0%, black 9%, black 88%, transparent 100%)",
+              }}
+            >
+              <div className="relative flex-1 overflow-hidden">
+                {COL1.map((card, i) => <GhostCard key={i} {...card} />)}
+              </div>
+              <div className="relative flex-1 overflow-hidden">
+                {COL2.map((card, i) => <GhostCard key={i} {...card} />)}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Central content */}
       <div className="relative z-10 flex flex-col items-center">
 
         {/* LIVE badge */}
-        <div className="relative mb-10 flex items-center justify-center">
+        <div className="relative flex items-center justify-center">
           <div className="relative flex items-center gap-4">
             <span className="relative flex h-3 w-3 shrink-0">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-70" />
               <span className="relative inline-flex h-3 w-3 rounded-full bg-accent" />
             </span>
             <div className="relative">
-              <motion.span
+              <span
                 aria-hidden="true"
-                className="pointer-events-none absolute top-0 left-0 whitespace-nowrap font-cinzel text-6xl tracking-[0.28em] lg:text-7xl"
+                className="live-feed-live-glitch-orange pointer-events-none absolute top-0 left-0 whitespace-nowrap font-cinzel text-6xl tracking-[0.28em] lg:text-7xl"
                 style={{ color: "rgba(255,155,80,0.75)" }}
-                animate={{ x: [0, 0, -7, 5, -5, 7, -2, 0], opacity: [0, 0, 0.9, 0, 0.9, 0, 0.6, 0] }}
-                transition={glitchT}
-              >LIVE</motion.span>
-              <motion.span
+              >LIVE</span>
+              <span
                 aria-hidden="true"
-                className="pointer-events-none absolute top-0 left-0 whitespace-nowrap font-cinzel text-6xl tracking-[0.28em] lg:text-7xl"
+                className="live-feed-live-glitch-cyan pointer-events-none absolute top-0 left-0 whitespace-nowrap font-cinzel text-6xl tracking-[0.28em] lg:text-7xl"
                 style={{ color: "rgba(90,210,255,0.65)" }}
-                animate={{ x: [0, 0, 7, -5, 5, -7, 2, 0], opacity: [0, 0, 0.75, 0, 0.75, 0, 0.5, 0] }}
-                transition={glitchT}
-              >LIVE</motion.span>
-              <motion.span
-                className="relative whitespace-nowrap font-cinzel text-6xl tracking-[0.28em] text-accent lg:text-7xl"
-                animate={{ x: [0, 0, 3, -3, 3, -3, 1, 0], skewX: [0, 0, -2, 1.5, -1.5, 2, 0, 0] }}
-                transition={glitchT}
-                style={{ textShadow: "0 0 48px color-mix(in srgb, var(--accent) 55%, transparent)" }}
-              >LIVE</motion.span>
+              >LIVE</span>
+              <span className="live-feed-live-glitch-main relative whitespace-nowrap font-cinzel text-6xl tracking-[0.28em] text-accent lg:text-7xl">
+                LIVE
+              </span>
             </div>
           </div>
         </div>
 
-        <h3 className="heading-serif mb-4 text-3xl text-text-primary lg:mb-8 lg:text-5xl">
-          {t("feed_empty_headline")}
-        </h3>
-        <p className="max-w-[26rem] text-sm leading-relaxed text-text-secondary/80 lg:text-lg">
-          {t("feed_empty_sub")}
-        </p>
+        <div className="mt-10 grid min-h-[5.5rem] w-full lg:min-h-[8.5rem]">
+          <div
+            aria-hidden={!isLoading}
+            className={`col-start-1 row-start-1 flex w-full flex-col items-center gap-6 transition-opacity duration-500 ${isLoading ? "opacity-100" : "opacity-0"}`}
+          >
+            <h3 className={FEED_EMPTY_STATE_HEADLINE_CLASS_NAME}>
+              {t("feed_loading_headline")}
+            </h3>
+            <p className="min-h-10 max-w-[26rem] text-sm leading-relaxed text-text-secondary/80 lg:min-h-14 lg:text-lg">
+              {t("feed_loading_sub")}
+            </p>
+          </div>
+
+          <div
+            aria-hidden={isLoading}
+            className={`col-start-1 row-start-1 flex w-full flex-col items-center gap-6 transition-opacity duration-[900ms] ${isLoading ? "opacity-0" : "opacity-100"}`}
+          >
+            <h3 className={FEED_EMPTY_STATE_HEADLINE_CLASS_NAME}>
+              {t("feed_empty_headline")}
+            </h3>
+            <p className="min-h-10 max-w-[26rem] text-sm leading-relaxed text-text-secondary/80 lg:min-h-14 lg:text-lg">
+              {t("feed_empty_sub")}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

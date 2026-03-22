@@ -3,6 +3,7 @@ import { expect, type Page } from "@playwright/test";
 export const RSVP_PAGE_PATH = "/en";
 export const WHEEL_PAGE_PATH = "/en/games/wheel-of-fortune";
 export const LIVE_PAGE_PATH = "/en/live";
+const PLAYER_SESSION_TIMEOUT_MS = 30_000;
 
 export function createUniqueNickname(prefix = "e2e"): string {
   const suffix = `${Date.now().toString(36)}${Math.random()
@@ -21,13 +22,43 @@ export async function registerPlayer(
   await expect(nicknameField).toBeVisible();
   await nicknameField.fill(nickname);
 
-  await page.getByRole("button", { name: "Start playing" }).click();
+  const startPlayingButton = page.getByRole("button", { name: "Start playing" });
+  await expect(startPlayingButton).toBeEnabled({
+    timeout: PLAYER_SESSION_TIMEOUT_MS,
+  });
+
+  const savePlayerResponsePromise = page.waitForResponse(
+    (response) => {
+      const request = response.request();
+      return (
+        request.method() === "POST" &&
+        new URL(response.url()).pathname === "/api/games/player"
+      );
+    },
+    { timeout: PLAYER_SESSION_TIMEOUT_MS }
+  );
+
+  await startPlayingButton.click();
+
+  const savePlayerResponse = await savePlayerResponsePromise;
+  if (!savePlayerResponse.ok()) {
+    const body = await savePlayerResponse
+      .text()
+      .catch(() => "<failed to read response body>");
+    throw new Error(
+      `Saving player session failed with ${savePlayerResponse.status()}: ${body}`
+    );
+  }
 
   const sessionSummary = page.getByTestId("player-session-summary");
-  await expect(sessionSummary).toBeVisible();
-  await expect(sessionSummary.getByTestId("player-session-nickname")).toHaveText(
-    nickname
-  );
+  await expect(sessionSummary).toBeVisible({
+    timeout: PLAYER_SESSION_TIMEOUT_MS,
+  });
+  await expect(
+    sessionSummary.getByTestId("player-session-nickname")
+  ).toHaveText(nickname, {
+    timeout: PLAYER_SESSION_TIMEOUT_MS,
+  });
   await expect(
     sessionSummary.getByRole("button", { name: "Edit name" })
   ).toBeVisible();

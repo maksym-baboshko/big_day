@@ -1,7 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
-
 const REGULAR_ROWS = [
   { rank: 2,  nameW: "64%", delay: 0.2, mobileHidden: false },
   { rank: 3,  nameW: "55%", delay: 0.4, mobileHidden: false },
@@ -24,18 +22,16 @@ export function LeaderboardEmptyState() {
       <div className="flex flex-col gap-2">
 
         {/* Leader row — matches LeaderboardRow isLeader style */}
-        <motion.div
-          className="relative overflow-hidden rounded-3xl border border-accent/18 bg-accent/7 px-5 py-4"
-          animate={{ opacity: [0.45, 0.85, 0.45] }}
-          transition={{ duration: 5, delay: 0, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" }}
-        >
+        <div className="live-leaderboard-leader-pulse relative overflow-hidden rounded-3xl border border-accent/18 bg-accent/7 px-5 py-4">
           <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-accent/30 to-transparent" />
           {/* Shimmer sweep */}
-          <motion.div
-            className="absolute inset-0"
-            style={{ background: "linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--accent) 8%, transparent) 50%, transparent 100%)" }}
-            animate={{ x: ["-100%", "200%"] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          <div
+            className="live-leaderboard-shimmer absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--accent) 8%, transparent) 50%, transparent 100%)",
+              animationDelay: "0s",
+            }}
           />
           <div className="relative flex items-center gap-4">
             <div className="font-cinzel text-4xl leading-none text-accent/35">1</div>
@@ -48,15 +44,14 @@ export function LeaderboardEmptyState() {
               <div className="h-1.5 w-4 rounded-full bg-accent/10" />
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Regular rows — match LeaderboardRow regular style */}
         {REGULAR_ROWS.map(({ rank, nameW, delay, mobileHidden }) => (
-          <motion.div
+          <div
             key={rank}
-            className={`flex items-center gap-3 rounded-2xl border border-accent/18 bg-bg-secondary/40 px-4 py-3 backdrop-blur-sm${mobileHidden ? " hidden lg:flex" : ""}`}
-            animate={{ opacity: [0.25, 0.85, 0.25] }}
-            transition={{ duration: 2.5, delay, repeat: Infinity, repeatDelay: 1, ease: "easeInOut" }}
+            className={`live-leaderboard-regular-pulse flex items-center gap-3 rounded-2xl border border-accent/18 bg-bg-secondary/40 px-4 py-3 backdrop-blur-sm${mobileHidden ? " hidden lg:flex" : ""}`}
+            style={{ animationDelay: `-${delay}s` }}
           >
             <div className="w-6 shrink-0 text-center font-cinzel text-base text-accent/50">{rank}</div>
             <div className="h-9 w-9 shrink-0 rounded-full border border-accent/20 bg-accent/14" />
@@ -67,7 +62,7 @@ export function LeaderboardEmptyState() {
               <div className="h-4 w-8 shrink-0 rounded bg-accent/18" />
               <div className="h-1.5 w-4 shrink-0 rounded-full bg-accent/12" />
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
 

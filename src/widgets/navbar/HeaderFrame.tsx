@@ -228,10 +228,12 @@ export function HeaderFrame({
       <div
         className={cn(
           "relative z-60 border-b py-4 transition-all duration-500",
-          isScrolled || isMobileOverlayActive
-            ? liteMotion
-              ? "border-accent/18 bg-bg-primary py-3 shadow-lg lg:bg-bg-primary/96"
-              : "border-accent/18 bg-bg-primary py-3 shadow-lg lg:bg-bg-primary/80 lg:backdrop-blur-2xl"
+          isMobileOverlayActive
+            ? "border-transparent bg-bg-primary py-4 shadow-none backdrop-blur-none"
+            : isScrolled
+              ? liteMotion
+                ? "border-accent/18 bg-bg-primary py-3 shadow-lg lg:bg-bg-primary/96"
+                : "border-accent/18 bg-bg-primary py-3 shadow-lg lg:bg-bg-primary/80 lg:backdrop-blur-2xl"
             : liteMotion
               ? "border-transparent bg-bg-primary lg:bg-bg-primary/92"
               : "border-transparent bg-bg-primary lg:bg-bg-primary/20 lg:backdrop-blur-md"
@@ -310,17 +312,17 @@ export function HeaderFrame({
                 animate={
                   isMobileMenuOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }
                 }
-                className="h-0.5 w-6 rounded-full bg-text-primary"
+                className="h-0.5 w-6 rounded-full bg-accent"
               />
               <motion.span
                 animate={isMobileMenuOpen ? { opacity: 0 } : { opacity: 1 }}
-                className="h-0.5 w-6 rounded-full bg-text-primary"
+                className="h-0.5 w-6 rounded-full bg-accent"
               />
               <motion.span
                 animate={
                   isMobileMenuOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }
                 }
-                className="h-0.5 w-6 rounded-full bg-text-primary"
+                className="h-0.5 w-6 rounded-full bg-accent"
               />
             </button>
           </div>

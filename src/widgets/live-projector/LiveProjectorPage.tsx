@@ -8,7 +8,6 @@ import type { SupportedLocale } from "@/shared/config";
 import { LanguageSwitcher } from "@/features/language-switcher";
 import { ThemeSwitcher } from "@/features/theme-switcher";
 import { Link } from "@/shared/i18n/navigation";
-import { cn } from "@/shared/lib";
 import { FeedEmptyState } from "./FeedEmptyState";
 import { FeedEventCard } from "./FeedEventCard";
 import { HeroEventOverlay } from "./HeroEventOverlay";
@@ -74,6 +73,9 @@ export function LiveProjectorPage() {
   const visibleCount = isMobileFeed ? mobileVisibleCount : desktopVisibleCount;
   const hasMoreFeed = (snapshot?.feed.length ?? 0) > visibleCount;
   const visibleFeed = snapshot?.feed.slice(0, visibleCount) ?? [];
+  const showFeedEmptyState = !error && (isLoading || !snapshot?.feed.length);
+  const showLeaderboardEmptyState =
+    !error && (isLoading || !snapshot?.leaderboard.length);
   const desktopFeedColumns = [
     visibleFeed.filter((_, index) => index % 2 === 0),
     visibleFeed.filter((_, index) => index % 2 !== 0),
@@ -188,229 +190,12 @@ export function LiveProjectorPage() {
         </header>
 
         {/* ── Main grid ───────────────────────────────────────────────── */}
-        <div className="grid flex-1 gap-4 lg:grid-cols-[minmax(0,4fr)_minmax(420px,1fr)] lg:grid-rows-1">
+        <div className="grid gap-4 lg:flex-1 lg:grid-cols-[minmax(0,4fr)_minmax(420px,1fr)] lg:grid-rows-1">
 
           {/* ─ Feed panel ─ */}
           <div className="flex flex-col gap-3 lg:pr-4">
-            {isLoading ? (
-              <div className="flex flex-col gap-3 sm:flex-row">
-                {/* Column 1 */}
-                <div className="flex flex-1 flex-col gap-3">
-                  {/* Full card */}
-                  <div className="relative overflow-hidden rounded-3xl border border-accent/10 bg-bg-secondary/30 py-4 pl-7 pr-5 backdrop-blur-sm">
-                    <div className="absolute inset-y-0 left-0 w-[3px] animate-pulse rounded-l-3xl bg-accent/20" />
-                    <div className="flex items-center gap-3">
-                      <div className="h-11 w-11 animate-pulse rounded-full bg-accent/12" />
-                      <div className="flex-1 space-y-1.5">
-                        <div className="h-3.5 w-3/5 animate-pulse rounded-full bg-bg-secondary/60" />
-                        <div className="h-2 w-2/5 animate-pulse rounded-full bg-accent/15" />
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                        <div className="h-7 w-10 animate-pulse rounded bg-accent/12" />
-                        <div className="h-2 w-5 animate-pulse rounded-full bg-bg-secondary/40" />
-                      </div>
-                    </div>
-                    <div className="mt-3 space-y-2">
-                      <div className="h-3 w-full animate-pulse rounded-full bg-bg-secondary/50" />
-                      <div className="h-3 w-11/12 animate-pulse rounded-full bg-bg-secondary/40" />
-                      <div className="h-3 w-4/5 animate-pulse rounded-full bg-bg-secondary/30" />
-                    </div>
-                    <div className="mt-2 h-3 w-1/2 animate-pulse rounded-full bg-bg-secondary/25" />
-                  </div>
-                  {/* Compact card */}
-                  <div className="relative overflow-hidden rounded-2xl border border-accent/10 bg-bg-secondary/30 py-3 pl-6 pr-4 backdrop-blur-sm">
-                    <div className="absolute inset-y-0 left-0 w-[3px] animate-pulse rounded-l-2xl bg-accent/15" />
-                    <div className="flex items-center gap-3">
-                      <div className="h-11 w-11 animate-pulse rounded-full bg-accent/12" />
-                      <div className="flex-1 space-y-1.5">
-                        <div className="h-3.5 w-2/5 animate-pulse rounded-full bg-bg-secondary/60" />
-                        <div className="h-2 w-1/3 animate-pulse rounded-full bg-accent/15" />
-                      </div>
-                    </div>
-                  </div>
-                  {/* Full card — desktop only */}
-                  <div className="relative hidden overflow-hidden rounded-3xl border border-accent/10 bg-bg-secondary/30 py-4 pl-7 pr-5 backdrop-blur-sm lg:block">
-                    <div className="absolute inset-y-0 left-0 w-[3px] animate-pulse rounded-l-3xl bg-accent/20" />
-                    <div className="flex items-center gap-3">
-                      <div className="h-11 w-11 animate-pulse rounded-full bg-accent/12" />
-                      <div className="flex-1 space-y-1.5">
-                        <div className="h-3.5 w-1/2 animate-pulse rounded-full bg-bg-secondary/60" />
-                        <div className="h-2 w-1/3 animate-pulse rounded-full bg-accent/15" />
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                        <div className="h-7 w-10 animate-pulse rounded bg-accent/12" />
-                        <div className="h-2 w-5 animate-pulse rounded-full bg-bg-secondary/40" />
-                      </div>
-                    </div>
-                    <div className="mt-3 space-y-2">
-                      <div className="h-3 w-full animate-pulse rounded-full bg-bg-secondary/50" />
-                      <div className="h-3 w-3/4 animate-pulse rounded-full bg-bg-secondary/35" />
-                    </div>
-                    <div className="mt-2 h-3 w-2/5 animate-pulse rounded-full bg-bg-secondary/25" />
-                  </div>
-                  {/* Compact card — desktop only */}
-                  <div className="relative hidden overflow-hidden rounded-2xl border border-accent/10 bg-bg-secondary/30 py-3 pl-6 pr-4 backdrop-blur-sm lg:block">
-                    <div className="absolute inset-y-0 left-0 w-[3px] animate-pulse rounded-l-2xl bg-accent/15" />
-                    <div className="flex items-center gap-3">
-                      <div className="h-11 w-11 animate-pulse rounded-full bg-accent/12" />
-                      <div className="flex-1 space-y-1.5">
-                        <div className="h-3.5 w-3/5 animate-pulse rounded-full bg-bg-secondary/60" />
-                        <div className="h-2 w-2/5 animate-pulse rounded-full bg-accent/15" />
-                      </div>
-                    </div>
-                  </div>
-                  {/* Full card — desktop only */}
-                  <div className="relative hidden overflow-hidden rounded-3xl border border-accent/10 bg-bg-secondary/30 py-4 pl-7 pr-5 backdrop-blur-sm lg:block">
-                    <div className="absolute inset-y-0 left-0 w-[3px] animate-pulse rounded-l-3xl bg-accent/20" />
-                    <div className="flex items-center gap-3">
-                      <div className="h-11 w-11 animate-pulse rounded-full bg-accent/12" />
-                      <div className="flex-1 space-y-1.5">
-                        <div className="h-3.5 w-2/3 animate-pulse rounded-full bg-bg-secondary/60" />
-                        <div className="h-2 w-1/3 animate-pulse rounded-full bg-accent/15" />
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                        <div className="h-7 w-10 animate-pulse rounded bg-accent/12" />
-                        <div className="h-2 w-5 animate-pulse rounded-full bg-bg-secondary/40" />
-                      </div>
-                    </div>
-                    <div className="mt-3 space-y-2">
-                      <div className="h-3 w-full animate-pulse rounded-full bg-bg-secondary/50" />
-                      <div className="h-3 w-4/5 animate-pulse rounded-full bg-bg-secondary/35" />
-                      <div className="h-3 w-2/3 animate-pulse rounded-full bg-bg-secondary/25" />
-                    </div>
-                    <div className="mt-2 h-3 w-1/3 animate-pulse rounded-full bg-bg-secondary/20" />
-                  </div>
-                  {/* Compact card — desktop only */}
-                  <div className="relative hidden overflow-hidden rounded-2xl border border-accent/10 bg-bg-secondary/30 py-3 pl-6 pr-4 backdrop-blur-sm lg:block">
-                    <div className="absolute inset-y-0 left-0 w-[3px] animate-pulse rounded-l-2xl bg-accent/15" />
-                    <div className="flex items-center gap-3">
-                      <div className="h-11 w-11 animate-pulse rounded-full bg-accent/12" />
-                      <div className="flex-1 space-y-1.5">
-                        <div className="h-3.5 w-2/5 animate-pulse rounded-full bg-bg-secondary/60" />
-                        <div className="h-2 w-1/4 animate-pulse rounded-full bg-accent/15" />
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                        <div className="h-7 w-10 animate-pulse rounded bg-accent/12" />
-                        <div className="h-2 w-5 animate-pulse rounded-full bg-bg-secondary/40" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {/* Column 2 */}
-                <div className="flex flex-1 flex-col gap-3">
-                  {/* Compact card with XP */}
-                  <div className="relative overflow-hidden rounded-2xl border border-accent/10 bg-bg-secondary/30 py-3 pl-6 pr-4 backdrop-blur-sm">
-                    <div className="absolute inset-y-0 left-0 w-[3px] animate-pulse rounded-l-2xl bg-accent/15" />
-                    <div className="flex items-center gap-3">
-                      <div className="h-11 w-11 animate-pulse rounded-full bg-accent/12" />
-                      <div className="flex-1 space-y-1.5">
-                        <div className="h-3.5 w-1/2 animate-pulse rounded-full bg-bg-secondary/60" />
-                        <div className="h-2 w-2/5 animate-pulse rounded-full bg-accent/15" />
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                        <div className="h-7 w-10 animate-pulse rounded bg-accent/12" />
-                        <div className="h-2 w-5 animate-pulse rounded-full bg-bg-secondary/40" />
-                      </div>
-                    </div>
-                  </div>
-                  {/* Full card */}
-                  <div className="relative overflow-hidden rounded-3xl border border-accent/10 bg-bg-secondary/30 py-4 pl-7 pr-5 backdrop-blur-sm">
-                    <div className="absolute inset-y-0 left-0 w-[3px] animate-pulse rounded-l-3xl bg-accent/20" />
-                    <div className="flex items-center gap-3">
-                      <div className="h-11 w-11 animate-pulse rounded-full bg-accent/12" />
-                      <div className="flex-1 space-y-1.5">
-                        <div className="h-3.5 w-2/3 animate-pulse rounded-full bg-bg-secondary/60" />
-                        <div className="h-2 w-1/3 animate-pulse rounded-full bg-accent/15" />
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                        <div className="h-7 w-10 animate-pulse rounded bg-accent/12" />
-                        <div className="h-2 w-5 animate-pulse rounded-full bg-bg-secondary/40" />
-                      </div>
-                    </div>
-                    <div className="mt-3 space-y-2">
-                      <div className="h-3 w-full animate-pulse rounded-full bg-bg-secondary/50" />
-                      <div className="h-3 w-4/5 animate-pulse rounded-full bg-bg-secondary/35" />
-                    </div>
-                  </div>
-                  {/* Compact card — desktop only */}
-                  <div className="relative hidden overflow-hidden rounded-2xl border border-accent/10 bg-bg-secondary/30 py-3 pl-6 pr-4 backdrop-blur-sm lg:block">
-                    <div className="absolute inset-y-0 left-0 w-[3px] animate-pulse rounded-l-2xl bg-accent/15" />
-                    <div className="flex items-center gap-3">
-                      <div className="h-11 w-11 animate-pulse rounded-full bg-accent/12" />
-                      <div className="flex-1 space-y-1.5">
-                        <div className="h-3.5 w-2/5 animate-pulse rounded-full bg-bg-secondary/60" />
-                        <div className="h-2 w-1/3 animate-pulse rounded-full bg-accent/15" />
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                        <div className="h-7 w-10 animate-pulse rounded bg-accent/12" />
-                        <div className="h-2 w-5 animate-pulse rounded-full bg-bg-secondary/40" />
-                      </div>
-                    </div>
-                  </div>
-                  {/* Full card — desktop only */}
-                  <div className="relative hidden overflow-hidden rounded-3xl border border-accent/10 bg-bg-secondary/30 py-4 pl-7 pr-5 backdrop-blur-sm lg:block">
-                    <div className="absolute inset-y-0 left-0 w-[3px] animate-pulse rounded-l-3xl bg-accent/20" />
-                    <div className="flex items-center gap-3">
-                      <div className="h-11 w-11 animate-pulse rounded-full bg-accent/12" />
-                      <div className="flex-1 space-y-1.5">
-                        <div className="h-3.5 w-3/5 animate-pulse rounded-full bg-bg-secondary/60" />
-                        <div className="h-2 w-2/5 animate-pulse rounded-full bg-accent/15" />
-                      </div>
-                    </div>
-                    <div className="mt-3 space-y-2">
-                      <div className="h-3 w-full animate-pulse rounded-full bg-bg-secondary/50" />
-                      <div className="h-3 w-11/12 animate-pulse rounded-full bg-bg-secondary/40" />
-                      <div className="h-3 w-3/5 animate-pulse rounded-full bg-bg-secondary/30" />
-                    </div>
-                  </div>
-                  {/* Compact card — desktop only */}
-                  <div className="relative hidden overflow-hidden rounded-2xl border border-accent/10 bg-bg-secondary/30 py-3 pl-6 pr-4 backdrop-blur-sm lg:block">
-                    <div className="absolute inset-y-0 left-0 w-[3px] animate-pulse rounded-l-2xl bg-accent/15" />
-                    <div className="flex items-center gap-3">
-                      <div className="h-11 w-11 animate-pulse rounded-full bg-accent/12" />
-                      <div className="flex-1 space-y-1.5">
-                        <div className="h-3.5 w-1/2 animate-pulse rounded-full bg-bg-secondary/60" />
-                        <div className="h-2 w-1/3 animate-pulse rounded-full bg-accent/15" />
-                      </div>
-                    </div>
-                  </div>
-                  {/* Full card — desktop only */}
-                  <div className="relative hidden overflow-hidden rounded-3xl border border-accent/10 bg-bg-secondary/30 py-4 pl-7 pr-5 backdrop-blur-sm lg:block">
-                    <div className="absolute inset-y-0 left-0 w-[3px] animate-pulse rounded-l-3xl bg-accent/20" />
-                    <div className="flex items-center gap-3">
-                      <div className="h-11 w-11 animate-pulse rounded-full bg-accent/12" />
-                      <div className="flex-1 space-y-1.5">
-                        <div className="h-3.5 w-3/4 animate-pulse rounded-full bg-bg-secondary/60" />
-                        <div className="h-2 w-2/5 animate-pulse rounded-full bg-accent/15" />
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                        <div className="h-7 w-10 animate-pulse rounded bg-accent/12" />
-                        <div className="h-2 w-5 animate-pulse rounded-full bg-bg-secondary/40" />
-                      </div>
-                    </div>
-                    <div className="mt-3 space-y-2">
-                      <div className="h-3 w-full animate-pulse rounded-full bg-bg-secondary/50" />
-                      <div className="h-3 w-5/6 animate-pulse rounded-full bg-bg-secondary/35" />
-                    </div>
-                    <div className="mt-2 h-3 w-2/5 animate-pulse rounded-full bg-bg-secondary/25" />
-                  </div>
-                  {/* Compact card — desktop only */}
-                  <div className="relative hidden overflow-hidden rounded-2xl border border-accent/10 bg-bg-secondary/30 py-3 pl-6 pr-4 backdrop-blur-sm lg:block">
-                    <div className="absolute inset-y-0 left-0 w-[3px] animate-pulse rounded-l-2xl bg-accent/15" />
-                    <div className="flex items-center gap-3">
-                      <div className="h-11 w-11 animate-pulse rounded-full bg-accent/12" />
-                      <div className="flex-1 space-y-1.5">
-                        <div className="h-3.5 w-2/5 animate-pulse rounded-full bg-bg-secondary/60" />
-                        <div className="h-2 w-1/4 animate-pulse rounded-full bg-accent/15" />
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                        <div className="h-7 w-10 animate-pulse rounded bg-accent/12" />
-                        <div className="h-2 w-5 animate-pulse rounded-full bg-bg-secondary/40" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            {showFeedEmptyState ? (
+              <FeedEmptyState variant={isLoading ? "loading" : "empty"} />
             ) : error ? (
               <div className="flex min-h-64 items-center justify-center rounded-3xl border border-accent/10 bg-bg-secondary/22 px-6 text-center text-base text-text-secondary">
                 {t("feed_error")}
@@ -468,46 +253,14 @@ export function LiveProjectorPage() {
                   </button>
                 )}
               </>
-            ) : (
-              <FeedEmptyState />
-            )}
+            ) : null}
           </div>
 
           {/* ─ Leaderboard panel ─ */}
           <div className="flex flex-col gap-3">
 
-            {isLoading ? (
-              <div className="grid gap-3">
-                {/* Leader row skeleton */}
-                <div className="relative overflow-hidden rounded-3xl border border-accent/18 bg-accent/7 px-5 py-4">
-                  <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-accent/30 to-transparent" />
-                  <div className="flex items-center gap-4">
-                    <div className="h-8 w-5 animate-pulse rounded bg-accent/20" />
-                    <div className="h-12 w-12 animate-pulse rounded-full bg-accent/18" />
-                    <div className="flex-1">
-                      <div className="h-4 w-2/3 animate-pulse rounded-full bg-bg-secondary/50" />
-                    </div>
-                    <div className="space-y-1.5 text-right">
-                      <div className="h-7 w-14 animate-pulse rounded bg-accent/20" />
-                      <div className="ml-auto h-2 w-6 animate-pulse rounded-full bg-bg-secondary/30" />
-                    </div>
-                  </div>
-                </div>
-                {/* Regular rows 2–6 */}
-                {[2, 3, 4, 5, 6].map((rank) => (
-                  <div
-                    key={rank}
-                    className="flex items-center gap-3 rounded-2xl border border-accent/10 bg-bg-secondary/30 px-4 py-3 backdrop-blur-sm"
-                  >
-                    <div className="h-3.5 w-4 animate-pulse rounded-full bg-bg-secondary/40" />
-                    <div className="h-9 w-9 animate-pulse rounded-full bg-accent/12" />
-                    <div className="flex-1">
-                      <div className={cn("h-3 animate-pulse rounded-full bg-bg-secondary/50", rank <= 3 ? "w-1/2" : "w-2/5")} />
-                    </div>
-                    <div className="h-5 w-12 animate-pulse rounded bg-bg-secondary/35" />
-                  </div>
-                ))}
-              </div>
+            {showLeaderboardEmptyState ? (
+              <LeaderboardEmptyState />
             ) : error ? (
               <div className="flex min-h-64 items-center justify-center rounded-3xl border border-accent/10 bg-bg-secondary/22 px-6 text-center text-base text-text-secondary">
                 {t("leaderboard_error")}
@@ -524,9 +277,7 @@ export function LiveProjectorPage() {
                   ))}
                 </AnimatePresence>
               </div>
-            ) : (
-              <LeaderboardEmptyState />
-            )}
+            ) : null}
           </div>
         </div>
       </div>

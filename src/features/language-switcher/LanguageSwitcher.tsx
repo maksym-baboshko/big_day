@@ -34,7 +34,7 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
         disabled
         className={cn(
           "flex items-center justify-center w-10 h-10 rounded-full border border-accent text-sm font-medium opacity-0",
-          "bg-bg-primary text-text-primary"
+          "bg-bg-primary text-accent"
         )}
         aria-label={locale === "uk" ? t("switch_language_to_en") : t("switch_language_to_uk")}
       >
@@ -48,7 +48,7 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
       onClick={toggleLocale}
       className={cn(
         "flex items-center justify-center w-10 h-10 rounded-full border border-accent text-sm font-medium transition-all duration-300 cursor-pointer select-none",
-        "bg-bg-primary text-text-primary hover:bg-accent hover:text-white",
+        "bg-bg-primary text-accent hover:bg-accent hover:text-white",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary",
         isPending && "opacity-70",
         className

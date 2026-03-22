@@ -33,13 +33,13 @@ export function LiveClock({ locale: _locale }: { locale: SupportedLocale }) {
   return (
     <time
       suppressHydrationWarning
-      className="flex items-baseline gap-0 text-base font-medium tracking-widest text-accent"
+      className="flex items-baseline text-base font-medium text-accent"
     >
-      <span className="inline-block w-[2ch] text-center">{parts.hh}</span>
-      <span className="text-accent/55">:</span>
-      <span className="inline-block w-[2ch] text-center">{parts.mm}</span>
-      <span className="text-accent/35">:</span>
-      <span className="inline-block w-[2ch] text-center text-accent/35">{parts.ss}</span>
+      <span className="inline-block w-[2ch] text-center tracking-widest">{parts.hh}</span>
+      <span className="mx-[0.3ch] text-accent/55">:</span>
+      <span className="inline-block w-[2ch] text-center tracking-widest">{parts.mm}</span>
+      <span className="mx-[0.3ch] text-accent/35">:</span>
+      <span className="inline-block w-[2ch] text-center tracking-widest text-accent/35">{parts.ss}</span>
     </time>
   );
 }

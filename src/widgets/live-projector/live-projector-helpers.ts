@@ -74,7 +74,7 @@ export function getEventLabelKey(eventType: string | null | undefined) {
     case "player.joined": return "event_player_joined";
     case "xp.awarded": return "event_xp_awarded";
     case "wheel.round.completed": return "event_answered";
-    case "wheel.round.promised": return "event_promised";
+    case "wheel.round.promised": return "hero_promised";
     case "leaderboard.new_top_player": return "event_new_top_player";
     default: return "event_generic";
   }
