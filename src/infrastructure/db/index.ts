@@ -1,1 +1,2 @@
-// barrel export — populated in subsequent PRs
+export { db } from "./client";
+export * from "./schema";
