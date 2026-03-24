@@ -40,6 +40,7 @@ FSD-inspired, with route composition in `app/`, interactive flows in `features/`
 src/
 ├── app/
 │   ├── [locale]/                 # invitation, invite, live pages
+│   │   └── error.tsx             # locale-level React error boundary
 │   └── api/
 │       └── rsvp/                 # RSVP submission API
 ├── features/
@@ -92,6 +93,7 @@ Barrel exports are already used across the repo. Prefer importing from the barre
 - personalized invite pages prefill RSVP defaults from the guest entry
 - `src/app/api/rsvp/route.ts` is implemented and uses `rsvpSchema`
 - the RSVP API uses a honeypot `website` field that short-circuits bot-like submissions and sends via Resend or `mock` mode
+- RSVP API response is validated with `rsvpApiResponseSchema` (Zod) in `useRsvpFormState.ts`; do not use bare `as` casts for API responses
 
 Current RSVP payload shape:
 

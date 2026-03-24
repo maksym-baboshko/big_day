@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Guest } from "@/shared/config";
 import { useLiteMotion } from "@/shared/lib";
-import { rsvpSchema, type RSVPFormData } from "./model";
+import { rsvpSchema, rsvpApiResponseSchema, type RSVPFormData } from "./model";
 import {
   createDefaultFormValues,
   getSubmittedDisplayName,
@@ -146,9 +146,9 @@ export function useRsvpFormState(guest?: Guest) {
         body: JSON.stringify(data),
       });
 
-      const payload = (await response.json().catch(() => null)) as
-        | { success?: boolean; error?: string }
-        | null;
+      const raw = await response.json().catch(() => null);
+      const parsed = rsvpApiResponseSchema.safeParse(raw);
+      const payload = parsed.success ? parsed.data : null;
 
       if (!response.ok || !payload?.success) {
         throw new Error(payload?.error ?? "RSVP submission failed.");
@@ -160,7 +160,9 @@ export function useRsvpFormState(guest?: Guest) {
       setShowConfetti(true);
       setSubmitted(true);
     } catch (error) {
-      console.warn("RSVP submit error:", error);
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("RSVP submit error:", error);
+      }
       setSubmitError(
         process.env.NODE_ENV === "development" && error instanceof Error
           ? error.message
