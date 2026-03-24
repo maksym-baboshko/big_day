@@ -1,1 +1,0 @@
-export { PersonalInvitation } from "./PersonalInvitation";

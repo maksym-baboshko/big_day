@@ -1,4 +1,4 @@
-# Big Day — Wedding Invitation Site
+# diandmax — Wedding Invitation & Event Hub
 
 Wedding website for Maksym & Diana.
 Date: June 28, 2026.
@@ -7,12 +7,23 @@ Venue: Grand Hotel Terminus, Bergen, Norway.
 > Keep `AGENTS.md` and `CLAUDE.md` aligned.
 > If a local `GEMINI.md` exists, keep that one aligned too.
 
+This repository is a **full rewrite** of the previous `wedaster` project.
+The old codebase has been removed. All code is being rebuilt from scratch with a new stack.
+
 This repository contains:
 
 - the invitation site at `/` and `/en`
 - personalized invite pages at `/invite/[slug]`
-- the projector/live feed page at `/live` (UI only — games backend is being rebuilt)
+- the projector/live feed page at `/live` (UI only — games backend is being built)
 - the RSVP API at `/api/rsvp`
+
+Future (game hub phase):
+
+- guest check-in with nickname
+- ~6 wedding games
+- real-time live feed with XP events
+- leaderboard
+- guest chat
 
 ---
 
@@ -20,67 +31,137 @@ This repository contains:
 
 | Layer | Tool |
 |---|---|
-| Framework | Next.js 16 (App Router) |
+| Framework | Next.js (App Router) |
 | Language | TypeScript 5 (strict mode) |
 | Styling | Tailwind CSS v4 + CSS variables |
-| Animation | Framer Motion 12 |
+| Animation | motion/react |
 | i18n | next-intl 4 |
 | Forms | react-hook-form + zod + @hookform/resolvers |
-| Testing | — (to be added in a future phase) |
-| Backend services | Resend (email delivery) |
+| UI primitives | shadcn/ui + Lucide React |
+| Server state | TanStack Query |
+| Client state | Zustand |
+| URL state | Nuqs |
+| Database | Supabase Postgres + Drizzle ORM |
+| Email | Resend + react-email |
+| Lint/Format | Biome |
+| Git hooks | Husky + lint-staged |
+| Testing | Vitest + Playwright |
+| CI/CD | GitHub Actions → Vercel (Free Plan) |
+| Analytics | @vercel/analytics + @vercel/speed-insights |
 | Utilities | clsx + tailwind-merge via `cn()` |
 
 ---
 
-## Project Structure
+## Architecture
 
-FSD-inspired, with route composition in `app/`, interactive flows in `features/`, shared primitives in `shared/`, and page/section composition in `widgets/`.
+Feature-Sliced Design (FSD) hybrid with Next.js App Router.
+
+Dependency direction (top → bottom only):
+
+```
+app → widgets → features → entities → shared
+                         ↘ infrastructure
+```
+
+Features must not import each other directly. Cross-feature communication goes through entities, shared contracts, or server actions.
+
+### Layer responsibilities
+
+| Layer | Purpose |
+|---|---|
+| `app/` | Routes, layouts, API handlers |
+| `widgets/` | Page sections and composition roots |
+| `features/` | Product features (countdown, rsvp, language-switcher, etc.) |
+| `entities/` | Domain models (guest, event, player) |
+| `shared/` | UI primitives, config, i18n, lib utilities |
+| `infrastructure/` | Supabase/Drizzle client, email sending |
+
+### Project Structure
 
 ```text
 src/
 ├── app/
-│   ├── [locale]/                 # invitation, invite, live pages
-│   │   └── error.tsx             # locale-level React error boundary
-│   └── api/
-│       └── rsvp/                 # RSVP submission API
+│   ├── [locale]/
+│   │   ├── page.tsx                  # invitation page
+│   │   ├── layout.tsx
+│   │   ├── error.tsx                 # locale-level error boundary
+│   │   ├── live/page.tsx             # live projector (noindex)
+│   │   └── invite/[slug]/page.tsx    # personalized invite
+│   ├── api/
+│   │   └── rsvp/route.ts
+│   ├── globals.css
+│   └── layout.tsx
 ├── features/
 │   ├── countdown/
 │   ├── language-switcher/
-│   └── theme-switcher/
+│   ├── theme-switcher/
+│   └── rsvp/
+│       ├── components/
+│       ├── actions/
+│       ├── hooks/
+│       └── schema/
+├── entities/
+│   ├── guest/
+│   │   ├── model/
+│   │   ├── queries/
+│   │   └── types.ts
+│   └── event/                        # game hub (future)
+│       └── types.ts
 ├── shared/
-│   ├── config/                   # wedding data, guests, metadata helpers
+│   ├── config/                       # wedding.ts, guests.ts, site.ts
 │   ├── i18n/
+│   │   ├── messages/
+│   │   │   ├── uk.json
+│   │   │   └── en.json
+│   │   ├── routing.ts
+│   │   ├── navigation.ts
+│   │   └── request.ts
 │   ├── lib/
-│   │   ├── motion.ts             # MOTION_EASE — canonical default animation curve
-│   │   └── server/               # server-only utilities
-│   │       ├── deferred.ts       # after() + runDeferredTasks for Vercel serverless
+│   │   ├── motion.ts                 # MOTION_EASE constant
+│   │   ├── cn.ts
+│   │   ├── fonts.ts
+│   │   ├── theme-script.ts
+│   │   └── server/
+│   │       ├── deferred.ts
 │   │       ├── api-error-response.ts
 │   │       ├── logger.ts
 │   │       ├── csp.ts
 │   │       └── request-id.ts
-│   └── ui/
-└── widgets/
-    ├── invitation-page/
-    ├── personal-invitation/
-    ├── live-projector/           # projector page (stub data — games backend pending)
-    │   ├── LiveProjectorPage.tsx  # composition root
-    │   ├── LiveClock.tsx
-    │   ├── FeedEventCard.tsx
-    │   ├── LeaderboardRow.tsx
-    │   ├── HeroEventOverlay.tsx
-    │   ├── FeedEmptyState.tsx
-    │   ├── LeaderboardEmptyState.tsx
-    │   ├── live-projector-helpers.ts
-    │   └── types.ts              # LiveSnapshot, LiveFeedEventSnapshot, LeaderboardEntrySnapshot
-    ├── navbar/
-    ├── not-found-page/
-    ├── rsvp/
-    └── invitation sections (our-story, timeline, location, dress-code, gifts, hero, splash)
+│   └── ui/                           # shadcn/ui + custom primitives
+├── widgets/
+│   ├── invitation-page/
+│   ├── personal-invitation/
+│   ├── live-projector/
+│   │   ├── LiveProjectorPage.tsx
+│   │   ├── LiveClock.tsx
+│   │   ├── FeedEventCard.tsx
+│   │   ├── LeaderboardRow.tsx
+│   │   ├── HeroEventOverlay.tsx
+│   │   ├── FeedEmptyState.tsx
+│   │   ├── LeaderboardEmptyState.tsx
+│   │   ├── live-projector-helpers.ts
+│   │   └── types.ts
+│   ├── navbar/
+│   ├── not-found-page/
+│   ├── footer/
+│   ├── splash/
+│   ├── hero/
+│   ├── our-story/
+│   ├── timeline/
+│   ├── location/
+│   ├── dress-code/
+│   └── gifts/
+└── infrastructure/
+    ├── db/
+    │   ├── schema.ts                 # Drizzle schema
+    │   ├── client.ts                 # Supabase + Drizzle client
+    │   └── migrations/
+    └── email/
+        ├── templates/
+        └── sender.ts
 ```
 
-There is still no dedicated `entities/` layer. Keep the current structure unless a change clearly needs a reusable domain module rather than a feature- or shared-level abstraction.
-
-Barrel exports are already used across the repo. Prefer importing from the barrel when one exists.
+Barrel exports (`index.ts`) are used across the repo. Import from the barrel when one exists.
 
 ---
 
@@ -90,12 +171,11 @@ Barrel exports are already used across the repo. Prefer importing from the barre
 
 - `/` and `/en` render the full invitation page
 - `/invite/[slug]` renders guest-specific copy and seat count
-- personalized invite pages prefill RSVP defaults from the guest entry
-- `src/app/api/rsvp/route.ts` is implemented and uses `rsvpSchema`
-- the RSVP API uses a honeypot `website` field that short-circuits bot-like submissions and sends via Resend or `mock` mode
-- RSVP API response is validated with `rsvpApiResponseSchema` (Zod) in `useRsvpFormState.ts`; do not use bare `as` casts for API responses
+- the RSVP form uses a honeypot `website` field to catch bots
+- RSVP responses are persisted to Supabase via Drizzle
+- email confirmation is sent via Resend using the deferred tasks pattern
 
-Current RSVP payload shape:
+RSVP payload shape:
 
 - `guestNames: string[]`
 - `attending: "yes" | "no"`
@@ -107,8 +187,8 @@ Current RSVP payload shape:
 ### Live projector
 
 - `/live` is the projector/live feed page, marked `noindex`
-- the page currently renders with stub data — the games backend will be built in a future phase
-- type contracts live in `src/widgets/live-projector/types.ts`: `LiveSnapshot`, `LiveFeedEventSnapshot`, `LeaderboardEntrySnapshot`
+- renders with stub data until the games backend is built
+- type contracts: `LiveSnapshot`, `LiveFeedEventSnapshot`, `LeaderboardEntrySnapshot` in `src/widgets/live-projector/types.ts`
 - connecting real data means wiring `LiveProjectorPage.tsx` to a new `/api/live` endpoint
 
 ---
@@ -121,24 +201,22 @@ Current RSVP payload shape:
 - always import `VENUE` (including `VENUE.locationShort` and `VENUE.directionsUrl`) from `@/shared/config`
 - do not duplicate `VENUE`, `COUPLE`, `DRESS_CODE`, guests, or metadata data in route files or widgets
 
-Current reusable UI primitives in `src/shared/ui`:
+Reusable UI primitives in `src/shared/ui`:
 
 - `SectionWrapper`
 - `SectionHeading`
 - `AnimatedReveal`
 - `Ornament`
-- `Button`
-- `Input`
-- `Textarea`
+- `Button`, `Input`, `Textarea` (built on shadcn/ui)
 
 Styling rules:
 
-- colors should go through CSS variables defined in `src/app/globals.css`
-- prefer Tailwind classes backed by those variables such as `bg-bg-primary`, `text-text-primary`, `text-accent`, `text-error`
-- avoid hardcoded colors in components except intentional config/email/SVG cases
+- colors go through CSS variables defined in `src/app/globals.css`
+- prefer Tailwind classes backed by those variables: `bg-bg-primary`, `text-text-primary`, `text-accent`, `text-error`
+- avoid hardcoded colors in components (except intentional config/email/SVG cases)
 - headings use `heading-serif` or `heading-serif-italic`
 - numerals and formal labels use `font-cinzel`
-- default motion curve is `[0.22, 1, 0.36, 1]`; import `MOTION_EASE` from `@/shared/lib` — do not hardcode the array inline
+- default motion curve is `[0.22, 1, 0.36, 1]`; import `MOTION_EASE` from `@/shared/lib` — do not hardcode inline
 
 ---
 
@@ -154,14 +232,14 @@ Styling rules:
 
 ## Hydration-Sensitive Code
 
-Do not casually refactor these pieces:
+Do not casually refactor these:
 
 - `features/countdown/Countdown.tsx`
 - `widgets/splash/Splash.tsx`
 - `features/language-switcher/LanguageSwitcher.tsx`
 - `features/theme-switcher/ThemeProvider.tsx`
 
-These pieces intentionally use hydration-safe patterns such as `useSyncExternalStore` and staged mount logic.
+These intentionally use hydration-safe patterns (`useSyncExternalStore`, staged mount logic).
 
 ---
 
@@ -169,39 +247,66 @@ These pieces intentionally use hydration-safe patterns such as `useSyncExternalS
 
 ### Deferred tasks
 
-On Vercel serverless, the runtime may shut down immediately after the response is sent. Fire-and-forget (`void asyncFn()`) is unreliable. All post-response work must go through the deferred tasks pattern:
+On Vercel serverless, fire-and-forget is unreliable. All post-response work uses:
 
-1. Repository methods return `{ data, deferredTasks: DeferredTask[] }`
-2. Route handlers call `after(() => runDeferredTasks(tasks))` after sending the response
-3. `runDeferredTasks` uses `Promise.allSettled` so one failure does not block others
+1. Return `{ data, deferredTasks: DeferredTask[] }` from repository methods
+2. Call `after(() => runDeferredTasks(tasks))` in route handlers
+3. `runDeferredTasks` uses `Promise.allSettled` — one failure does not block others
 
-Each deferred task is labeled as `{ label, run }`, so failures remain attributable in structured logs.
+Each task is `{ label, run }` for attributable failures in structured logs.
 
-### Unified error envelopes and request IDs
+### Unified error envelopes
 
-All `/api/*` error responses share the same shape:
+All `/api/*` error responses:
 
 - `error: string`
 - `code: string`
 - `requestId: string`
 - `retryAfterSeconds?: number`
 
-Request IDs come from `x-request-id`, then `x-vercel-id`, then `crypto.randomUUID()`.
+Request IDs: `x-request-id` → `x-vercel-id` → `crypto.randomUUID()`.
 
-### Structured server logging
+### Structured logging
 
-Prefer `logServerInfo()` and `logServerError()` from `@/shared/lib/server` over direct `console.error` / `console.log` in server code.
-Structured log payloads include `scope`, `event`, `requestId`, optional `context`, and serialized error details.
+Use `logServerInfo()` and `logServerError()` from `@/shared/lib/server`.
+Payloads include `scope`, `event`, `requestId`, optional `context`, serialized error details.
+
+---
+
+## Database
+
+Drizzle queries must live in `entities/*/queries/` or `features/*/`. UI components never query the DB directly.
+
+Schema tables:
+
+- `guests` — slug, localized names, seat count
+- `rsvp_responses` — RSVP submissions
+- `players` — future game hub (Supabase anon uid + nickname)
+- `events` — future live game events
+- `leaderboard` — future XP rankings
+
+---
+
+## Architectural Contracts
+
+- Dependencies flow downward only: `app → widgets → features → entities → shared`
+- Features must not import from each other's internals (only public `index.ts`)
+- Circular dependencies are forbidden
+- Filters/search/pagination → URL state (Nuqs), not Zustand
+- Zustand → minimal global UI state only (theme, etc.)
+- `any` is forbidden in TypeScript
+- All Zod schemas are colocated with their feature/entity
 
 ---
 
 ## Quality Gates
 
-Minimum local verification before considering the repo ready:
-
 ```bash
-pnpm lint
-pnpm build
+pnpm typecheck   # tsc --noEmit
+pnpm lint        # biome check
+pnpm build       # next build
+pnpm test        # vitest run
+pnpm test:e2e    # playwright test
 ```
 
 ---
@@ -210,15 +315,16 @@ pnpm build
 
 - Never hardcode the wedding date; import `WEDDING_DATE` from `@/shared/config`
 - Never hardcode the Roman numeral date; import `WEDDING_DATE_ROMAN` from `@/shared/config`
-- Never hardcode venue strings; import `VENUE` from `@/shared/config` (`VENUE.locationShort`, `VENUE.directionsUrl`, etc.)
-- Never hardcode the default motion curve `[0.22, 1, 0.36, 1]` inline; import `MOTION_EASE` from `@/shared/lib`
+- Never hardcode venue strings; import `VENUE` from `@/shared/config`
+- Never hardcode `[0.22, 1, 0.36, 1]` inline; import `MOTION_EASE` from `@/shared/lib`
 - Keep locale message files in sync
 - Prefer server components by default
+- Server Actions first for mutations
 - Keep invite route metadata localized
 - Use existing barrel exports when they exist
-- Treat `/invite/[slug]` and `/live` as intentionally non-indexed surfaces
-- Do not remove the current hydration-safe patterns in countdown, splash, language switcher, or theme provider
-- Use the deferred tasks pattern for any post-response async work in API routes — never `void asyncFn()`
+- Treat `/invite/[slug]` and `/live` as intentionally non-indexed
+- Do not remove hydration-safe patterns in countdown, splash, language switcher, or theme provider
+- Use the deferred tasks pattern for any post-response async work — never `void asyncFn()`
 
 ---
 
@@ -226,6 +332,11 @@ pnpm build
 
 ```bash
 pnpm dev
+pnpm typecheck
 pnpm lint
 pnpm build
+pnpm test
+pnpm test:e2e
+pnpm db:generate    # drizzle-kit generate
+pnpm db:migrate     # drizzle-kit migrate
 ```
