@@ -41,22 +41,22 @@
   --accent-rgb: 191, 149, 112;
   --error: #e07070;
 
-  /* ── Splash envelope & card (dark kraft palette) ── */
-  --splash-env-outer: #5c4530;
-  --splash-card-bg: #352818;
-  --splash-card-border: #7a5e3e;
-  --splash-card-text: #f2ebe0;
-  --splash-card-subtext: #b89e82;
-  --splash-flap-triangle: #3e3020;
-  --splash-flap-back: #6a5035;
-  --splash-flap-left-a: #634e33;
-  --splash-flap-left-b: #553f27;
-  --splash-flap-right-a: #604b30;
-  --splash-flap-right-b: #503d26;
-  --splash-flap-bottom-a: #5e4a2f;
-  --splash-flap-bottom-b: #4e3b22;
-  --splash-flap-top-a: #674e34;
-  --splash-flap-top-b: #57412a;
+  /* ── Splash envelope & card (muted parchment — ~20% darker than light) ── */
+  --splash-env-outer: #CCBCA0;
+  --splash-card-bg: #E4D8C6;
+  --splash-card-border: #C0A888;
+  --splash-card-text: #2e2820;
+  --splash-card-subtext: #907868;
+  --splash-flap-triangle: #DED0B8;
+  --splash-flap-back: #B8A484;
+  --splash-flap-left-a: #D4C4A4;
+  --splash-flap-left-b: #C4B090;
+  --splash-flap-right-a: #D0BEA0;
+  --splash-flap-right-b: #C0AC8C;
+  --splash-flap-bottom-a: #CEBC9C;
+  --splash-flap-bottom-b: #BEAA88;
+  --splash-flap-top-a: #DACCB0;
+  --splash-flap-top-b: #CABC9E;
 }
 
 @theme inline {
