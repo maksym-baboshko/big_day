@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type { LiveFeedEventSnapshot } from "@/features/game-session";
+import type { LiveFeedEventSnapshot } from "./types";
 import type { SupportedLocale } from "@/shared/config";
 import { cn } from "@/shared/lib";
 import {
@@ -9,7 +9,6 @@ import {
   getEventBarClass,
   getEventLabelKey,
   getEventPrompt,
-  getGameTitle,
 } from "./live-projector-helpers";
 
 function EventMeta({
@@ -71,9 +70,9 @@ export function FeedEventCard({
 }) {
   const t = useTranslations("LivePage");
   const prompt = getEventPrompt(event, locale);
-  const gameTitle = getGameTitle(event.gameSlug, locale);
+  const gameTitle = null; // will be populated when new games platform is wired up
   const eventLabelKey = getEventLabelKey(event.eventType);
-  const barClass = getEventBarClass(event.eventType);
+  const barClass = getEventBarClass();
 
   const hasXp =
     event.xpDelta != null &&

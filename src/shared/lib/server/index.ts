@@ -6,7 +6,6 @@ export {
 } from "./api-error-response";
 export { buildContentSecurityPolicy } from "./csp";
 export { type DeferredTask, runDeferredTasks } from "./deferred";
-export { handleGameApiError } from "./game-api-error-handler";
 export { createServerLogPayload, logServerError, logServerInfo } from "./logger";
 export {
   enforceRateLimit,
@@ -15,3 +14,4 @@ export {
   RateLimitExceededError,
 } from "./rate-limit";
 export { getRequestId } from "./request-id";
+export { getSupabaseAdminClient } from "./supabase";

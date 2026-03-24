@@ -1,8 +1,15 @@
 import "server-only";
 
-import type { ConsumeRateLimitWindowResult } from "@/features/game-session/server/types";
-import { getSupabaseAdminClient } from "@/features/game-session/server/supabase";
+import { getSupabaseAdminClient } from "./supabase";
 import { createApiErrorPayload } from "./api-error-response";
+import { logServerInfo } from "./logger";
+
+type ConsumeRateLimitWindowResult = {
+  allowed: boolean;
+  current_count: number;
+  remaining: number;
+  retry_after_seconds: number;
+};
 
 export class RateLimitExceededError extends Error {
   retryAfterSeconds: number;
@@ -75,7 +82,19 @@ export async function enforceRateLimit({
   windowSeconds,
   authUserId = null,
 }: EnforceRateLimitOptions) {
-  const supabase = getSupabaseAdminClient();
+  let supabase: ReturnType<typeof getSupabaseAdminClient>;
+
+  try {
+    supabase = getSupabaseAdminClient();
+  } catch {
+    // Supabase not configured — rate-limiting skipped.
+    logServerInfo({
+      scope: "rate-limit",
+      event: "skipped_no_supabase",
+      context: { rateLimitScope: scope },
+    });
+    return;
+  }
   const identifier = getRateLimitIdentifier(request, authUserId);
   const { data, error } = await supabase
     .rpc("consume_rate_limit_window", {

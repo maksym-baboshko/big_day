@@ -21,7 +21,7 @@ export async function generateMetadata({
   const typedLocale = resolveLocale(locale);
   const t = await getTranslations({
     locale: typedLocale,
-    namespace: "GamesMetadata",
+    namespace: "LiveMetadata",
   });
 
   return {

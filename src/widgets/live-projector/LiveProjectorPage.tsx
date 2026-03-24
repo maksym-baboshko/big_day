@@ -3,24 +3,24 @@
 import { useCallback, useRef, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { MOTION_EASE } from "@/shared/lib";
-import { useLocale, useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import type { SupportedLocale } from "@/shared/config";
 import { LanguageSwitcher } from "@/features/language-switcher";
 import { ThemeSwitcher } from "@/features/theme-switcher";
-import { Link } from "@/shared/i18n/navigation";
 import { FeedEmptyState } from "./FeedEmptyState";
 import { FeedEventCard } from "./FeedEventCard";
 import { HeroEventOverlay } from "./HeroEventOverlay";
 import { LeaderboardEmptyState } from "./LeaderboardEmptyState";
 import { LeaderboardRow } from "./LeaderboardRow";
 import { LiveClock } from "./LiveClock";
+import type { LiveFeedEventSnapshot, LeaderboardEntrySnapshot } from "./types";
 import {
   DESKTOP_FEED_INITIAL_VISIBLE,
   DESKTOP_FEED_LOAD_MORE_STEP,
   MOBILE_FEED_INITIAL_VISIBLE,
   MOBILE_FEED_LOAD_MORE_STEP,
 } from "./live-projector-helpers";
-import { useLiveProjectorSnapshot } from "./useLiveProjectorSnapshot";
 
 const MOBILE_FEED_MEDIA_QUERY = "(max-width: 1023px)";
 
@@ -53,11 +53,16 @@ function subscribeToMobileFeed(callback: () => void) {
   return () => mediaQuery.removeListener(handler);
 }
 
+// Stub data — will be replaced with real data fetching in the next phase
+const snapshot: { feed: LiveFeedEventSnapshot[]; leaderboard: LeaderboardEntrySnapshot[] } | null =
+  null;
+const isLoading = false;
+const error = null;
+const heroEvent: LiveFeedEventSnapshot | null = null;
+
 export function LiveProjectorPage() {
   const locale = useLocale() as SupportedLocale;
   const t = useTranslations("LivePage");
-  const tGames = useTranslations("GamesCommon");
-  const { snapshot, isLoading, error, heroEvent } = useLiveProjectorSnapshot();
   const isMobileFeed = useSyncExternalStore(
     subscribeToMobileFeed,
     getMobileFeedSnapshot,
@@ -85,8 +90,6 @@ export function LiveProjectorPage() {
     setMobileVisibleCount((prev) => prev + MOBILE_FEED_LOAD_MORE_STEP);
   }, []);
 
-  // Callback ref: called by React exactly when the sentinel mounts or unmounts —
-  // no race condition between ref assignment and effect scheduling.
   const sentinelRef = useCallback((node: HTMLDivElement | null) => {
     observerRef.current?.disconnect();
     observerRef.current = null;
@@ -134,58 +137,10 @@ export function LiveProjectorPage() {
             <LiveClock locale={locale} />
           </div>
 
-          {/* Right desktop: games link + separator + theme + language */}
-          <div className="ml-auto hidden shrink-0 items-center gap-8 lg:flex">
-            <Link
-              href="/games"
-              className="group flex items-center gap-2 rounded-sm px-1 py-2 text-xs font-medium uppercase tracking-widest text-accent/70 transition-colors hover:text-accent"
-            >
-              <svg
-                width="13"
-                height="13"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M19 12H5M12 19l-7-7 7-7" />
-              </svg>
-              {tGames("back_to_games")}
-            </Link>
-            <div aria-hidden="true" className="mx-2 h-4 w-px bg-accent/30" />
-            <div className="flex items-center gap-3">
-              <ThemeSwitcher className="bg-transparent" />
-              <LanguageSwitcher className="bg-transparent" />
-            </div>
-          </div>
-
-          {/* Right mobile: theme + language + separator + back arrow button */}
-          <div className="ml-auto flex shrink-0 items-center gap-3 lg:hidden">
+          {/* Right: theme + language */}
+          <div className="ml-auto flex shrink-0 items-center gap-3">
             <ThemeSwitcher className="bg-transparent" />
             <LanguageSwitcher className="bg-transparent" />
-            <div aria-hidden="true" className="mx-1 h-4 w-px bg-accent/30" />
-            <Link
-              href="/games"
-              aria-label={tGames("back_to_games")}
-              className="flex h-10 w-10 items-center justify-center rounded-full text-accent transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
-            >
-              <svg
-                width="26"
-                height="26"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M19 12H5M12 19l-7-7 7-7" />
-              </svg>
-            </Link>
           </div>
         </header>
 
@@ -238,12 +193,10 @@ export function LiveProjectorPage() {
                   ))}
                 </div>
 
-                {/* Desktop infinite scroll sentinel — hidden on mobile, observer won't fire */}
                 {hasMoreFeed && (
                   <div ref={sentinelRef} className="hidden h-1 lg:block" aria-hidden="true" />
                 )}
 
-                {/* Mobile load-more button */}
                 {hasMoreFeed && (
                   <button
                     onClick={handleLoadMore}
@@ -258,7 +211,6 @@ export function LiveProjectorPage() {
 
           {/* ─ Leaderboard panel ─ */}
           <div className="flex flex-col gap-3">
-
             {showLeaderboardEmptyState ? (
               <LeaderboardEmptyState />
             ) : error ? (
@@ -282,7 +234,7 @@ export function LiveProjectorPage() {
         </div>
       </div>
 
-      {/* ── Bottom gradient — full-width fade masking overflowing cards ── */}
+      {/* ── Bottom gradient ── */}
       <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 h-48 bg-linear-to-t from-bg-primary to-transparent" />
 
       {/* ── Hero event overlay ──────────────────────────────────────────── */}

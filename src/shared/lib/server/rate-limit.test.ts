@@ -15,7 +15,7 @@ const { getSupabaseAdminClient, rpcMock, singleMock } = vi.hoisted(() => {
   };
 });
 
-vi.mock("@/features/game-session/server/supabase", () => ({
+vi.mock("./supabase", () => ({
   getSupabaseAdminClient,
 }));
 

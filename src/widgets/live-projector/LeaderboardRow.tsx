@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { LeaderboardEntrySnapshot } from "@/features/game-session";
+import type { LeaderboardEntrySnapshot } from "./types";
 import { cn } from "@/shared/lib";
 import { getAvatarMonogram } from "./live-projector-helpers";
 
