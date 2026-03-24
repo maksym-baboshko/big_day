@@ -59,11 +59,7 @@
     "dotenv": "^16.4.7"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx}": [
-      "biome check --write --no-errors-on-unmatched"
-    ],
-    "*.{json,css,md}": [
-      "biome format --write --no-errors-on-unmatched"
-    ]
+    "*.{ts,tsx,js,jsx}": ["biome check --write --no-errors-on-unmatched"],
+    "*.{json,css,md}": ["biome format --write --no-errors-on-unmatched"]
   }
 }

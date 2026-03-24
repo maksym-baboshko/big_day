@@ -4,6 +4,6 @@ import { NextResponse } from "next/server";
 export async function POST() {
   return NextResponse.json(
     { error: "Not implemented yet", code: "NOT_IMPLEMENTED", requestId: crypto.randomUUID() },
-    { status: 501 }
+    { status: 501 },
   );
 }

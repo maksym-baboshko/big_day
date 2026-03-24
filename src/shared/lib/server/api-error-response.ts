@@ -9,10 +9,7 @@ interface ApiErrorOptions {
   requestId?: string;
 }
 
-export function makeApiErrorResponse(
-  request: Request,
-  options: ApiErrorOptions
-): NextResponse {
+export function makeApiErrorResponse(request: Request, options: ApiErrorOptions): NextResponse {
   const requestId = options.requestId ?? getRequestId(request);
 
   const body: Record<string, unknown> = {
@@ -22,7 +19,7 @@ export function makeApiErrorResponse(
   };
 
   if (options.retryAfterSeconds !== undefined) {
-    body["retryAfterSeconds"] = options.retryAfterSeconds;
+    body.retryAfterSeconds = options.retryAfterSeconds;
   }
 
   const headers: Record<string, string> = {

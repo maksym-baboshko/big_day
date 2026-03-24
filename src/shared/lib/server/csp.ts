@@ -3,9 +3,7 @@
  * Extend as needed when adding new external resources.
  */
 export function buildCsp(nonce?: string): string {
-  const scriptSrc = nonce
-    ? `'nonce-${nonce}' 'strict-dynamic'`
-    : "'self'";
+  const scriptSrc = nonce ? `'nonce-${nonce}' 'strict-dynamic'` : "'self'";
 
   return [
     "default-src 'self'",
