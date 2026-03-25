@@ -184,6 +184,75 @@
   will-change: transform;
 }
 
+/* ─── Error state keyframes ──────────────────────────────── */
+
+/* Dot: slow dying-heartbeat pulse */
+@keyframes af-error-dot {
+  0%,
+  45%,
+  100% {
+    opacity: 0.18;
+  }
+
+  22% {
+    opacity: 0.45;
+  }
+}
+
+/* LIVE text: slowly fading signal */
+@keyframes af-error-signal {
+  0%,
+  100% {
+    opacity: 0.13;
+  }
+
+  50% {
+    opacity: 0.26;
+  }
+}
+
+/* WifiOff icon: slow breath */
+@keyframes af-error-icon {
+  0%,
+  100% {
+    opacity: 0.28;
+  }
+
+  50% {
+    opacity: 0.52;
+  }
+}
+
+/* Frozen ghost cards: very subtle vertical drift */
+@keyframes af-error-drift {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+/* ─── Error state animation classes ─────────────────────── */
+.af-error-dot {
+  animation: af-error-dot 3.2s ease-in-out infinite;
+}
+
+.af-error-signal {
+  animation: af-error-signal 4s ease-in-out infinite;
+}
+
+.af-error-icon {
+  animation: af-error-icon 3s ease-in-out infinite;
+}
+
+.af-error-drift {
+  animation: af-error-drift 10s ease-in-out infinite;
+  will-change: transform;
+}
+
 /* ─── Reduced motion overrides ───────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .af-card-scroll,
@@ -192,7 +261,11 @@
   .af-glitch-main,
   .af-leader-pulse,
   .af-regular-pulse,
-  .af-shimmer {
+  .af-shimmer,
+  .af-error-dot,
+  .af-error-signal,
+  .af-error-icon,
+  .af-error-drift {
     animation: none !important;
   }
 }

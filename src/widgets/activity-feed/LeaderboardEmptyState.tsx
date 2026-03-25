@@ -1,5 +1,8 @@
 "use client";
 
+import { WifiOff } from "lucide-react";
+import { useTranslations } from "next-intl";
+
 const REGULAR_ROWS = [
   { rank: 2, nameW: "64%", delay: 0.2, mobileHidden: false },
   { rank: 3, nameW: "55%", delay: 0.4, mobileHidden: false },
@@ -14,13 +17,33 @@ const REGULAR_ROWS = [
   { rank: 12, nameW: "24%", delay: 2.2, mobileHidden: true },
 ] as const;
 
-export function LeaderboardEmptyState() {
+interface LeaderboardEmptyStateProps {
+  variant?: "loading" | "error";
+}
+
+export function LeaderboardEmptyState({ variant = "loading" }: LeaderboardEmptyStateProps) {
+  const t = useTranslations("ActivityFeedPage");
+  const isError = variant === "error";
+
   return (
     <div className="flex min-h-[400px] flex-col lg:min-h-0 lg:flex-1">
-      <div className="flex flex-col gap-2">
-        <div className="af-leader-pulse relative overflow-hidden rounded-3xl border border-accent/18 bg-accent/7 px-5 py-4">
+      {isError ? (
+        // Offline banner shown above the dimmed skeleton
+        <div className="mb-2 flex items-center justify-center gap-2 rounded-2xl border border-accent/10 bg-bg-secondary/40 px-4 py-2.5 text-xs text-text-secondary/50">
+          <WifiOff size={12} strokeWidth={1.5} aria-hidden="true" />
+          <span>{t("leaderboard_error")}</span>
+        </div>
+      ) : null}
+
+      {/* Skeleton rows — animated when loading, frozen/dim when error */}
+      <div className={`flex flex-col gap-2 ${isError ? "opacity-25" : ""}`}>
+        <div
+          className={`relative overflow-hidden rounded-3xl border border-accent/18 bg-accent/7 px-5 py-4 ${isError ? "" : "af-leader-pulse"}`}
+        >
           <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-accent/30 to-transparent" />
-          <div className="af-shimmer absolute inset-0 bg-linear-to-r from-transparent via-accent/8 to-transparent" />
+          {isError ? null : (
+            <div className="af-shimmer absolute inset-0 bg-linear-to-r from-transparent via-accent/8 to-transparent" />
+          )}
           <div className="relative flex items-center gap-4">
             <div className="font-cinzel text-4xl leading-none text-accent/35">1</div>
             <div className="h-12 w-12 shrink-0 rounded-full border-2 border-accent/18 bg-accent/10" />
@@ -37,8 +60,8 @@ export function LeaderboardEmptyState() {
         {REGULAR_ROWS.map(({ rank, nameW, delay, mobileHidden }) => (
           <div
             key={rank}
-            className={`af-regular-pulse flex items-center gap-3 rounded-2xl border border-accent/18 bg-bg-secondary/40 px-4 py-3 backdrop-blur-sm${mobileHidden ? " hidden lg:flex" : ""}`}
-            style={{ animationDelay: `-${delay}s` }}
+            className={`flex items-center gap-3 rounded-2xl border border-accent/18 bg-bg-secondary/40 px-4 py-3 backdrop-blur-sm${mobileHidden ? " hidden lg:flex" : ""}${isError ? "" : " af-regular-pulse"}`}
+            style={isError ? undefined : { animationDelay: `-${delay}s` }}
           >
             <div className="w-6 shrink-0 text-center font-cinzel text-base text-accent/50">
               {rank}

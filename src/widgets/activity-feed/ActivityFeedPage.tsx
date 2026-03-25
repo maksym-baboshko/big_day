@@ -68,8 +68,6 @@ export function ActivityFeedPage({ locale }: ActivityFeedPageProps) {
   const visibleCount = isMobile ? mobileVisibleCount : desktopVisibleCount;
   const hasMoreFeed = (snapshot?.feed.length ?? 0) > visibleCount;
   const visibleFeed = snapshot?.feed.slice(0, visibleCount) ?? [];
-  const showFeedEmptyState = !error && (isLoading || !snapshot?.feed.length);
-  const showLeaderboardEmptyState = !error && (isLoading || !snapshot?.leaderboard.length);
   const desktopFeedColumns = [
     { id: "left", events: visibleFeed.filter((_, index) => index % 2 === 0) },
     { id: "right", events: visibleFeed.filter((_, index) => index % 2 !== 0) },
@@ -111,10 +109,16 @@ export function ActivityFeedPage({ locale }: ActivityFeedPageProps) {
           <div className="flex shrink-0 items-center gap-4">
             <div className="flex items-center gap-2.5">
               <span className="relative flex h-2.5 w-2.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-55" />
-                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-accent" />
+                {error ? null : (
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-55" />
+                )}
+                <span
+                  className={`relative inline-flex h-2.5 w-2.5 rounded-full transition-colors ${error ? "bg-text-secondary/30" : "bg-accent"}`}
+                />
               </span>
-              <span className="text-[14px] font-medium uppercase tracking-[0.32em] text-accent">
+              <span
+                className={`text-[14px] font-medium uppercase tracking-[0.32em] transition-colors ${error ? "text-text-secondary/40" : "text-accent"}`}
+              >
                 Live
               </span>
             </div>
@@ -180,13 +184,11 @@ export function ActivityFeedPage({ locale }: ActivityFeedPageProps) {
 
         <div className="grid gap-4 lg:flex-1 lg:grid-cols-[minmax(0,4fr)_minmax(420px,1fr)] lg:grid-rows-1">
           <div className="flex flex-col gap-3 lg:pr-4">
-            {showFeedEmptyState ? (
+            {error ? (
+              <FeedEmptyState variant="error" />
+            ) : isLoading || !snapshot?.feed.length ? (
               <FeedEmptyState variant={isLoading ? "loading" : "empty"} />
-            ) : error ? (
-              <div className="flex min-h-64 items-center justify-center rounded-3xl border border-accent/10 bg-bg-secondary/22 px-6 text-center text-base text-text-secondary">
-                {t("feed_error")}
-              </div>
-            ) : snapshot?.feed.length ? (
+            ) : (
               <>
                 <div className="flex flex-col gap-3 sm:hidden">
                   <AnimatePresence mode="popLayout" initial={false}>
@@ -236,17 +238,15 @@ export function ActivityFeedPage({ locale }: ActivityFeedPageProps) {
                   </button>
                 ) : null}
               </>
-            ) : null}
+            )}
           </div>
 
           <div className="flex flex-col gap-3">
-            {showLeaderboardEmptyState ? (
+            {error ? (
+              <LeaderboardEmptyState variant="error" />
+            ) : isLoading || !snapshot?.leaderboard.length ? (
               <LeaderboardEmptyState />
-            ) : error ? (
-              <div className="flex min-h-64 items-center justify-center rounded-3xl border border-accent/10 bg-bg-secondary/22 px-6 text-center text-base text-text-secondary">
-                {t("leaderboard_error")}
-              </div>
-            ) : snapshot?.leaderboard.length ? (
+            ) : (
               <div className="grid gap-3">
                 <AnimatePresence mode="popLayout" initial={false}>
                   {snapshot.leaderboard.map((entry) => (
@@ -258,7 +258,7 @@ export function ActivityFeedPage({ locale }: ActivityFeedPageProps) {
                   ))}
                 </AnimatePresence>
               </div>
-            ) : null}
+            )}
           </div>
         </div>
       </div>
