@@ -26,10 +26,18 @@ export function LeaderboardEmptyState({ variant = "loading" }: LeaderboardEmptyS
   const isError = variant === "error";
 
   return (
-    <div className="flex min-h-[400px] flex-col lg:min-h-0 lg:flex-1">
+    <div
+      data-testid={
+        isError ? "live-leaderboard-state-error-shell" : "live-leaderboard-state-skeleton"
+      }
+      className="flex min-h-[400px] flex-col lg:min-h-0 lg:flex-1"
+    >
       {isError ? (
         // Offline banner shown above the dimmed skeleton
-        <div className="mb-2 flex items-center justify-center gap-2 rounded-2xl border border-accent/10 bg-bg-secondary/40 px-4 py-2.5 text-xs text-text-secondary/50">
+        <div
+          data-testid="live-leaderboard-state-error"
+          className="mb-2 flex items-center justify-center gap-2 rounded-2xl border border-accent/10 bg-bg-secondary/40 px-4 py-2.5 text-xs text-text-secondary/50"
+        >
           <WifiOff size={12} strokeWidth={1.5} aria-hidden="true" />
           <span>{t("leaderboard_error")}</span>
         </div>

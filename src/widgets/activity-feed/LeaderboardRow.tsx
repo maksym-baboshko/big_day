@@ -15,6 +15,8 @@ export function LeaderboardRow({ entry, isLeader }: LeaderboardRowProps) {
     return (
       <motion.div
         layout
+        data-testid="leaderboard-row"
+        data-rank={entry.rank}
         className="relative overflow-hidden rounded-3xl border border-accent/18 bg-accent/7 px-5 py-4 shadow-[0_12px_28px_-20px_rgba(0,0,0,0.45)]"
       >
         <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-accent/65 to-transparent" />
@@ -45,6 +47,8 @@ export function LeaderboardRow({ entry, isLeader }: LeaderboardRowProps) {
   return (
     <motion.div
       layout
+      data-testid="leaderboard-row"
+      data-rank={entry.rank}
       className={cn(
         "flex items-center gap-3 rounded-2xl border px-4 py-3 shadow-[0_12px_28px_-20px_rgba(0,0,0,0.45)]",
         entry.rank === 2 || entry.rank === 3

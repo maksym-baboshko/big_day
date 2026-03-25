@@ -81,6 +81,8 @@ export function FeedEventCard({ event }: FeedEventCardProps) {
 
   return (
     <div
+      data-testid="feed-event-card"
+      data-event-id={event.id}
       className={cn(
         "relative overflow-hidden rounded-3xl shadow-[0_12px_28px_-20px_rgba(0,0,0,0.45)] backdrop-blur-sm",
         prompt

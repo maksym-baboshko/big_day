@@ -562,6 +562,7 @@ export function FeedEmptyState({ variant }: FeedEmptyStateProps) {
         <div className="mt-10 grid w-full">
           {/* loading */}
           <div
+            data-testid="live-feed-state-loading"
             aria-hidden={!isLoading}
             className={cn(
               "col-start-1 row-start-1 flex w-full flex-col items-center gap-5 transition-opacity duration-500",
@@ -577,6 +578,7 @@ export function FeedEmptyState({ variant }: FeedEmptyStateProps) {
 
           {/* empty */}
           <div
+            data-testid="live-feed-state-empty"
             aria-hidden={isLoading || isError}
             className={cn(
               "col-start-1 row-start-1 flex w-full flex-col items-center gap-5 transition-opacity duration-[900ms]",
@@ -592,6 +594,7 @@ export function FeedEmptyState({ variant }: FeedEmptyStateProps) {
 
           {/* error */}
           <div
+            data-testid="live-feed-state-error"
             aria-hidden={!isError}
             className={cn(
               "col-start-1 row-start-1 flex w-full flex-col items-center gap-5 transition-opacity duration-700",
