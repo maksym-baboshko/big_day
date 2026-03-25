@@ -3,7 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import type { Guest } from "@/entities/guest";
 import { RsvpForm } from "@/features/rsvp";
 import { getGuestVocative } from "@/shared/config";
-import { AnimatedReveal, SectionHeading, SectionWrapper } from "@/shared/ui";
+import { SectionHeading, SectionWrapper } from "@/shared/ui";
 import { DressCode } from "@/widgets/dress-code";
 import { Footer } from "@/widgets/footer";
 import { Gifts } from "@/widgets/gifts";
@@ -39,14 +39,10 @@ export async function PersonalInvitationPage({ guest }: PersonalInvitationPagePr
 
         {/* RSVP */}
         <SectionWrapper id="rsvp" className="relative overflow-hidden pt-12 pb-8 md:py-24">
-          <div className="mx-auto max-w-7xl px-4">
-            <AnimatedReveal direction="up">
-              <SectionHeading subtitle={t("subtitle")}>{t("title")}</SectionHeading>
-            </AnimatedReveal>
+          <SectionHeading subtitle={t("subtitle")}>{t("title")}</SectionHeading>
 
-            <div className="relative z-10 mx-auto mt-12 flex max-w-7xl flex-col items-center justify-center md:mt-32 xl:flex-row">
-              <RsvpForm slug={guest.slug} guestVocative={vocative} maxSeats={guest.seats} />
-            </div>
+          <div className="relative z-10 mx-auto mt-12 flex max-w-7xl flex-col items-center justify-center px-4 md:mt-32 xl:flex-row">
+            <RsvpForm slug={guest.slug} guestVocative={vocative} maxSeats={guest.seats} />
           </div>
         </SectionWrapper>
       </main>
