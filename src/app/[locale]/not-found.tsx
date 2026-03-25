@@ -12,7 +12,7 @@ export default function LocaleNotFound() {
       <h1 className="heading-serif text-3xl">{t("title")}</h1>
       <p className="text-text-secondary">{t("description")}</p>
       <Link href="/" className="underline underline-offset-4">
-        {t("backHome")}
+        {t("primary_cta")}
       </Link>
     </div>
   );

@@ -1,1 +1,1 @@
-// barrel export — populated in subsequent PRs
+export { LanguageSwitcher } from "./LanguageSwitcher";

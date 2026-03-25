@@ -38,6 +38,8 @@
   --color-accent-soft: var(--accent-soft);
   --color-error: var(--error);
 
+  --ease-smooth: var(--ease-default);
+
   --font-inter: var(--font-inter);
   --font-playfair: var(--font-playfair);
   --font-cinzel: var(--font-cinzel);
@@ -59,19 +61,19 @@ body {
 }
 
 /* ─── Typography utilities ───────────────────────────────── */
-.heading-serif {
+@utility heading-serif {
   font-family: var(--font-playfair), serif;
   font-weight: 700;
 }
 
-.heading-serif-italic {
+@utility heading-serif-italic {
   font-family: var(--font-playfair), serif;
   font-style: italic;
   font-weight: 400;
 }
 
 /* ─── Decorative ─────────────────────────────────────────── */
-.gold-rule {
+@utility gold-rule {
   border: none;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--accent), transparent);

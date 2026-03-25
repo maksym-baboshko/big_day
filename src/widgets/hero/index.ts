@@ -1,1 +1,1 @@
-// barrel export — populated in subsequent PRs
+export { Hero } from "./Hero";
