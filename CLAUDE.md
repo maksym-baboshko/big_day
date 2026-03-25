@@ -186,7 +186,7 @@ RSVP payload shape:
 
 ### Activity feed (/live)
 
-- `/live` is the activity feed / live projector page, marked `noindex`
+- `/live` is the activity feed page, marked `noindex`
 - renders with stub data until the games backend is built
 - type contracts: `LiveSnapshot`, `LiveFeedEventSnapshot`, `LeaderboardEntrySnapshot` in `src/widgets/activity-feed/types.ts`
 - connecting real data means wiring `ActivityFeedPage.tsx` to a new `/api/live` endpoint

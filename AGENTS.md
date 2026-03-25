@@ -26,7 +26,7 @@ This file mirrors `CLAUDE.md`. Refer to `CLAUDE.md` for the full specification.
 |---|---|
 | `/` and `/en` | Full invitation page |
 | `/invite/[slug]` | Personalized invite (noindex) |
-| `/live` | Live projector — stub data (noindex) |
+| `/live` | Activity feed — stub data (noindex) |
 | `/api/rsvp` | RSVP POST endpoint |
 
 ---
