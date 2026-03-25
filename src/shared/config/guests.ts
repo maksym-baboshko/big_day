@@ -1,13 +1,13 @@
-interface LocalizedGuestText {
+export interface LocalizedText {
   uk: string;
   en: string;
 }
 
 export interface Guest {
   slug: string;
-  name: LocalizedGuestText;
-  vocative: LocalizedGuestText;
-  formName?: LocalizedGuestText;
+  name: LocalizedText;
+  vocative: LocalizedText;
+  formName?: LocalizedText;
   seats: number;
 }
 
@@ -181,10 +181,15 @@ export const guests: Guest[] = [
   },
 ];
 
+/** Sync lookup from static config. Use for SSR/SSG without DB. */
 export function getGuestBySlug(slug: string): Guest | undefined {
   return guests.find((guest) => guest.slug === slug);
 }
 
 export function getAllGuestSlugs(): string[] {
   return guests.map((guest) => guest.slug);
+}
+
+export function getGuestVocative(guest: Guest, locale: string): string {
+  return locale === "uk" ? guest.vocative.uk : guest.vocative.en;
 }

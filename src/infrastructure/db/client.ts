@@ -35,4 +35,4 @@ if (!globalForDb.db) {
   globalForDb.pgClient = client;
 }
 
-export const db = globalForDb.db!;
+export const db = globalForDb.db as ReturnType<typeof drizzle<typeof schema>>;

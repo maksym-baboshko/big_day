@@ -1,2 +1,2 @@
-export type { Guest, LocalizedText } from "./types";
-export { findGuestBySlug, listGuests } from "./queries/index";
+export type { Guest, LocalizedText } from "@/shared/config";
+export { fetchGuestBySlug, fetchGuests } from "./queries/index";

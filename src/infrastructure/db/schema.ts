@@ -35,7 +35,7 @@ export const players = pgTable("players", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const events = pgTable("events", {
+export const gameEvents = pgTable("game_events", {
   id: uuid("id").primaryKey().defaultRandom(),
   type: text("type").notNull(),
   playerId: uuid("player_id").references(() => players.id),
@@ -55,12 +55,13 @@ export const leaderboard = pgTable("leaderboard", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-// ─── Types ──────────────────────────────────────────────────────────
+// ─── DB row types (Drizzle-inferred) ───────────────────────────────
+// Prefixed with "Db" to distinguish from domain models in entities/
 
-export type Guest = typeof guests.$inferSelect;
-export type NewGuest = typeof guests.$inferInsert;
-export type RsvpResponse = typeof rsvpResponses.$inferSelect;
-export type NewRsvpResponse = typeof rsvpResponses.$inferInsert;
-export type Player = typeof players.$inferSelect;
-export type Event = typeof events.$inferSelect;
-export type LeaderboardEntry = typeof leaderboard.$inferSelect;
+export type DbGuest = typeof guests.$inferSelect;
+export type DbNewGuest = typeof guests.$inferInsert;
+export type DbRsvpResponse = typeof rsvpResponses.$inferSelect;
+export type DbNewRsvpResponse = typeof rsvpResponses.$inferInsert;
+export type DbPlayer = typeof players.$inferSelect;
+export type DbGameEvent = typeof gameEvents.$inferSelect;
+export type DbLeaderboardEntry = typeof leaderboard.$inferSelect;
