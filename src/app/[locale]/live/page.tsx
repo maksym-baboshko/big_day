@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// Live projector page — full implementation in PR 8
+// Activity feed page — full implementation in PR 8
 export default function LivePage() {
   return (
     <main>

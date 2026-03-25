@@ -110,7 +110,7 @@ src/
 ├── shared/
 │   ├── config/                       # wedding.ts, guests.ts, site.ts
 │   ├── i18n/
-│   │   ├── messages/
+│   │   ├── translations/
 │   │   │   ├── uk.json
 │   │   │   └── en.json
 │   │   ├── routing.ts
@@ -224,7 +224,7 @@ Styling rules:
 
 - default locale is `uk`
 - English uses `/en`
-- messages live in `src/shared/i18n/messages/uk.json` and `en.json`
+- translations live in `src/shared/i18n/translations/uk.json` and `en.json`
 - client navigation must use `@/shared/i18n/navigation`
 - new message keys must be added to both locale files with identical structure
 

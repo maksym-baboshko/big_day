@@ -1,9 +1,10 @@
+import { COUPLE, SITE_NAME, VENUE } from "@/shared/config";
 import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Diandmax",
-  description: "Maksym & Diana — June 28, 2026",
+  title: SITE_NAME,
+  description: `${COUPLE.groom.name.en} & ${COUPLE.bride.name.en}'s Wedding · ${VENUE.locationShort}`,
 };
 
 export default function RootLayout({

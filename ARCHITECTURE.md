@@ -125,10 +125,8 @@ src/
 │
 ├── entities/
 │   ├── guest/
-│   │   ├── model/
-│   │   ├── queries/           # Drizzle queries
-│   │   ├── types.ts
-│   │   └── index.ts
+│   │   ├── queries/           # fetchGuestBySlug, fetchGuests (Drizzle)
+│   │   └── index.ts           # re-exports Guest from @/shared/config
 │   └── event/                 # future game hub
 │       ├── types.ts
 │       └── index.ts
@@ -141,7 +139,7 @@ src/
 │   │   ├── structured-data.ts # Schema.org JSON-LD
 │   │   └── index.ts
 │   ├── i18n/
-│   │   ├── messages/
+│   │   ├── translations/
 │   │   │   ├── uk.json
 │   │   │   └── en.json
 │   │   ├── routing.ts
@@ -172,7 +170,7 @@ src/
 │       └── index.ts
 │
 ├── widgets/
-│   ├── invitation-page/
+│   ├── invitation/
 │   ├── personal-invitation/
 │   ├── splash/
 │   ├── hero/
@@ -183,16 +181,16 @@ src/
 │   ├── gifts/
 │   ├── navbar/
 │   ├── footer/
-│   ├── not-found-page/
-│   └── live-projector/
-│       ├── LiveProjectorPage.tsx
+│   ├── not-found/
+│   └── activity-feed/
+│       ├── ActivityFeedPage.tsx
 │       ├── LiveClock.tsx
 │       ├── FeedEventCard.tsx
 │       ├── FeedEmptyState.tsx
 │       ├── LeaderboardRow.tsx
 │       ├── LeaderboardEmptyState.tsx
 │       ├── HeroEventOverlay.tsx
-│       ├── live-projector-helpers.ts
+│       ├── activity-feed-helpers.ts
 │       ├── types.ts
 │       └── index.ts
 │
@@ -205,7 +203,7 @@ src/
         ├── templates/         # react-email components
         └── sender.ts          # Resend send function
 
-testing/
+src/testing/
 ├── helpers/
 └── fixtures/
 ```
@@ -268,7 +266,7 @@ players
   guest_slug       text nullable FK→guests.slug
   created_at       timestamptz
 
-events
+game_events                          -- named gameEvents in Drizzle (avoids DOM Event collision)
   id         uuid PK
   type       text
   player_id  uuid FK→players.id
@@ -314,7 +312,7 @@ leaderboard
 
 - Default locale: `uk`
 - English: `/en`
-- Messages: `src/shared/i18n/messages/{uk,en}.json`
+- Translations: `src/shared/i18n/translations/{uk,en}.json`
 - Client navigation: `@/shared/i18n/navigation` (useRouter, Link, usePathname)
 - All UI text must come from translations — no hardcoded strings
 
