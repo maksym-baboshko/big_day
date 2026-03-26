@@ -10,7 +10,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": resolve(__dirname, "./src"),
-      "next/font/google": resolve(__dirname, "./src/test/mocks/next-font.ts"),
+      "next/font/local": resolve(__dirname, "./src/test/mocks/next-font.ts"),
     },
   },
 });

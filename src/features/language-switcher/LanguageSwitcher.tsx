@@ -1,20 +1,23 @@
 "use client";
 
-import { usePathname, useRouter } from "@/shared/i18n/navigation";
+import { getPathname, usePathname } from "@/shared/i18n/navigation";
 import { cn } from "@/shared/lib";
 import { useLocale, useTranslations } from "next-intl";
-import { useSyncExternalStore, useTransition } from "react";
+import { useState, useSyncExternalStore } from "react";
 
 interface LanguageSwitcherProps {
   className?: string;
 }
 
+function syncLocaleCookie(nextLocale: string): void {
+  document.cookie = `NEXT_LOCALE=${nextLocale}; path=/; samesite=lax;`;
+}
+
 export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
   const locale = useLocale();
   const t = useTranslations("Accessibility");
-  const router = useRouter();
   const pathname = usePathname();
-  const [isPending, startTransition] = useTransition();
+  const [isPending, setIsPending] = useState(false);
   const mounted = useSyncExternalStore(
     () => () => {},
     () => true,
@@ -23,10 +26,13 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
 
   const toggleLocale = () => {
     const nextLocale = locale === "uk" ? "en" : "uk";
+    const nextPathname = getPathname({ href: pathname, locale: nextLocale });
+    const search = window.location.search;
+    const hash = window.location.hash;
 
-    startTransition(() => {
-      router.replace(pathname, { locale: nextLocale });
-    });
+    setIsPending(true);
+    syncLocaleCookie(nextLocale);
+    window.location.replace(`${nextPathname}${search}${hash}`);
   };
 
   if (!mounted) {

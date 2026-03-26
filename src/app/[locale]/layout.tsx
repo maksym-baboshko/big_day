@@ -17,6 +17,7 @@ import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -92,11 +93,16 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     <html lang={typedLocale} suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
         {/* Inline theme script prevents flash of wrong theme before React hydration */}
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
-        <script
+        <Script id="theme-init" strategy="beforeInteractive">
+          {THEME_INIT_SCRIPT}
+        </Script>
+        <Script
+          id={`structured-data-${typedLocale}`}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: structuredDataJson }}
-        />
+          strategy="beforeInteractive"
+        >
+          {structuredDataJson}
+        </Script>
       </head>
       <body
         className={`${inter.variable} ${playfair.variable} ${cinzel.variable} ${vibes.variable} font-inter antialiased`}
