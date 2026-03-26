@@ -133,6 +133,18 @@ describe("filterQueueableHeroEvents", () => {
     expect(result.map((e) => e.id)).toEqual(["2", "3"]);
   });
 
+  it("skips the active hero event and already queued ids", () => {
+    const events: FeedEventSnapshot[] = [
+      makeEvent("1", "promised"),
+      makeEvent("2", "new_top_player"),
+      makeEvent("3", "promised"),
+    ];
+
+    const result = filterQueueableHeroEvents(events, "1", new Set(["2"]));
+
+    expect(result.map((event) => event.id)).toEqual(["3"]);
+  });
+
   it("returns empty array when no queueable events", () => {
     expect(filterQueueableHeroEvents([makeEvent("1", "player_joined")])).toHaveLength(0);
   });

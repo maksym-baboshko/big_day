@@ -103,8 +103,15 @@ export function getEventPrompt(
 
 const HERO_TYPES: Set<FeedEventType> = new Set(["promised", "new_top_player"]);
 
-export function filterQueueableHeroEvents(events: FeedEventSnapshot[]): FeedEventSnapshot[] {
-  return events.filter((event) => HERO_TYPES.has(event.type));
+export function filterQueueableHeroEvents(
+  events: FeedEventSnapshot[],
+  activeHeroEventId: string | null = null,
+  queuedHeroIds: Set<string> = new Set<string>(),
+): FeedEventSnapshot[] {
+  return events.filter(
+    (event) =>
+      HERO_TYPES.has(event.type) && event.id !== activeHeroEventId && !queuedHeroIds.has(event.id),
+  );
 }
 
 export function collectUnseenHeroEvents(

@@ -76,8 +76,10 @@ export function useActivityFeedSnapshot(): UseActivityFeedSnapshotResult {
       }
 
       const queuedHeroIds = new Set(heroQueueRef.current.map((event) => event.id));
-      const uniqueHeroEvents = nextHeroEvents.filter(
-        (event) => event.id !== activeHeroEventIdRef.current && !queuedHeroIds.has(event.id),
+      const uniqueHeroEvents = filterQueueableHeroEvents(
+        nextHeroEvents,
+        activeHeroEventIdRef.current,
+        queuedHeroIds,
       );
 
       if (uniqueHeroEvents.length === 0) {
