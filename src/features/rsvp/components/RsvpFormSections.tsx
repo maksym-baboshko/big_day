@@ -2,7 +2,7 @@
 
 import { AnimatePresence, type Variants, motion } from "motion/react";
 import Image from "next/image";
-import type { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
+import type { FieldErrors, UseFormRegister } from "react-hook-form";
 
 import { MOTION_EASE, cn } from "@/shared/lib";
 import { Input, Textarea } from "@/shared/ui";
@@ -278,7 +278,7 @@ interface RsvpAttendanceSectionProps {
   errors: FieldErrors<RsvpFormData>;
   formField: Variants;
   isSubmitting: boolean;
-  setValue: UseFormSetValue<RsvpFormData>;
+  onAttendingChange: (value: RsvpFormData["attending"]) => void;
   t: RsvpTranslations;
 }
 
@@ -287,7 +287,7 @@ export function RsvpAttendanceSection({
   errors,
   formField,
   isSubmitting,
-  setValue,
+  onAttendingChange,
   t,
 }: RsvpAttendanceSectionProps) {
   return (
@@ -298,7 +298,7 @@ export function RsvpAttendanceSection({
           type="button"
           disabled={isSubmitting}
           whileTap={{ scale: 0.97 }}
-          onClick={() => setValue("attending", "yes", { shouldValidate: true })}
+          onClick={() => onAttendingChange("yes")}
           className={cn(
             "relative flex cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 px-3 py-5 transition-all duration-500 md:py-8",
             focusRingClass,
@@ -337,7 +337,7 @@ export function RsvpAttendanceSection({
           type="button"
           disabled={isSubmitting}
           whileTap={{ scale: 0.97 }}
-          onClick={() => setValue("attending", "no", { shouldValidate: true })}
+          onClick={() => onAttendingChange("no")}
           className={cn(
             "relative flex cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 px-3 py-5 transition-all duration-500 md:py-8",
             focusRingClass,

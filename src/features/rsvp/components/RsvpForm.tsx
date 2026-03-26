@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { type Variants, motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { type DefaultValues, useForm } from "react-hook-form";
+import { type DefaultValues, type FieldErrors, useForm } from "react-hook-form";
 
 import { submitRsvp } from "../actions/submit-rsvp";
 import { rsvpSchema } from "../schema/rsvp-schema";
@@ -41,6 +41,7 @@ export function RsvpForm({ slug, guestVocative, maxSeats, initialGuestName }: Rs
   );
   const [submitError, setSubmitError] = useState<string | null>(null);
   const guestNameKeyCounterRef = useRef(1);
+  const guestFieldToFocusRef = useRef<number | null>(null);
   const [guestNameKeys, setGuestNameKeys] = useState<string[]>(["guest-name-0"]);
   const defaultValues = useMemo<DefaultValues<RsvpFormData>>(
     () => ({
@@ -59,9 +60,10 @@ export function RsvpForm({ slug, guestVocative, maxSeats, initialGuestName }: Rs
     register,
     handleSubmit,
     reset,
+    setFocus,
     watch,
     setValue,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, submitCount },
   } = useForm<RsvpFormData>({
     resolver: zodResolver(rsvpSchema),
     defaultValues,
@@ -71,6 +73,7 @@ export function RsvpForm({ slug, guestVocative, maxSeats, initialGuestName }: Rs
   const guestsValue = watch("guests") ?? 1;
   const guestNames = watch("guestNames") ?? [""];
   const visibleGuestFieldsCount = attendingChoice === "yes" ? guestsValue : 1;
+  const hasAttemptedSubmit = submitCount > 0;
 
   const formStagger: Variants = {
     hidden: {},
@@ -110,9 +113,9 @@ export function RsvpForm({ slug, guestVocative, maxSeats, initialGuestName }: Rs
       updated.some((value, index) => value !== normalizedCurrent[index]);
 
     if (didChange) {
-      setValue("guestNames", updated, { shouldValidate: true });
+      setValue("guestNames", updated, { shouldValidate: hasAttemptedSubmit });
     }
-  }, [guestNames, setValue, visibleGuestFieldsCount]);
+  }, [guestNames, hasAttemptedSubmit, setValue, visibleGuestFieldsCount]);
 
   useEffect(() => {
     setGuestNameKeys((currentKeys) => {
@@ -135,6 +138,26 @@ export function RsvpForm({ slug, guestVocative, maxSeats, initialGuestName }: Rs
     });
   }, [visibleGuestFieldsCount]);
 
+  useEffect(() => {
+    if (
+      guestFieldToFocusRef.current == null ||
+      attendingChoice !== "yes" ||
+      visibleGuestFieldsCount <= guestFieldToFocusRef.current
+    ) {
+      return;
+    }
+
+    const guestFieldIndex = guestFieldToFocusRef.current;
+    guestFieldToFocusRef.current = null;
+    const frameId = window.requestAnimationFrame(() => {
+      setFocus(`guestNames.${guestFieldIndex}`);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [attendingChoice, setFocus, visibleGuestFieldsCount]);
+
   function handleGuestsChange(newCount: number) {
     if (maxSeats && newCount > maxSeats) return;
     const clamped = Math.max(1, Math.min(maxSeats ?? 20, newCount));
@@ -143,8 +166,44 @@ export function RsvpForm({ slug, guestVocative, maxSeats, initialGuestName }: Rs
       clamped > current
         ? [...guestNames, ...Array<string>(clamped - current).fill("")]
         : guestNames.slice(0, clamped);
-    setValue("guests", clamped, { shouldValidate: true });
-    setValue("guestNames", updated, { shouldValidate: true });
+    setValue("guests", clamped, { shouldValidate: hasAttemptedSubmit });
+    setValue("guestNames", updated, { shouldValidate: hasAttemptedSubmit });
+  }
+
+  function handleAttendingChange(value: RsvpFormData["attending"]) {
+    setValue("attending", value, { shouldValidate: hasAttemptedSubmit });
+
+    if (value !== "yes" || !guestVocative) {
+      guestFieldToFocusRef.current = null;
+      return;
+    }
+
+    guestFieldToFocusRef.current = (maxSeats ?? 1) > 1 ? 1 : 0;
+  }
+
+  function handleInvalidSubmit(formErrors: FieldErrors<RsvpFormData>) {
+    if (Array.isArray(formErrors.guestNames)) {
+      const firstInvalidGuestIndex = formErrors.guestNames.findIndex(Boolean);
+
+      if (firstInvalidGuestIndex >= 0) {
+        setFocus(`guestNames.${firstInvalidGuestIndex}`);
+        return;
+      }
+    }
+
+    if (formErrors.guestNames) {
+      setFocus("guestNames.0");
+      return;
+    }
+
+    if (formErrors.dietary) {
+      setFocus("dietary");
+      return;
+    }
+
+    if (formErrors.message) {
+      setFocus("message");
+    }
   }
 
   function getSubmittedDisplayName(names: string[]) {
@@ -219,7 +278,10 @@ export function RsvpForm({ slug, guestVocative, maxSeats, initialGuestName }: Rs
       >
         <div className="pointer-events-none absolute inset-0 z-20 rounded-4xl border border-accent/0 transition-colors duration-500 group-hover/form:border-accent/40 md:rounded-[2.5rem]" />
 
-        <form onSubmit={handleSubmit(onSubmit)} className="relative z-10 p-6 md:p-12">
+        <form
+          onSubmit={handleSubmit(onSubmit, handleInvalidSubmit)}
+          className="relative z-10 p-6 md:p-12"
+        >
           {!liteMotion && (
             <>
               <div className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full bg-accent/20 blur-[100px]" />
@@ -273,7 +335,7 @@ export function RsvpForm({ slug, guestVocative, maxSeats, initialGuestName }: Rs
               errors={errors}
               formField={formField}
               isSubmitting={isSubmitting}
-              setValue={setValue}
+              onAttendingChange={handleAttendingChange}
               t={translateSection}
             />
 
