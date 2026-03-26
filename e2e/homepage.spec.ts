@@ -22,10 +22,12 @@ test.describe("Homepage", () => {
   test("countdown shows DD/HH/MM/SS labels", async ({ page }) => {
     // Wait for client-side hydration
     await page.waitForTimeout(1000);
-    const countdown = page
-      .locator('[data-testid="countdown"]')
-      .or(page.getByText(/days|hours|mins|secs|днів|годин/i).first());
+    const countdown = page.getByTestId("countdown");
     await expect(countdown).toBeVisible();
+    await expect(countdown).toContainText(/days|днів/i);
+    await expect(countdown).toContainText(/hours|годин/i);
+    await expect(countdown).toContainText(/mins|хвилин/i);
+    await expect(countdown).toContainText(/secs|секунд/i);
   });
 
   test("language switcher is present", async ({ page }) => {
