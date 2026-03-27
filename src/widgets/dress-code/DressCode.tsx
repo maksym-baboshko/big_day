@@ -3,7 +3,7 @@
 import { DRESS_CODE } from "@/shared/config";
 import { resolveLocale } from "@/shared/i18n/routing";
 import { MOTION_EASE, useLiteMotion } from "@/shared/lib";
-import { Ornament, SectionHeading, SectionWrapper } from "@/shared/ui";
+import { SectionHeading, SectionWrapper } from "@/shared/ui";
 import { type Variants, motion } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -145,9 +145,6 @@ export function DressCode() {
 
   return (
     <SectionWrapper id="dress-code" className="relative overflow-hidden py-24">
-      <Ornament position="top-right" size="sm" className="opacity-40" />
-      <Ornament position="bottom-left" size="sm" className="opacity-40" />
-
       {!liteMotion && (
         <div className="pointer-events-none absolute left-1/2 top-1/2 h-150 w-200 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/4 blur-[150px]" />
       )}

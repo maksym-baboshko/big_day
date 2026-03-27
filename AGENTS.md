@@ -230,6 +230,21 @@ pnpm build-storybook
 
 ### Browser verification policy
 
+- Minor local visual tweaks can stop at quick safety checks during iteration:
+  - `pnpm lint`
+  - `pnpm typecheck`
+- Substantial UI/UX changes, or any UI/UX batch before commit, must end with a verification pass.
+- Minimum required full lane for substantial UI/UX work:
+  - `pnpm lint`
+  - `pnpm typecheck`
+  - `pnpm test`
+  - `pnpm build`
+  - `pnpm test:e2e`
+- If the change touches reusable UI surfaces, stories, or visual baselines, also run the relevant visual lane:
+  - `pnpm test:storybook`
+  - `pnpm build-storybook`
+- Do not leave a substantial UI/UX change or a UI/UX commit batch with failing visual, storybook, or e2e checks.
+  Fix the regression or update the approved baseline in the same change, then rerun the affected lane.
 - Prefer canonical script-driven lanes over raw tool invocations:
   - `pnpm test:e2e`
   - `pnpm test:storybook`

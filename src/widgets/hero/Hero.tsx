@@ -14,13 +14,12 @@ export function Hero() {
       contentWidth="full"
       className="relative overflow-hidden"
     >
-      <div className="relative flex min-h-screen w-full flex-col items-center justify-between py-12 md:pb-8 md:pt-24">
-        <Ornament position="top-left" size="lg" />
-        <Ornament position="top-right" size="lg" />
-        <Ornament position="bottom-left" size="md" />
-        <Ornament position="bottom-right" size="md" />
+      <div className="relative flex min-h-[100svh] w-full flex-col items-center justify-center px-4 pb-[max(10px,env(safe-area-inset-bottom))] pt-[calc(5.75rem+env(safe-area-inset-top))] md:pt-24">
+        <Ornament position="top-left" size="lg" className="-left-4 md:left-0" />
+        <Ornament position="top-right" size="lg" className="-right-4 md:right-0" />
+        <Ornament position="bottom-left" size="lg" className="-left-4 md:left-0" />
+        <Ornament position="bottom-right" size="lg" className="-right-4 md:right-0" />
 
-        <div className="h-12 flex-none md:h-24" />
         <InvitationHeroIntro />
       </div>
     </SectionShell>

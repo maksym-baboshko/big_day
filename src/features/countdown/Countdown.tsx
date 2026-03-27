@@ -112,7 +112,7 @@ export function Countdown({ className }: CountdownProps) {
             transition={{ duration: 0.8, delay: 0.2 + index * 0.1, ease: "easeOut" }}
             className="flex min-w-16 flex-col items-center px-2 md:min-w-20 md:px-4"
           >
-            <span className="mb-3 font-cinzel text-4xl leading-none font-medium tabular-nums tracking-widest text-text-primary md:text-5xl">
+            <span className="mb-3 font-cinzel text-[2.625rem] leading-none font-medium tabular-nums tracking-widest text-text-primary md:text-5xl">
               {item.value.toString().padStart(2, "0")}
             </span>
             <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-accent md:text-sm">
@@ -124,7 +124,7 @@ export function Countdown({ className }: CountdownProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.3 + index * 0.1 }}
-              className="mt-1 select-none font-cinzel text-2xl text-accent/30 md:text-3xl"
+              className="mt-1 select-none font-cinzel text-[1.75rem] text-accent/45 md:text-[2.1rem]"
             >
               ·
             </motion.span>

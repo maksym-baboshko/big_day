@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 
 import type { GuestProfile } from "@/entities/guest";
 import { COUPLE } from "@/shared/config";
-import { Ornament, PageEnterReveal, SectionShell, SurfacePanel } from "@/shared/ui";
+import { PageEnterReveal, SectionShell, SurfacePanel } from "@/shared/ui";
 import { InvitationSummaryCard } from "./InvitationSummaryCard";
 
 interface PersonalInvitationSectionProps {
@@ -38,27 +38,6 @@ export function PersonalInvitationSection({ guest }: PersonalInvitationSectionPr
             <div className="pointer-events-none absolute -right-16 bottom-8 h-48 w-48 rounded-full bg-accent/10 blur-3xl" />
             <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-linear-to-r from-transparent via-accent/70 to-transparent" />
             <div className="pointer-events-none absolute inset-x-10 bottom-0 h-px bg-linear-to-r from-transparent via-accent/35 to-transparent" />
-
-            <Ornament
-              position="top-left"
-              size="sm"
-              className="left-3 top-4 opacity-20 md:left-6 md:top-6"
-            />
-            <Ornament
-              position="top-right"
-              size="sm"
-              className="right-3 top-4 opacity-20 md:right-6 md:top-6"
-            />
-            <Ornament
-              position="bottom-left"
-              size="sm"
-              className="bottom-3 left-3 opacity-[0.16] md:bottom-6 md:left-6"
-            />
-            <Ornament
-              position="bottom-right"
-              size="sm"
-              className="bottom-3 right-3 opacity-[0.16] md:bottom-6 md:right-6"
-            />
 
             <div className="relative z-10">
               <p className="section-eyebrow md:text-xs">{t("eyebrow")}</p>

@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 
 import { VENUE } from "@/shared/config";
 import { MOTION_EASE, cn, useLiteMotion } from "@/shared/lib";
-import { AnimatedReveal, Button, Ornament, SectionHeading, SectionWrapper } from "@/shared/ui";
+import { AnimatedReveal, Button, SectionHeading, SectionWrapper } from "@/shared/ui";
 
 const chips = [
   { icon: "\u{1F3DB}\u{FE0F}", key: "chip_history" },
@@ -66,9 +66,6 @@ export function Location() {
 
   return (
     <SectionWrapper id="location" className="relative overflow-hidden py-24">
-      <Ornament position="top-left" size="lg" className="z-30 opacity-20" />
-      <Ornament position="bottom-right" size="lg" className="z-30 opacity-20" />
-
       {!liteMotion && (
         <div
           aria-hidden="true"

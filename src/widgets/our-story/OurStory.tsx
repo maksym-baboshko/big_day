@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 
 import { MOTION_EASE, useLiteMotion } from "@/shared/lib";
-import { AnimatedReveal, Ornament, SectionHeading, SectionWrapper } from "@/shared/ui";
+import { AnimatedReveal, SectionHeading, SectionWrapper } from "@/shared/ui";
 
 const ease = MOTION_EASE;
 
@@ -134,11 +134,6 @@ export function OurStory() {
 
   return (
     <SectionWrapper id="our-story" className="relative overflow-hidden py-24">
-      <Ornament position="top-left" size="sm" />
-      <Ornament position="top-right" size="sm" />
-      <Ornament position="bottom-left" size="sm" />
-      <Ornament position="bottom-right" size="sm" />
-
       <SectionHeading subtitle={t("how_we_met_title")}>{t("title")}</SectionHeading>
 
       <div className="mx-auto mt-16 max-w-5xl px-4 md:mt-24">

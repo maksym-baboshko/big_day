@@ -1,7 +1,7 @@
 "use client";
 
 import { MOTION_EASE, cn, useLiteMotion } from "@/shared/lib";
-import { Ornament, SectionHeading, SectionWrapper } from "@/shared/ui";
+import { SectionHeading, SectionWrapper } from "@/shared/ui";
 import { type Variants, motion, useReducedMotion } from "motion/react";
 import { useTranslations } from "next-intl";
 
@@ -148,9 +148,6 @@ export function Gifts() {
 
   return (
     <SectionWrapper id="gifts" className="relative overflow-hidden py-24">
-      <Ornament position="top-left" size="sm" className="opacity-30" />
-      <Ornament position="bottom-right" size="sm" className="opacity-30" />
-
       {!liteMotion && (
         <>
           <div className="pointer-events-none absolute left-1/2 top-1/2 h-[700px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/5 blur-[140px]" />

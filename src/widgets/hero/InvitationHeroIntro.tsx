@@ -1,6 +1,7 @@
 "use client";
 
 import { Countdown } from "@/features/countdown";
+import { VENUE, WEDDING_DATE_ROMAN } from "@/shared/config";
 import { MOTION_EASE, useLiteMotion } from "@/shared/lib";
 import { PageEnterReveal } from "@/shared/ui";
 import { type Variants, motion, useReducedMotion } from "motion/react";
@@ -37,6 +38,41 @@ const heroTitleVariants: Variants = {
   },
 };
 
+const heroSectionGapClass = "mb-[clamp(1.75rem,5.8vh,4rem)] md:mb-24";
+
+function HeroMetaContent() {
+  return (
+    <div
+      className={`${heroSectionGapClass} flex flex-col items-center gap-[clamp(1rem,3vh,1.75rem)] text-center`}
+    >
+      <div className="flex items-center gap-[clamp(1rem,5vw,1.75rem)] text-accent/72">
+        <div className="h-px w-[clamp(4.5rem,18vw,6.5rem)] bg-linear-to-r from-transparent to-accent/40" />
+        <svg
+          width="40"
+          height="20"
+          viewBox="0 0 36 18"
+          aria-hidden="true"
+          fill="none"
+          className="h-[clamp(1rem,4.5vw,1.25rem)] w-[clamp(2rem,10vw,2.5rem)] shrink-0"
+        >
+          <circle cx="12" cy="9" r="8" stroke="currentColor" strokeWidth="1.3" />
+          <circle cx="24" cy="9" r="8" stroke="currentColor" strokeWidth="1.3" />
+        </svg>
+        <div className="h-px w-[clamp(4.5rem,18vw,6.5rem)] bg-linear-to-l from-transparent to-accent/40" />
+      </div>
+
+      <div className="flex flex-col items-center gap-[clamp(0.5rem,1.75vh,0.85rem)]">
+        <span className="font-cinzel text-[0.95rem] font-semibold uppercase tracking-[0.34em] text-accent/88 sm:text-[1.02rem] md:text-[1.18rem] lg:text-[1.3rem]">
+          {WEDDING_DATE_ROMAN}
+        </span>
+        <span className="whitespace-nowrap font-cinzel text-[0.75rem] font-normal uppercase tracking-[0.075em] text-text-secondary/90 sm:text-[1rem] sm:tracking-[0.16em] md:text-[1.08rem] lg:text-[1.18rem]">
+          {`${VENUE.name} · ${VENUE.locationShort}`}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export function InvitationHeroIntro() {
   const t = useTranslations("Hero");
   const liteMotion = useLiteMotion();
@@ -44,90 +80,46 @@ export function InvitationHeroIntro() {
 
   if (liteMotion) {
     return (
-      <>
+      <div className="relative z-10 flex w-full max-w-6xl flex-1 flex-col items-center px-6 sm:px-4">
         <motion.div
           initial="hidden"
           animate="visible"
           variants={heroVariants}
-          className="relative z-10 flex w-full max-w-6xl flex-1 flex-col items-center justify-center px-4"
+          className="flex w-full flex-1 flex-col items-center justify-center"
         >
           <motion.h1
             variants={heroTitleVariants}
-            className="heading-serif mb-10 text-center text-6xl leading-[0.9] text-text-primary sm:text-7xl md:mb-16 md:text-7xl lg:text-8xl xl:text-[100px]"
+            className={`heading-serif ${heroSectionGapClass} text-center text-[clamp(3.375rem,13.8vw,4.4rem)] leading-[0.88] text-text-primary sm:text-7xl md:text-7xl lg:text-8xl xl:text-[100px]`}
             style={{ willChange: "transform, opacity" }}
           >
             <span className="hidden whitespace-nowrap md:inline-block">
               {t("groom_name")} <span className="text-accent italic">&</span> {t("bride_name")}
             </span>
-            <span className="flex flex-col items-center leading-tight md:hidden">
+            <span className="grid justify-items-center gap-[clamp(0.45rem,1.8vh,0.9rem)] leading-[0.88] md:hidden">
               <span>{t("groom_name")}</span>
-              <motion.span
-                animate={
-                  reduceMotion ? undefined : { scale: [1, 1.06, 1], opacity: [0.88, 1, 0.88] }
-                }
-                transition={
-                  reduceMotion
-                    ? undefined
-                    : { duration: 4.6, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }
-                }
-                className="my-4 text-5xl text-accent"
-                style={{ willChange: reduceMotion ? "auto" : "transform, opacity" }}
-              >
-                &
-              </motion.span>
-              <span>{t("bride_name")}</span>
+              <span className="flex items-end justify-center gap-[clamp(0.75rem,4vw,1.35rem)]">
+                <span className="shrink-0 translate-y-[0.06em] text-[clamp(3rem,12.9vw,3.9rem)] leading-none text-accent">
+                  &
+                </span>
+                <span>{t("bride_name")}</span>
+              </span>
             </span>
           </motion.h1>
 
           <motion.div
             variants={heroItemVariants}
-            className="mb-16 flex flex-col items-center justify-center gap-4 md:mb-24 md:flex-row md:gap-8"
+            className="flex justify-center"
             style={{ willChange: "transform, opacity" }}
           >
-            <span className="text-sm font-medium uppercase tracking-widest text-text-secondary md:text-base lg:text-lg">
-              {t("date")}
-            </span>
-            <span className="hidden h-1.5 w-1.5 rounded-full bg-accent/40 md:inline-block" />
-            <span className="text-sm font-medium uppercase tracking-widest text-text-secondary md:text-base lg:text-lg">
-              {t("location")}
-            </span>
+            <HeroMetaContent />
           </motion.div>
 
           <motion.div
             variants={heroItemVariants}
-            className="scale-90 sm:scale-100"
+            className="origin-top scale-[0.84] sm:scale-100"
             style={{ willChange: "transform, opacity" }}
           >
             <Countdown />
-          </motion.div>
-
-          <motion.div
-            variants={heroItemVariants}
-            className="mt-16 flex items-center gap-5 md:mt-20"
-            style={{ willChange: "transform, opacity" }}
-          >
-            <div className="h-px w-20 bg-linear-to-r from-transparent to-accent/40 md:w-32" />
-            <motion.svg
-              width="40"
-              height="20"
-              viewBox="0 0 36 18"
-              fill="none"
-              className="shrink-0 text-accent/55"
-              aria-hidden="true"
-              animate={
-                reduceMotion ? undefined : { scale: [1, 1.04, 1], opacity: [0.58, 0.78, 0.58] }
-              }
-              transition={
-                reduceMotion
-                  ? undefined
-                  : { duration: 5.2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }
-              }
-              style={{ willChange: reduceMotion ? "auto" : "transform, opacity" }}
-            >
-              <circle cx="12" cy="9" r="8" stroke="currentColor" strokeWidth="1.3" />
-              <circle cx="24" cy="9" r="8" stroke="currentColor" strokeWidth="1.3" />
-            </motion.svg>
-            <div className="h-px w-20 bg-linear-to-l from-transparent to-accent/40 md:w-32" />
           </motion.div>
         </motion.div>
 
@@ -145,7 +137,7 @@ export function InvitationHeroIntro() {
                 ? undefined
                 : { duration: 3.4, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }
             }
-            className="flex flex-col items-center gap-4"
+            className="flex flex-col items-center gap-[clamp(0.5rem,1.5vh,1rem)]"
             style={{ willChange: reduceMotion ? "auto" : "transform" }}
           >
             <motion.span
@@ -171,78 +163,56 @@ export function InvitationHeroIntro() {
                   ? undefined
                   : { duration: 2.8, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }
               }
-              className="h-16 w-px origin-top bg-linear-to-b from-accent/50 to-transparent"
+              className="h-[clamp(2.25rem,7vh,4rem)] w-px origin-top bg-linear-to-b from-accent/50 to-transparent"
               style={{ willChange: reduceMotion ? "auto" : "transform, opacity" }}
             />
           </motion.div>
         </motion.div>
-      </>
+      </div>
     );
   }
 
   return (
-    <>
-      <div className="relative z-10 flex w-full max-w-6xl flex-1 flex-col items-center justify-center px-4">
+    <div className="relative z-10 flex w-full max-w-6xl flex-1 flex-col items-center px-6 sm:px-4">
+      <div className="flex w-full flex-1 flex-col items-center justify-center">
         <PageEnterReveal direction="down" delay={0.1}>
-          <h1 className="heading-serif mb-10 text-center text-6xl leading-[0.9] text-text-primary sm:text-7xl md:mb-16 md:text-7xl lg:text-8xl xl:text-[100px]">
+          <h1
+            className={`heading-serif ${heroSectionGapClass} text-center text-[clamp(3.375rem,13.8vw,4.4rem)] leading-[0.88] text-text-primary sm:text-7xl md:text-7xl lg:text-8xl xl:text-[100px]`}
+          >
             <span className="hidden whitespace-nowrap md:inline-block">
               {t("groom_name")} <span className="text-accent italic">&</span> {t("bride_name")}
             </span>
-            <span className="flex flex-col items-center leading-tight md:hidden">
+            <span className="grid justify-items-center gap-[clamp(0.45rem,1.8vh,0.9rem)] leading-[0.88] md:hidden">
               <span>{t("groom_name")}</span>
-              <span className="my-4 text-5xl text-accent">&</span>
-              <span>{t("bride_name")}</span>
+              <span className="flex items-end justify-center gap-[clamp(0.75rem,4vw,1.35rem)]">
+                <span className="shrink-0 translate-y-[0.06em] text-[clamp(3rem,12.9vw,3.9rem)] leading-none text-accent">
+                  &
+                </span>
+                <span>{t("bride_name")}</span>
+              </span>
             </span>
           </h1>
         </PageEnterReveal>
 
         <PageEnterReveal direction="up" delay={0.2}>
-          <div className="mb-16 flex flex-col items-center justify-center gap-4 md:mb-24 md:flex-row md:gap-8">
-            <span className="text-sm font-medium uppercase tracking-widest text-text-secondary md:text-base lg:text-lg">
-              {t("date")}
-            </span>
-            <span className="hidden h-1.5 w-1.5 rounded-full bg-accent/40 md:inline-block" />
-            <span className="text-sm font-medium uppercase tracking-widest text-text-secondary md:text-base lg:text-lg">
-              {t("location")}
-            </span>
-          </div>
+          <HeroMetaContent />
         </PageEnterReveal>
 
         <PageEnterReveal direction="up" delay={0.4}>
-          <div className="scale-90 sm:scale-100">
+          <div className="origin-top scale-[0.84] sm:scale-100">
             <Countdown />
           </div>
-        </PageEnterReveal>
-
-        <PageEnterReveal
-          direction="up"
-          delay={0.6}
-          className="mt-16 flex items-center gap-5 md:mt-20"
-        >
-          <div className="h-px w-20 bg-linear-to-r from-transparent to-accent/40 md:w-32" />
-          <svg
-            width="40"
-            height="20"
-            viewBox="0 0 36 18"
-            fill="none"
-            className="shrink-0 text-accent/55"
-            aria-hidden="true"
-          >
-            <circle cx="12" cy="9" r="8" stroke="currentColor" strokeWidth="1.3" />
-            <circle cx="24" cy="9" r="8" stroke="currentColor" strokeWidth="1.3" />
-          </svg>
-          <div className="h-px w-20 bg-linear-to-l from-transparent to-accent/40 md:w-32" />
         </PageEnterReveal>
       </div>
 
       <PageEnterReveal direction="up" delay={0.9} className="relative z-10 w-full flex-none">
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-[clamp(0.5rem,1.5vh,1rem)]">
           <span className="text-xs font-medium uppercase tracking-widest text-text-secondary/90">
             {t("scroll_down")}
           </span>
-          <div className="h-16 w-px bg-linear-to-b from-accent/50 to-transparent" />
+          <div className="h-[clamp(2.25rem,7vh,4rem)] w-px bg-linear-to-b from-accent/50 to-transparent" />
         </div>
       </PageEnterReveal>
-    </>
+    </div>
   );
 }

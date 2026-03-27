@@ -1,7 +1,6 @@
 "use client";
 
 import { VENUE, WEDDING_DATE, WEDDING_DATE_ROMAN } from "@/shared/config";
-import { Ornament } from "@/shared/ui";
 import { useTranslations } from "next-intl";
 import { BackToTopControl } from "./BackToTopControl";
 import { FooterNavCluster } from "./FooterNavCluster";
@@ -43,11 +42,6 @@ export function Footer() {
           {tHero("groom_name")} &amp; {tHero("bride_name")}
         </span>
       </div>
-
-      <Ornament position="top-left" size="lg" className="opacity-[0.09]" />
-      <Ornament position="top-right" size="lg" className="opacity-[0.09]" />
-      <Ornament position="bottom-left" size="sm" className="opacity-[0.06]" />
-      <Ornament position="bottom-right" size="sm" className="opacity-[0.06]" />
 
       <div className="relative mx-auto flex max-w-4xl flex-col items-center gap-10 px-6 pb-10 pt-10 md:pt-32">
         <FooterSignatureBlock
