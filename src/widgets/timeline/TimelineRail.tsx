@@ -3,6 +3,7 @@
 import { MOTION_EASE, cn, useLiteMotion } from "@/shared/lib";
 import { AnimatedReveal } from "@/shared/ui";
 import { type Variants, motion } from "motion/react";
+import { TimelineItemCard } from "./TimelineItemCard";
 
 const ease = MOTION_EASE;
 
@@ -138,19 +139,7 @@ export function TimelineRail({ events, className }: TimelineRailProps) {
           const icon = EVENT_ICONS[event.id];
 
           const cardContent = (
-            <div className="group/card rounded-2xl border border-accent/20 bg-bg-secondary/32 px-5 py-5 transition-colors duration-300 hover:border-accent/32 md:px-6 md:py-6">
-              <div className="mb-3 flex items-center gap-3">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent transition-colors duration-300 group-hover/card:bg-accent/20">
-                  {icon}
-                </div>
-                <h3 className="heading-serif text-xl text-text-primary transition-colors duration-300 group-hover/card:text-accent md:text-2xl">
-                  {event.title}
-                </h3>
-              </div>
-              <p className="pl-10 text-sm leading-relaxed text-text-secondary md:text-base">
-                {event.description}
-              </p>
-            </div>
+            <TimelineItemCard icon={icon} title={event.title} description={event.description} />
           );
 
           return (

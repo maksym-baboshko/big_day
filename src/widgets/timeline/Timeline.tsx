@@ -1,6 +1,6 @@
 "use client";
 
-import { Ornament, SectionHeading, SectionWrapper } from "@/shared/ui";
+import { Ornament, SectionHeading, SectionShell } from "@/shared/ui";
 import { useTranslations } from "next-intl";
 import { TimelineRail, type TimelineRailEvent } from "./TimelineRail";
 
@@ -16,12 +16,17 @@ export function Timeline() {
   }));
 
   return (
-    <SectionWrapper id="timeline" className="relative overflow-hidden py-24">
+    <SectionShell
+      id="timeline"
+      background="primary"
+      contentWidth="wide"
+      className="relative overflow-hidden"
+    >
       <Ornament position="top-right" size="sm" />
       <Ornament position="bottom-left" size="sm" />
 
       <SectionHeading subtitle={t("subtitle")}>{t("title")}</SectionHeading>
       <TimelineRail events={events} />
-    </SectionWrapper>
+    </SectionShell>
   );
 }

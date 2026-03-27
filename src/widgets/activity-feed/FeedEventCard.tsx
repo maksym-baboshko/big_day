@@ -3,6 +3,7 @@
 import { resolveLocale } from "@/shared/i18n/routing";
 import type { Locale } from "@/shared/i18n/routing";
 import { cn } from "@/shared/lib";
+import { SurfacePanel } from "@/shared/ui";
 import { useLocale, useTranslations } from "next-intl";
 import {
   formatEventTime,
@@ -81,19 +82,16 @@ export function FeedEventCard({ event }: FeedEventCardProps) {
     : null;
 
   return (
-    <div
+    <SurfacePanel
       data-testid="feed-event-card"
       data-event-id={event.id}
-      className={cn(
-        "relative overflow-hidden rounded-3xl shadow-[0_12px_28px_-20px_rgba(0,0,0,0.45)] backdrop-blur-sm",
-        prompt
-          ? "border border-accent/18 bg-accent/7"
-          : "border border-accent/10 bg-bg-secondary/30",
-      )}
+      className={cn("relative", prompt ? "bg-accent/7" : "bg-bg-secondary/30")}
+      contentClassName="py-4 pl-7 pr-5"
+      tone={prompt ? "highlighted" : "subtle"}
     >
-      <div className={cn("absolute inset-y-0 left-0 w-[3px] rounded-l-3xl", barClass)} />
+      <div className={cn("absolute inset-y-0 left-0 w-[3px] rounded-l-[inherit]", barClass)} />
 
-      <div className="py-4 pl-7 pr-5">
+      <div className={cn("relative", prompt ? "text-text-primary" : "text-text-primary")}>
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-accent/22 bg-accent/10 font-cinzel text-xs tracking-[0.14em] text-accent">
             {getAvatarMonogram(event.avatarKey, event.playerName)}
@@ -126,6 +124,6 @@ export function FeedEventCard({ event }: FeedEventCardProps) {
           </div>
         ) : null}
       </div>
-    </div>
+    </SurfacePanel>
   );
 }

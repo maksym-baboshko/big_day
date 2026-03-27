@@ -7,17 +7,13 @@ import {
   getLocalePath,
   getMetadataBase,
   getOpenGraphLocale,
-  getStructuredDataJson,
 } from "@/shared/config";
 import { isLocale, resolveLocale, routing } from "@/shared/i18n/routing";
-import { THEME_INIT_SCRIPT, cinzel, inter, playfair, vibes } from "@/shared/lib";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+import { NotFoundPage, getNotFoundPageContent } from "@/widgets/not-found";
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
-import { notFound } from "next/navigation";
-import Script from "next/script";
+import { cookies } from "next/headers";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -82,37 +78,23 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   const { locale } = await params;
 
   if (!isLocale(locale)) {
-    notFound();
+    const cookieStore = await cookies();
+    const resolvedLocale = resolveLocale(cookieStore.get("NEXT_LOCALE")?.value ?? "");
+    const content = getNotFoundPageContent(resolvedLocale);
+
+    return (
+      <ThemeProvider>
+        <NotFoundPage locale={resolvedLocale} content={content} />
+      </ThemeProvider>
+    );
   }
 
   const typedLocale = resolveLocale(locale);
-  const messages = await getMessages();
-  const structuredDataJson = getStructuredDataJson(typedLocale);
+  const messages = await getMessages({ locale: typedLocale });
 
   return (
-    <html lang={typedLocale} suppressHydrationWarning data-scroll-behavior="smooth">
-      <head>
-        {/* Inline theme script prevents flash of wrong theme before React hydration */}
-        <Script id="theme-init" strategy="beforeInteractive">
-          {THEME_INIT_SCRIPT}
-        </Script>
-        <Script
-          id={`structured-data-${typedLocale}`}
-          type="application/ld+json"
-          strategy="beforeInteractive"
-        >
-          {structuredDataJson}
-        </Script>
-      </head>
-      <body
-        className={`${inter.variable} ${playfair.variable} ${cinzel.variable} ${vibes.variable} font-inter antialiased`}
-      >
-        <NextIntlClientProvider messages={messages}>
-          <ThemeProvider>{children}</ThemeProvider>
-        </NextIntlClientProvider>
-        <Analytics />
-        <SpeedInsights />
-      </body>
-    </html>
+    <NextIntlClientProvider locale={typedLocale} messages={messages}>
+      <ThemeProvider>{children}</ThemeProvider>
+    </NextIntlClientProvider>
   );
 }

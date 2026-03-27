@@ -2,6 +2,8 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useTranslations } from "next-intl";
+import { useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { MOTION_EASE, cn } from "@/shared/lib";
 import type { RsvpFormData } from "../schema/rsvp-schema";
@@ -27,8 +29,23 @@ export function RsvpSuccessOverlay({
   const t = useTranslations("RSVP");
   const titleId = "rsvp-success-title";
   const descriptionId = "rsvp-success-description";
+  const [isClosing, setIsClosing] = useState(false);
+  const hasDismissedRef = useRef(false);
 
-  return (
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  function handleAnimationComplete() {
+    if (!isClosing || hasDismissedRef.current) {
+      return;
+    }
+
+    hasDismissedRef.current = true;
+    onDismiss();
+  }
+
+  return createPortal(
     <>
       <AnimatePresence>
         {showConfetti && <ConfettiOverlay lite={liteMotion} onDone={onHideConfetti} />}
@@ -36,10 +53,10 @@ export function RsvpSuccessOverlay({
 
       <motion.div
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.35 }}
-        className="fixed inset-0 z-[180]"
+        animate={{ opacity: isClosing ? 0 : 1 }}
+        transition={{ duration: isClosing ? 0.28 : liteMotion ? 0.14 : 0.18 }}
+        onAnimationComplete={handleAnimationComplete}
+        className="fixed inset-0 z-[300]"
       >
         <dialog
           open
@@ -49,8 +66,15 @@ export function RsvpSuccessOverlay({
         >
           <motion.div
             initial={{ opacity: 0, y: liteMotion ? 18 : 28, scale: liteMotion ? 0.98 : 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: liteMotion ? 0.5 : 0.75, ease: MOTION_EASE }}
+            animate={
+              isClosing
+                ? { opacity: 0, y: liteMotion ? -10 : -18, scale: liteMotion ? 1 : 1.02 }
+                : { opacity: 1, y: 0, scale: 1 }
+            }
+            transition={{
+              duration: isClosing ? 0.24 : liteMotion ? 0.5 : 0.75,
+              ease: MOTION_EASE,
+            }}
             className={cn(
               "relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-bg-primary px-8 py-16 text-center md:px-10 md:py-20",
               !liteMotion && "backdrop-blur-md",
@@ -124,9 +148,10 @@ export function RsvpSuccessOverlay({
             <motion.button
               type="button"
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.1 }}
-              onClick={onDismiss}
+              animate={{ opacity: isClosing ? 0 : 1 }}
+              transition={{ delay: isClosing ? 0 : 1.1, duration: isClosing ? 0.16 : undefined }}
+              onClick={() => setIsClosing(true)}
+              disabled={isClosing}
               className="relative z-10 cursor-pointer text-xs uppercase tracking-[0.18em] text-text-secondary/90 transition-colors duration-300 hover:text-accent md:text-sm"
             >
               ← {t("return_button")}
@@ -134,6 +159,7 @@ export function RsvpSuccessOverlay({
           </motion.div>
         </dialog>
       </motion.div>
-    </>
+    </>,
+    document.body,
   );
 }

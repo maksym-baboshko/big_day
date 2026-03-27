@@ -1,7 +1,7 @@
 "use client";
 
 import { useTheme } from "@/features/theme-switcher";
-import { cn } from "@/shared/lib";
+import { LAST_VISITED_ROUTE_STORAGE_KEY, cn } from "@/shared/lib";
 import { Button, Ornament } from "@/shared/ui";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -13,6 +13,24 @@ import type { NotFoundPageContent } from "./not-found-content";
 interface NotFoundPageProps {
   locale: Locale;
   content: NotFoundPageContent;
+}
+
+function resolveBackHref(currentRoute: string, homeHref: string): string {
+  const lastVisitedRoute = sessionStorage.getItem(LAST_VISITED_ROUTE_STORAGE_KEY);
+
+  if (!lastVisitedRoute) {
+    return homeHref;
+  }
+
+  if (
+    !lastVisitedRoute.startsWith("/") ||
+    lastVisitedRoute === currentRoute ||
+    lastVisitedRoute.includes("/__not-found/")
+  ) {
+    return homeHref;
+  }
+
+  return lastVisitedRoute;
 }
 
 function getAlternateLocalePath(pathname: string, locale: Locale): string {
@@ -118,13 +136,20 @@ function LanguageToggleButton({
     return getAlternateLocalePath(pathname, locale);
   }, [locale, pathname]);
 
+  const handleClick = () => {
+    const nextLocale = locale === "uk" ? "en" : "uk";
+    document.cookie = `NEXT_LOCALE=${nextLocale}; path=/; samesite=lax;`;
+    window.location.replace(href);
+  };
+
   if (!mounted) {
     return <div className="h-10 w-10 rounded-full border border-accent/20 opacity-0" />;
   }
 
   return (
-    <Link
-      href={href}
+    <button
+      type="button"
+      onClick={handleClick}
       className={cn(
         "flex h-10 w-10 cursor-pointer select-none items-center justify-center rounded-full border border-accent text-sm font-medium transition-all duration-300",
         "bg-bg-primary text-accent hover:bg-accent hover:text-white",
@@ -133,19 +158,26 @@ function LanguageToggleButton({
       aria-label={label}
     >
       <span className="pointer-events-none">{locale === "uk" ? "EN" : "UA"}</span>
-    </Link>
+    </button>
   );
 }
 
 export function NotFoundPage({ locale, content }: NotFoundPageProps) {
-  const handleBack = () => {
-    if (window.history.length > 1) {
-      window.history.back();
-      return;
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+  const backHref = useMemo(() => {
+    if (!mounted) {
+      return content.homeHref;
     }
 
-    window.location.assign(content.homeHref);
-  };
+    return resolveBackHref(
+      `${window.location.pathname}${window.location.search}`,
+      content.homeHref,
+    );
+  }, [mounted, content.homeHref]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-bg-primary text-text-primary">
@@ -233,10 +265,10 @@ export function NotFoundPage({ locale, content }: NotFoundPageProps) {
                   </Button>
 
                   <Button
-                    type="button"
+                    as={Link}
+                    href={backHref}
                     variant="outline"
                     size="lg"
-                    onClick={handleBack}
                     className="min-w-55 border-accent/30 text-bg-primary hover:bg-bg-primary/10 hover:text-bg-primary dark:text-text-primary dark:hover:bg-accent/12 dark:hover:text-text-primary"
                   >
                     {content.secondaryCta}

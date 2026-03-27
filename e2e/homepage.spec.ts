@@ -1,4 +1,23 @@
-import { expect, test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
+
+async function expectHeroContentVisible(page: Page): Promise<void> {
+  const heroHeading = page.locator("#hero h1").first();
+
+  await expect(heroHeading).toBeVisible();
+  await expect
+    .poll(async () =>
+      heroHeading.evaluate((node) => {
+        const wrapper = node.parentElement;
+
+        if (!wrapper) {
+          return 0;
+        }
+
+        return Number.parseFloat(window.getComputedStyle(wrapper).opacity);
+      }),
+    )
+    .toBeGreaterThan(0.99);
+}
 
 test.describe("Homepage", () => {
   test.beforeEach(async ({ page }) => {
@@ -48,12 +67,51 @@ test.describe("Homepage", () => {
         .first(),
     ).toBeVisible();
   });
+
+  test("browser back from live keeps the homepage hero visible", async ({ page }) => {
+    await expectHeroContentVisible(page);
+
+    await page.goto("/live?state=empty");
+    await expect(page.getByTestId("live-projector-page")).toBeVisible();
+
+    await page.goBack();
+
+    await expect(page).toHaveURL("/");
+    await expectHeroContentVisible(page);
+  });
 });
 
 test.describe("Homepage — /en locale", () => {
   test("renders in English at /en", async ({ page }) => {
     await page.goto("/en");
     await expect(page.getByText("Maksym").or(page.getByText("Diana")).first()).toBeVisible();
+  });
+
+  test("browser back from english live keeps the homepage hero visible", async ({ page }) => {
+    await page.goto("/en");
+    await expectHeroContentVisible(page);
+
+    await page.goto("/en/live?state=empty");
+    await expect(page.getByTestId("live-projector-page")).toBeVisible();
+
+    await page.goBack();
+
+    await expect(page).toHaveURL("/en");
+    await expectHeroContentVisible(page);
+  });
+
+  test("clean storage still defaults to Ukrainian even for an English browser locale", async ({
+    browser,
+  }) => {
+    const context = await browser.newContext({ locale: "en-US" });
+    const page = await context.newPage();
+
+    await page.goto("/");
+
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.getByText("Максим").or(page.getByText("Діана")).first()).toBeVisible();
+
+    await context.close();
   });
 });
 

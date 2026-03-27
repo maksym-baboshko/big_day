@@ -102,11 +102,13 @@ Script-driven config entrypoints:
 ```text
 src/
 ├── app/
+│   ├── not-found.tsx
 │   ├── [locale]/
+│   │   ├── __not-found/[...segments]/page.tsx
+│   │   ├── [...segments]/page.tsx
 │   │   ├── page.tsx
 │   │   ├── invite/[slug]/page.tsx
 │   │   └── live/page.tsx
-│   ├── not-found.tsx
 │   ├── globals.css
 │   └── layout.tsx
 ├── entities/
@@ -235,6 +237,14 @@ The mock adapter validates with the real schema and writes accepted submissions 
 - empty/error/populated are explicit UI states
 - hero-event queue behavior remains client-side
 
+### History restore hardening
+
+- `src/shared/ui/PageEnterReveal.tsx` owns above-the-fold entrance motion and never re-hides content on browser history restore
+- `src/shared/ui/InViewReveal.tsx` owns observer-driven reveal below the fold and starts its hide/reveal logic only after synchronous client-side viewport measurement
+- valid top-level page routes write the last visited route before hydration through `VisitedRouteScript`
+- widgets and page sections must not duplicate that write through client-side trackers
+- 404 secondary CTA reads the last valid route instead of emulating browser history
+
 ---
 
 ## 7. Design System Phase 1
@@ -303,10 +313,77 @@ pnpm build-storybook
 ### Playwright
 
 - functional specs live in `e2e/*.spec.ts`
+- local-only browser diagnostics live in `e2e/smoke/`
 - page-level visual baselines live in `e2e/visual.spec.ts`
 - visual baselines are committed under `e2e/visual.spec.ts-snapshots/`
 - runtime outputs live in `artifacts/playwright/`
 - local and CI browser lanes both stay on `localhost`, not `127.0.0.1`, to avoid the known Next Intl refresh-loop issue
+- `pnpm smoke:history-restore:dev` is the canonical local-only diagnostic for `next dev` back/forward restore issues and expects an already running `localhost:3000`
+
+---
+
+## 9. Design System Phase 2
+
+Phase 2 is a **controlled unification redesign**, not a strict parity-preservation pass.
+
+The goal is to reduce ad-hoc surface recipes and converge invitation-first UI around a compact set
+of canonical surfaces. Partial redesign is allowed when it improves unification without changing
+the site’s brand direction.
+
+### Canonical surface reference
+
+`SurfacePanel` is the canonical panel language for invitation-first UI and is derived from the
+RSVP panel treatment. Nearby surface-heavy blocks should converge toward that visual system instead
+of inventing new one-off panel recipes.
+
+`RsvpPanel` keeps the RSVP-specific glow/gradient recipe as a local composition on top of that
+surface language instead of widening `SurfacePanel` with RSVP-only escape hatches.
+
+### Public DS contracts
+
+Canonical primitives:
+
+- `SurfacePanel`
+- `SectionShell`
+- `SectionHeading`
+- `PageEnterReveal`
+- `InViewReveal`
+- `HeaderFrame`
+
+Invitation-first public composites:
+
+- `InvitationHeroIntro`
+- `RsvpPanel`
+- `RsvpFieldGroup`
+- `RsvpActionRow`
+- `InvitationSummaryCard`
+- `TimelineItemCard`
+- `FooterNavCluster`
+- `FooterSignatureBlock`
+- `BackToTopControl`
+
+Second-wave live composites:
+
+- `FeedEventCard`
+- `FeedStatePanel`
+- `LeaderboardPanel`
+- `LeaderboardStatePanel`
+
+### Extraction rules
+
+- add a new public surface only when it is canonical, repeated, or a deliberate section-level contract
+- keep `SurfacePanel` narrow and reusable; page- or feature-specific styling belongs in local composites
+- `SectionWrapper` remains a compatibility wrapper around `SectionShell` and preserves legacy `noPadding` semantics
+- do not extract page-specific markup into `shared/ui` just because it exists
+- keep page orchestration in `widgets/` or `app/`
+- prefer fewer strong public APIs over many weak micro-components
+
+### Current phase-2 direction
+
+- invitation-first surfaces are the primary design-system reference
+- `/live` participates in the same surface system, but keeps its more functional shell
+- strict `main` parity is no longer the goal for this phase
+- hydration and history-restore stability remain mandatory for all public motion primitives
 
 ### Git hooks
 
@@ -322,6 +399,8 @@ These files intentionally use guarded mount logic and should not be casually ref
 
 - `src/features/countdown/Countdown.tsx`
 - `src/widgets/splash/Splash.tsx`
+- `src/shared/ui/PageEnterReveal.tsx`
+- `src/shared/ui/InViewReveal.tsx`
 - `src/features/language-switcher/LanguageSwitcher.tsx`
 - `src/features/theme-switcher/ThemeProvider.tsx`
 
@@ -390,12 +469,14 @@ Only when the backend phase starts in earnest, the same change must:
 
 ## 12. Security Hardening Notes
 
-Security headers and CSP are intentionally deferred until the inline-script story is formalized.
+Security headers and CSP are intentionally deferred until the remaining inline-script story is
+formalized.
 
-Current inline scripts live in `src/app/[locale]/layout.tsx`:
+Current inline script usage is limited to localized JSON-LD on
+`/Users/boshmax/Home/Coding/Projects/26.03/diandmax.com/src/app/[locale]/page.tsx`.
 
-- `THEME_INIT_SCRIPT`
-- localized JSON-LD structured data
+Theme bootstrapping no longer depends on an inline script; the root layout derives the initial
+theme from a synced cookie and the client provider keeps `localStorage` and the cookie aligned.
 
-When CSP is introduced, it must use a nonce/hash strategy that is compatible with these scripts and
-with Next.js runtime behavior. Do not add a partial CSP that breaks hydration or metadata scripts.
+When CSP is introduced, it must account for the JSON-LD script without breaking hydration or the
+Next.js runtime.

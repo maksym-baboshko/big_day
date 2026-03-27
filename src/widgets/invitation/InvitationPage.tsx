@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 
 import { RsvpForm } from "@/features/rsvp";
-import { SectionHeading, SectionWrapper } from "@/shared/ui";
+import { SectionHeading, SectionShell } from "@/shared/ui";
 import { DressCode } from "@/widgets/dress-code";
 import { Footer } from "@/widgets/footer";
 import { Gifts } from "@/widgets/gifts";
@@ -28,13 +28,20 @@ export async function InvitationPage() {
         <Gifts />
 
         {/* RSVP */}
-        <SectionWrapper id="rsvp" className="relative overflow-hidden pt-12 pb-8 md:py-24">
+        <SectionShell
+          id="rsvp"
+          background="primary"
+          padding="compact"
+          contentWidth="wide"
+          fadeEdges={false}
+          className="relative overflow-hidden"
+        >
           <SectionHeading subtitle={t("subtitle")}>{t("title")}</SectionHeading>
 
           <div className="relative z-10 mx-auto mt-12 flex max-w-7xl flex-col items-center justify-center px-4 md:mt-32 xl:flex-row">
             <RsvpForm />
           </div>
-        </SectionWrapper>
+        </SectionShell>
       </main>
       <Footer />
     </>

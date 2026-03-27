@@ -1,10 +1,7 @@
 "use client";
 
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
-
-const THEME_STORAGE_KEY = "theme" as const;
-
-type Theme = "light" | "dark";
+import { THEME_STORAGE_KEY, type Theme } from "./constants";
 
 interface ThemeContextValue {
   theme: Theme;
@@ -30,12 +27,14 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
+    const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const documentTheme = document.documentElement.classList.contains("dark") ? "dark" : "light";
+    const initialTheme = stored === "dark" || stored === "light" ? stored : null;
 
     // Defer to avoid React 19 cascading render warnings
     queueMicrotask(() => {
-      setTheme(stored ?? (prefersDark ? "dark" : "light"));
+      setTheme(initialTheme ?? (documentTheme === "dark" || prefersDark ? "dark" : "light"));
       setMounted(true);
     });
   }, []);
@@ -43,7 +42,9 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   useEffect(() => {
     if (!mounted) return;
     document.documentElement.classList.toggle("dark", theme === "dark");
+    document.documentElement.classList.toggle("light", theme === "light");
     localStorage.setItem(THEME_STORAGE_KEY, theme);
+    document.cookie = `${THEME_STORAGE_KEY}=${theme}; path=/; samesite=lax; max-age=31536000`;
   }, [theme, mounted]);
 
   const toggleTheme = useCallback(() => {

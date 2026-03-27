@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { getAllGuestSlugs, getGuestBySlug } from "@/entities/guest";
 import { resolveLocale } from "@/shared/i18n/routing";
+import { VisitedRouteScript } from "@/shared/lib/VisitedRouteScript";
 import { PersonalInvitationPage } from "@/widgets/personal-invitation";
 
 interface InvitePageProps {
@@ -33,12 +34,19 @@ export async function generateMetadata({ params }: InvitePageProps): Promise<Met
 }
 
 export default async function InvitePage({ params }: InvitePageProps) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const guest = getGuestBySlug(slug);
 
   if (!guest) {
     notFound();
   }
 
-  return <PersonalInvitationPage guest={guest} />;
+  const route = `${resolveLocale(locale) === "en" ? "/en" : ""}/invite/${slug}`;
+
+  return (
+    <>
+      <VisitedRouteScript route={route} />
+      <PersonalInvitationPage guest={guest} />
+    </>
+  );
 }

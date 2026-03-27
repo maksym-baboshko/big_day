@@ -4,6 +4,7 @@ import { MOTION_EASE, cn } from "@/shared/lib";
 import { WifiOff } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useTranslations } from "next-intl";
+import { FeedStatePanel } from "./FeedStatePanel";
 
 const CARD_DURATION = 18;
 const EMPTY_STATE_FADE_DURATION = 0.9;
@@ -388,7 +389,7 @@ export function FeedEmptyState({ variant }: FeedEmptyStateProps) {
   const isError = variant === "error";
 
   return (
-    <div className="relative flex min-h-[620px] flex-col items-center justify-center overflow-hidden rounded-3xl border border-accent/20 bg-bg-secondary/30 px-8 py-16 text-center lg:min-h-0 lg:flex-1">
+    <FeedStatePanel>
       <AnimatePresence initial={false}>
         {!isLoading ? (
           <motion.div
@@ -616,6 +617,6 @@ export function FeedEmptyState({ variant }: FeedEmptyStateProps) {
           </div>
         </div>
       </div>
-    </div>
+    </FeedStatePanel>
   );
 }

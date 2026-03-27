@@ -20,7 +20,7 @@ behind explicit contracts instead of evolving the deleted implementation.
 - `/live` renders the live projector from typed mock feed data
 - `/live?state=populated|empty|error` is the canonical local/demo state switch
 - RSVP submits into a local mock service backed by `localStorage`
-- Storybook covers reusable UI and design-system phase 1 components
+- Storybook covers reusable UI and design-system phase 2 canonical surfaces
 - Chromatic is wired through GitHub Actions and requires `CHROMATIC_PROJECT_TOKEN`
 
 ### Explicitly out of scope in the current phase
@@ -138,6 +138,11 @@ Stable reusable exports in the current phase:
 - `Input`
 - `Textarea`
 - `GlassPanel`
+- `SurfacePanel`
+- `SectionShell`
+- `SectionHeading`
+- `PageEnterReveal`
+- `InViewReveal`
 - `Navbar`
 - `Countdown`
 - `LanguageSwitcher`
@@ -146,6 +151,29 @@ Stable reusable exports in the current phase:
 - `LeaderboardList`
 - `LeaderboardState`
 - `Footer`
+- `InvitationHeroIntro`
+- `RsvpPanel`
+- `RsvpFieldGroup`
+- `RsvpActionRow`
+- `InvitationSummaryCard`
+- `TimelineItemCard`
+- `FooterNavCluster`
+- `FooterSignatureBlock`
+- `BackToTopControl`
+- `FeedEventCard`
+- `FeedStatePanel`
+- `LeaderboardPanel`
+- `LeaderboardStatePanel`
+
+Phase 2 is a controlled unification redesign:
+
+- RSVP panel language is the canonical surface reference
+- invitation-first surfaces lead the system direction
+- `/live` follows the same surface language where it is genuinely reusable
+- page-specific markup should stay local unless it becomes a canonical system pattern
+- `SurfacePanel` stays narrow; RSVP-specific visual treatment belongs in `RsvpPanel`
+- `SectionWrapper` is a compatibility wrapper; new section work should prefer `SectionShell`
+- `VisitedRouteScript` is the single source of truth for writing the last visited route
 
 Storybook is for these reusable blocks and their variants, not for full pages.
 
@@ -200,6 +228,21 @@ pnpm build-storybook
 - `pnpm test:e2e` → Playwright route flows and screenshot baselines
 - `pnpm test:coverage` → current unit coverage baseline
 
+### Browser verification policy
+
+- Prefer canonical script-driven lanes over raw tool invocations:
+  - `pnpm test:e2e`
+  - `pnpm test:storybook`
+  - `pnpm smoke:history-restore:dev`
+- Do not treat raw `pnpm exec playwright test ...` as the canonical verification path in this repo.
+  Playwright is configured via `package.json` scripts and explicit `--config` wiring.
+- In the Codex desktop sandbox on macOS, ad-hoc browser launches can fail with MachPort / permission errors.
+  Treat that as an environment limitation first, not as automatic evidence of a product bug.
+- If a build or e2e run fails with `Another next build process is already running`, check for a stale
+  `.next/lock` left by an interrupted build, clear it, and rerun the canonical script.
+- When reporting browser-test results, prefer the script-driven lane first and mention sandbox instability
+  only when the failure is genuinely environment-related.
+
 ### Git hooks
 
 - `pre-commit` runs `lint-staged` only
@@ -234,6 +277,8 @@ Do not casually refactor these:
 
 - `features/countdown/Countdown.tsx`
 - `widgets/splash/Splash.tsx`
+- `shared/ui/PageEnterReveal.tsx`
+- `shared/ui/InViewReveal.tsx`
 - `features/language-switcher/LanguageSwitcher.tsx`
 - `features/theme-switcher/ThemeProvider.tsx`
 

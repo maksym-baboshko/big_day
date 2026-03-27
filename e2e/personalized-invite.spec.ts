@@ -33,6 +33,12 @@ test.describe("Personalized invite", () => {
     await expect(page.getByRole("dialog")).toBeVisible();
     await expect(page.getByText("Дякуємо за відповідь, Ігор!")).toBeVisible();
 
+    await page.getByRole("button", { name: /повернутись|return/i }).click();
+
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.locator("#rsvp h2").first()).toBeVisible();
+    await expect.poll(async () => page.evaluate(() => window.scrollY)).toBeGreaterThan(1000);
+
     await expect
       .poll(async () =>
         page.evaluate((storageKey) => {

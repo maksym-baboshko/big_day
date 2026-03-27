@@ -98,7 +98,7 @@ export function ConfettiOverlay({ lite, onDone }: ConfettiOverlayProps) {
       exit={{ opacity: 0 }}
       transition={{ duration: lite ? 0.9 : 1.5, delay: lite ? 8.6 : 5 }}
       onAnimationComplete={() => setTimeout(onDone, 100)}
-      className="pointer-events-none fixed inset-0 z-[220] overflow-hidden"
+      className="pointer-events-none fixed inset-0 z-[320] overflow-hidden"
     >
       {lite
         ? liteConfettiPieces.map((piece) => (

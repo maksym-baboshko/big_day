@@ -8,7 +8,8 @@ Current phase:
 - personalized invites at `/invite/[slug]`
 - mock-driven live screen at `/live`
 - RSVP mock submission via `localStorage`
-- Storybook + Chromatic for reusable UI
+- controlled invitation-first design-system phase 2 with canonical surface primitives
+- Storybook + Chromatic for reusable UI and canonical surface stories
 - Vitest unit tests + Storybook browser tests + Playwright visual regression baselines
 
 ## Routes
@@ -30,6 +31,7 @@ pnpm lint
 pnpm test
 pnpm test:storybook
 pnpm test:e2e
+pnpm smoke:history-restore:dev
 pnpm build
 pnpm build-storybook
 ```
@@ -40,6 +42,10 @@ already have it:
 ```bash
 pnpm exec playwright install chromium
 ```
+
+`pnpm smoke:history-restore:dev` is a local-only diagnostic lane for the known `next dev`
+back/forward restore path. It expects a running dev server on `http://localhost:3000` and lives
+with the rest of the browser checks under `e2e/smoke/`.
 
 ## Repository layout
 
@@ -80,6 +86,47 @@ Then the workflow in `.github/workflows/chromatic.yml` can publish Storybook bui
 - `shared/config` contains only true global site constants
 - canonical configs live under `configs/`
 - root bridge files preserve normal tool discovery without root clutter
+- phase 2 is a controlled unification redesign, not strict parity preservation
+- RSVP panel language is the canonical surface reference for invitation-first UI
+
+## Design system phase 2
+
+Canonical public surface layer:
+
+- `SurfacePanel`
+- `SectionShell`
+- `SectionHeading`
+- `PageEnterReveal`
+- `InViewReveal`
+- `HeaderFrame`
+
+Invitation-first public composites:
+
+- `InvitationHeroIntro`
+- `RsvpPanel`
+- `RsvpFieldGroup`
+- `RsvpActionRow`
+- `InvitationSummaryCard`
+- `TimelineItemCard`
+- `FooterNavCluster`
+- `FooterSignatureBlock`
+- `BackToTopControl`
+
+Second-wave live public composites:
+
+- `FeedEventCard`
+- `FeedStatePanel`
+- `LeaderboardPanel`
+- `LeaderboardStatePanel`
+
+Phase-2 rule:
+
+- extract only canonical building blocks and section-level contracts
+- keep page-specific markup local when it is not a real reusable system pattern
+- keep `SurfacePanel` narrow; RSVP-specific glow/gradient treatment belongs in `RsvpPanel`
+- prefer `SectionShell` for new work; `SectionWrapper` remains a compatibility wrapper that preserves legacy `noPadding` semantics
+- valid top-level routes write the last visited route through `VisitedRouteScript`; widgets should not duplicate that write client-side
+- allow partial redesign when it improves unification without changing the brand direction
 
 The deleted backend stack is not part of the current runtime. Future server work must plug into the
 existing frontend contracts instead of reintroducing direct DB/API logic into UI layers. That
@@ -91,6 +138,7 @@ dependencies stay out of the repo until the backend phase is reintroduced on pur
 - `pnpm test` runs colocated unit and pure-logic tests through the `unit` Vitest project.
 - `pnpm test:storybook` runs Storybook-driven browser component tests through the `storybook` Vitest project.
 - `pnpm test:e2e` runs route-level Playwright flows and screenshot baselines from `e2e/`.
+- `pnpm smoke:history-restore:dev` verifies the dev-only browser back/forward restore flow from `e2e/smoke/` against a running `localhost:3000`.
 - `pnpm test:coverage` collects the current unit-test coverage baseline into `artifacts/vitest/coverage/`.
 - `src/testing/` is reserved for shared test mocks and helpers only. Tests themselves stay colocated with source files.
 - Storybook stories stay in the default test lane; opt out later with `tags: ["!test"]` only for intentionally decorative or unstable stories.

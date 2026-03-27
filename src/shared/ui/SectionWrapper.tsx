@@ -1,4 +1,4 @@
-import { cn } from "@/shared/lib/cn";
+import { SectionShell } from "./SectionShell";
 
 interface SectionWrapperProps {
   children: React.ReactNode;
@@ -20,29 +20,16 @@ export function SectionWrapper({
   noFade = false,
 }: SectionWrapperProps) {
   return (
-    <section
+    <SectionShell
       id={id}
-      className={cn(
-        "relative w-full overflow-hidden",
-        !noPadding && "px-5 py-10 md:px-8 md:py-24 lg:py-32",
-        alternate ? "bg-bg-secondary" : "bg-bg-primary",
-        fullHeight && "flex min-h-screen flex-col items-center justify-center",
-        className,
-      )}
+      className={className}
+      background={alternate ? "secondary" : "primary"}
+      padding={noPadding ? "none" : "default"}
+      contentWidth={noPadding ? "full" : "narrow"}
+      fullHeight={fullHeight}
+      fadeEdges={!noFade}
     >
-      {!noFade && (
-        <>
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 z-20 h-16 bg-linear-to-b from-bg-primary to-transparent"
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-16 bg-linear-to-t from-bg-primary to-transparent"
-          />
-        </>
-      )}
-      <div className={cn("mx-auto w-full", !noPadding && "max-w-4xl")}>{children}</div>
-    </section>
+      {children}
+    </SectionShell>
   );
 }

@@ -1,6 +1,7 @@
 import { resolveLiveFeedState } from "@/entities/event";
 import { PREVIEW_IMAGE, getOpenGraphLocale } from "@/shared/config";
 import { resolveLocale } from "@/shared/i18n/routing";
+import { VisitedRouteScript } from "@/shared/lib/VisitedRouteScript";
 import { ActivityFeedPage } from "@/widgets/activity-feed";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -37,11 +38,17 @@ export default async function ActivityFeedRoute({ params, searchParams }: Activi
   const { locale } = await params;
   const typedLocale = resolveLocale(locale);
   const resolvedSearchParams = await searchParams;
+  const search = resolvedSearchParams?.state ? `?state=${resolvedSearchParams.state}` : "";
+  const route = `${typedLocale === "en" ? "/en" : ""}/live${search}`;
   setRequestLocale(typedLocale);
+
   return (
-    <ActivityFeedPage
-      locale={typedLocale}
-      initialState={resolveLiveFeedState(resolvedSearchParams?.state)}
-    />
+    <>
+      <VisitedRouteScript route={route} />
+      <ActivityFeedPage
+        locale={typedLocale}
+        initialState={resolveLiveFeedState(resolvedSearchParams?.state)}
+      />
+    </>
   );
 }

@@ -5,9 +5,11 @@ import Image from "next/image";
 import type { FieldErrors, UseFormRegister } from "react-hook-form";
 
 import { MOTION_EASE, cn } from "@/shared/lib";
-import { Input, Textarea } from "@/shared/ui";
+import { Input, SurfacePanel, Textarea } from "@/shared/ui";
 
 import type { RsvpFormData } from "../schema/rsvp-schema";
+import { RsvpActionRow } from "./RsvpActionRow";
+import { RsvpFieldGroup } from "./RsvpFieldGroup";
 
 type RsvpTranslations = (
   key: string,
@@ -16,81 +18,6 @@ type RsvpTranslations = (
 
 const focusRingClass =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary";
-
-function FieldLabel({
-  as = "p",
-  children,
-  className,
-  htmlFor,
-  id,
-  required,
-}: {
-  as?: "label" | "legend" | "p";
-  children: React.ReactNode;
-  className?: string;
-  htmlFor?: string;
-  id?: string;
-  required?: boolean;
-}) {
-  const baseClassName = cn(
-    "mb-3 block w-full text-xs font-medium uppercase tracking-[0.18em] text-text-secondary/90",
-    as === "legend" && "px-0",
-    className,
-  );
-
-  const content = (
-    <>
-      {children}
-      {required ? <span className="ml-1 text-accent">*</span> : null}
-    </>
-  );
-
-  if (as === "label") {
-    return (
-      <label htmlFor={htmlFor} id={id} className={baseClassName}>
-        {content}
-      </label>
-    );
-  }
-
-  if (as === "legend") {
-    return (
-      <legend id={id} className={baseClassName}>
-        {content}
-      </legend>
-    );
-  }
-
-  return (
-    <p id={id} className={baseClassName}>
-      {content}
-    </p>
-  );
-}
-
-function ErrorText({
-  className,
-  children,
-  id,
-  role,
-}: {
-  className?: string;
-  children: React.ReactNode;
-  id?: string;
-  role?: "alert" | "status";
-}) {
-  return (
-    <p
-      id={id}
-      role={role}
-      aria-live={role === "alert" ? "assertive" : undefined}
-      aria-atomic={role ? "true" : undefined}
-      className={cn("mt-2 text-[10px] uppercase tracking-[0.15em] text-error/85", className)}
-    >
-      {children}
-    </p>
-  );
-}
 
 function joinDescribedBy(...ids: Array<string | undefined>): string | undefined {
   const resolved = ids.filter((value): value is string => Boolean(value));
@@ -260,17 +187,15 @@ export function RsvpPersonalizedNoteSection({
   return (
     <>
       <motion.div variants={formField}>
-        <div className="rounded-[1.75rem] border border-accent/22 bg-accent/12 px-5 py-4 text-left">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-accent">
-            {t("personalized_note_label")}
-          </p>
+        <SurfacePanel tone="highlighted" contentClassName="px-5 py-4 text-left">
+          <p className="surface-panel-label">{t("personalized_note_label")}</p>
           <p className="mt-2 text-sm leading-relaxed text-text-secondary/90 md:text-[15px]">
             {t("personalized_note", {
               name: guestVocative,
               seats: maxSeats,
             })}
           </p>
-        </div>
+        </SurfacePanel>
       </motion.div>
 
       <motion.div variants={formField}>
@@ -306,13 +231,15 @@ export function RsvpGuestNamesSection({
 
   return (
     <motion.div variants={formField}>
-      <fieldset
-        className="min-w-0 border-0 p-0"
-        aria-describedby={joinDescribedBy(hintId, groupErrorId)}
+      <RsvpFieldGroup
+        as="fieldset"
+        title={visibleGuestFieldsCount > 1 ? t("guest_names_label") : t("name_label")}
+        required
+        hint={hintId ? t("guest_names_hint") : undefined}
+        hintId={hintId}
+        error={groupError ? getTranslatedError(groupError, t, "guest_names_required") : undefined}
+        errorId={groupErrorId}
       >
-        <FieldLabel as="legend" required>
-          {visibleGuestFieldsCount > 1 ? t("guest_names_label") : t("name_label")}
-        </FieldLabel>
         <div className="space-y-3">
           {guestNameKeys.slice(0, visibleGuestFieldsCount).map((key, index) => {
             const fieldError = errors.guestNames?.[index];
@@ -326,15 +253,15 @@ export function RsvpGuestNamesSection({
 
             return (
               <div key={key}>
-                <FieldLabel
-                  as="label"
+                <label
                   htmlFor={inputId}
-                  className={
-                    visibleGuestFieldsCount > 1 ? "mb-2 text-[10px] tracking-[0.15em]" : "sr-only"
-                  }
+                  className={cn(
+                    "mb-3 block w-full text-xs font-medium uppercase tracking-[0.18em] text-text-secondary/90",
+                    visibleGuestFieldsCount > 1 ? "mb-2 text-[10px] tracking-[0.15em]" : "sr-only",
+                  )}
                 >
                   {labelText}
-                </FieldLabel>
+                </label>
                 <Input
                   id={inputId}
                   placeholder={isPrimaryField ? t("name_placeholder") : t("guest_name_placeholder")}
@@ -346,28 +273,18 @@ export function RsvpGuestNamesSection({
                   {...register(`guestNames.${index}`)}
                 />
                 {fieldError ? (
-                  <ErrorText id={fieldErrorId}>
+                  <p
+                    id={fieldErrorId}
+                    className="mt-2 text-[10px] uppercase tracking-[0.15em] text-error/85"
+                  >
                     {getTranslatedError(fieldError, t, "name_min")}
-                  </ErrorText>
+                  </p>
                 ) : null}
               </div>
             );
           })}
         </div>
-        {hintId ? (
-          <p
-            id={hintId}
-            className="mt-3 text-[10px] uppercase tracking-[0.13em] text-text-secondary/90"
-          >
-            {t("guest_names_hint")}
-          </p>
-        ) : null}
-        {groupError ? (
-          <ErrorText id={groupErrorId}>
-            {getTranslatedError(groupError, t, "guest_names_required")}
-          </ErrorText>
-        ) : null}
-      </fieldset>
+      </RsvpFieldGroup>
     </motion.div>
   );
 }
@@ -395,12 +312,13 @@ export function RsvpAttendanceSection({
 
   return (
     <motion.div variants={formField}>
-      <fieldset
-        className="min-w-0 border-0 p-0"
-        aria-invalid={errors.attending ? "true" : undefined}
-        aria-describedby={errorId}
+      <RsvpFieldGroup
+        as="fieldset"
+        title={t("attending_label")}
+        error={errors.attending ? t("attendance_required") : undefined}
+        errorId={errorId}
+        invalid={Boolean(errors.attending)}
       >
-        <FieldLabel as="legend">{t("attending_label")}</FieldLabel>
         <div className="grid grid-cols-2 gap-3">
           <motion.button
             ref={yesButtonRef}
@@ -472,8 +390,7 @@ export function RsvpAttendanceSection({
             </span>
           </motion.button>
         </div>
-        {errors.attending ? <ErrorText id={errorId}>{t("attendance_required")}</ErrorText> : null}
-      </fieldset>
+      </RsvpFieldGroup>
     </motion.div>
   );
 }
@@ -523,7 +440,9 @@ export function RsvpAttendingDetailsSection({
           <RsvpDivider />
 
           <div>
-            <FieldLabel>{t("guests_label")}</FieldLabel>
+            <p className="mb-3 block w-full text-xs font-medium uppercase tracking-[0.18em] text-text-secondary/90">
+              {t("guests_label")}
+            </p>
             <div className="flex w-full items-center justify-between rounded-2xl border border-accent/22 bg-bg-primary/55 px-5 py-3">
               <button
                 type="button"
@@ -567,10 +486,13 @@ export function RsvpAttendingDetailsSection({
             </div>
           </div>
 
-          <div>
-            <FieldLabel as="label" htmlFor="dietary">
-              {t("dietary_label")}
-            </FieldLabel>
+          <RsvpFieldGroup
+            title={t("dietary_label")}
+            titleAs="label"
+            htmlFor="dietary"
+            error={dietaryError ? getTranslatedError(dietaryError, t, "dietary_max") : undefined}
+            errorId={dietaryErrorId}
+          >
             <Textarea
               id="dietary"
               placeholder={t("dietary_placeholder")}
@@ -581,12 +503,7 @@ export function RsvpAttendingDetailsSection({
               className="min-h-24 rounded-2xl text-sm"
               {...register("dietary")}
             />
-            {dietaryError ? (
-              <ErrorText id={dietaryErrorId}>
-                {getTranslatedError(dietaryError, t, "dietary_max")}
-              </ErrorText>
-            ) : null}
-          </div>
+          </RsvpFieldGroup>
         </div>
       </div>
     </div>
@@ -613,24 +530,24 @@ export function RsvpMessageSection({
 
   return (
     <motion.div variants={formField}>
-      <FieldLabel as="label" htmlFor="message">
-        {t("message_label")}
-      </FieldLabel>
-      <Textarea
-        id="message"
-        placeholder={t("message_placeholder")}
-        error={!!messageError}
-        disabled={isSubmitting}
-        aria-invalid={messageError ? "true" : undefined}
-        aria-describedby={messageErrorId}
-        className="rounded-2xl"
-        {...register("message")}
-      />
-      {messageError ? (
-        <ErrorText id={messageErrorId}>
-          {getTranslatedError(messageError, t, "message_max")}
-        </ErrorText>
-      ) : null}
+      <RsvpFieldGroup
+        title={t("message_label")}
+        titleAs="label"
+        htmlFor="message"
+        error={messageError ? getTranslatedError(messageError, t, "message_max") : undefined}
+        errorId={messageErrorId}
+      >
+        <Textarea
+          id="message"
+          placeholder={t("message_placeholder")}
+          error={!!messageError}
+          disabled={isSubmitting}
+          aria-invalid={messageError ? "true" : undefined}
+          aria-describedby={messageErrorId}
+          className="rounded-2xl"
+          {...register("message")}
+        />
+      </RsvpFieldGroup>
     </motion.div>
   );
 }
@@ -659,62 +576,16 @@ export function RsvpSubmitSection({
       : t("delivery_note");
 
   return (
-    <motion.div variants={formField} className="pt-1">
-      {submitError ? (
-        <ErrorText
-          id="rsvp-submit-error"
-          role="alert"
-          className="mb-3 text-center text-[10px] uppercase tracking-[0.13em] text-error/90"
-        >
-          {submitError}
-        </ErrorText>
-      ) : null}
-      <motion.button
-        type="submit"
-        disabled={!attending || isSubmitting}
-        whileHover={attending && !isSubmitting ? { scale: 1.01 } : undefined}
-        whileTap={attending && !isSubmitting ? { scale: 0.99 } : undefined}
-        className={cn(
-          "relative w-full overflow-hidden rounded-2xl py-4 text-base font-medium tracking-wide transition-all duration-500 md:py-5 md:text-lg",
-          focusRingClass,
-          attending && !isSubmitting
-            ? "cursor-pointer bg-accent text-bg-primary shadow-xl shadow-accent/20"
-            : "cursor-not-allowed border border-accent/22 bg-accent/22 text-text-primary/58",
-        )}
-      >
-        <span className="relative z-10 flex items-center justify-center gap-3">
-          <span>{isSubmitting ? t("submit_loading") : t("submit")}</span>
-          {!isSubmitting ? (
-            <motion.span
-              animate={attending ? { x: [0, 5, 0] } : undefined}
-              transition={{
-                duration: 1.8,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "easeInOut",
-              }}
-            >
-              →
-            </motion.span>
-          ) : null}
-        </span>
-        {attending && !isSubmitting && !liteMotion ? (
-          <motion.div
-            initial={{ x: "-110%" }}
-            whileHover={{ x: "110%" }}
-            transition={{ duration: 0.55, ease: MOTION_EASE }}
-            className="pointer-events-none absolute inset-0 skew-x-[-20deg] bg-linear-to-r from-transparent via-white/15 to-transparent"
-          />
-        ) : null}
-      </motion.button>
-
-      <p
-        aria-live="polite"
-        aria-atomic="true"
-        role={isSubmitting ? "status" : undefined}
-        className="mt-3 text-center text-[10px] uppercase tracking-[0.13em] text-text-secondary/90"
-      >
-        {statusMessage}
-      </p>
+    <motion.div variants={formField}>
+      <RsvpActionRow
+        disabled={!attending}
+        isSubmitting={isSubmitting}
+        liteMotion={liteMotion}
+        submitLabel={t("submit")}
+        loadingLabel={t("submit_loading")}
+        statusMessage={statusMessage}
+        errorMessage={submitError}
+      />
     </motion.div>
   );
 }
