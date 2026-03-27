@@ -10,6 +10,11 @@ const playwrightArtifactsDirectory = resolve(projectRoot, "artifacts/playwright"
 
 export default defineConfig({
   outputDir: resolve(playwrightArtifactsDirectory, "test-results"),
+  expect: {
+    toHaveScreenshot: {
+      pathTemplate: "{testDir}/{testFilePath}-snapshots/{arg}{-projectName}{ext}",
+    },
+  },
   reporter: isCI
     ? [
         ["github"],

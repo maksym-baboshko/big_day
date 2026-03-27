@@ -316,6 +316,7 @@ pnpm build-storybook
 - local-only browser diagnostics live in `e2e/smoke/`
 - page-level visual baselines live in `e2e/visual.spec.ts`
 - visual baselines are committed under `e2e/visual.spec.ts-snapshots/`
+- visual baselines intentionally omit OS-specific suffixes so local macOS runs and Linux CI share one canonical snapshot set
 - runtime outputs live in `artifacts/playwright/`
 - local and CI browser lanes both stay on `localhost`, not `127.0.0.1`, to avoid the known Next Intl refresh-loop issue
 - `pnpm smoke:history-restore:dev` is the canonical local-only diagnostic for `next dev` back/forward restore issues and expects an already running `localhost:3000`

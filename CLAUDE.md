@@ -263,6 +263,7 @@ pnpm build-storybook
 - `e2e/visual.spec.ts` owns current page-level screenshot baselines
 - homepage and personalized invite use stabilized above-the-fold screenshots
 - `/live` uses full-screen baselines for empty and error states
+- Playwright screenshot baselines are committed without OS suffixes so macOS and Linux share the same canonical files
 
 ### Chromatic
 
