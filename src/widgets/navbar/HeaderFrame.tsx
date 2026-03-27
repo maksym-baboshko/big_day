@@ -247,11 +247,11 @@ export function HeaderFrame({
                 : "border-transparent bg-bg-primary lg:bg-bg-primary/20 lg:backdrop-blur-md",
         )}
       >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6">
+        <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-6">
           {renderHeaderLink({
             item: logo,
             className: cn(
-              "heading-serif shrink-0 rounded-sm text-xl text-text-primary transition-colors hover:text-accent md:text-2xl",
+              "heading-serif justify-self-start shrink-0 rounded-sm text-xl text-text-primary transition-colors hover:text-accent md:text-2xl",
               FOCUS_RING_CLASS,
             ),
             children: (
@@ -261,7 +261,10 @@ export function HeaderFrame({
             ),
           })}
 
-          <nav aria-label={desktopNavLabel} className="hidden items-center gap-8 lg:flex">
+          <nav
+            aria-label={desktopNavLabel}
+            className="hidden items-center justify-self-center gap-8 lg:flex"
+          >
             {items.map((item) => (
               <div key={`${item.kind}-${item.href}`} className="contents">
                 {renderHeaderLink({
@@ -287,15 +290,14 @@ export function HeaderFrame({
                 })}
               </div>
             ))}
-
-            <div aria-hidden="true" className="mx-2 h-4 w-px bg-accent/30" />
-            <div className="flex items-center gap-3">
-              <ThemeSwitcher />
-              <LanguageSwitcher />
-            </div>
           </nav>
 
-          <div className="flex items-center gap-3 lg:hidden">
+          <div className="hidden justify-self-end lg:flex lg:items-center lg:gap-3">
+            <ThemeSwitcher />
+            <LanguageSwitcher />
+          </div>
+
+          <div className="col-start-3 flex items-center justify-self-end gap-3 lg:hidden">
             <ThemeSwitcher />
             <LanguageSwitcher />
             <div className="mx-1 h-4 w-px bg-accent/30" />
