@@ -10,6 +10,42 @@ const INVITATION_REVEAL_DELAY_SECONDS = 2;
 const INVITATION_REVEAL_DURATION_SECONDS = 1.04;
 const ENVELOPE_CLOSED_OFFSET = "-24%";
 const LETTER_OPEN_OFFSET = "-65%";
+const splashPaletteClassName = [
+  "[--splash-paper-base:#EAE0CE]",
+  "[--splash-paper-soft:#F6ECE2]",
+  "[--splash-paper-left-start:#EEE0CC]",
+  "[--splash-paper-left-end:#E0CEB8]",
+  "[--splash-paper-right-start:#ECDDC8]",
+  "[--splash-paper-right-end:#DECBB5]",
+  "[--splash-paper-bottom-start:#E6D8C4]",
+  "[--splash-paper-bottom-end:#DDD0BC]",
+  "[--splash-paper-top-start:#F8F0E8]",
+  "[--splash-paper-top-end:#EDE2D4]",
+  "[--splash-paper-back:#C8B89E]",
+  "[--splash-card:#FAF6F0]",
+  "[--splash-card-border:#E6D5C3]",
+  "[--splash-card-ink:#3A3530]",
+  "[--splash-card-muted:#A08875]",
+  "[--splash-card-accent:#C4A07A]",
+  "[--splash-ornament:#A87848]",
+  "dark:[--splash-paper-base:#E0D1C0]",
+  "dark:[--splash-paper-soft:#ECDDCE]",
+  "dark:[--splash-paper-left-start:#E3D2C1]",
+  "dark:[--splash-paper-left-end:#D4BFA8]",
+  "dark:[--splash-paper-right-start:#E1CFBE]",
+  "dark:[--splash-paper-right-end:#D1BBA4]",
+  "dark:[--splash-paper-bottom-start:#D8C8B4]",
+  "dark:[--splash-paper-bottom-end:#CBB8A2]",
+  "dark:[--splash-paper-top-start:#EDE0D2]",
+  "dark:[--splash-paper-top-end:#E0CFBE]",
+  "dark:[--splash-paper-back:#B7A58C]",
+  "dark:[--splash-card:#F5EDE3]",
+  "dark:[--splash-card-border:#DDCAB7]",
+  "dark:[--splash-card-ink:#342F2A]",
+  "dark:[--splash-card-muted:#9D856F]",
+  "dark:[--splash-card-accent:#C49E75]",
+  "dark:[--splash-ornament:#A97D53]",
+].join(" ");
 
 export function Splash() {
   const t = useTranslations("Splash");
@@ -63,7 +99,7 @@ export function Splash() {
           />
 
           <motion.div
-            className="relative flex h-[28rem] w-96 max-w-[90vw] items-center justify-center md:h-[620px] md:w-[560px]"
+            className={`${splashPaletteClassName} relative flex h-[28rem] w-96 max-w-[90vw] items-center justify-center md:h-[620px] md:w-[560px]`}
             initial={{ scale: 0.95, opacity: 0, y: 30 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 1.05, opacity: 0, filter: "blur(4px)" }}
@@ -82,7 +118,10 @@ export function Splash() {
                 },
               }}
             >
-              <div className="absolute inset-0 rounded-sm bg-[#EAE0CE] shadow-xl z-0" />
+              <div
+                className="absolute inset-0 z-0 rounded-sm shadow-xl"
+                style={{ backgroundColor: "var(--splash-paper-base)" }}
+              />
 
               <div className="absolute inset-0 z-[5] pointer-events-none overflow-hidden">
                 <svg
@@ -97,71 +136,89 @@ export function Splash() {
                     y="11"
                     width="378"
                     height="278"
-                    stroke="#B8956A"
+                    stroke="var(--splash-card-accent)"
                     strokeWidth="0.7"
                     opacity="0.45"
                   />
                   <path
                     d="M11 42 L11 11 L42 11"
-                    stroke="#A8845A"
+                    stroke="var(--splash-ornament)"
                     strokeWidth="1.5"
                     strokeLinecap="round"
                     opacity="0.65"
                   />
                   <path
                     d="M358 11 L389 11 L389 42"
-                    stroke="#A8845A"
+                    stroke="var(--splash-ornament)"
                     strokeWidth="1.5"
                     strokeLinecap="round"
                     opacity="0.65"
                   />
                   <path
                     d="M11 258 L11 289 L42 289"
-                    stroke="#A8845A"
+                    stroke="var(--splash-ornament)"
                     strokeWidth="1.5"
                     strokeLinecap="round"
                     opacity="0.65"
                   />
                   <path
                     d="M358 289 L389 289 L389 258"
-                    stroke="#A8845A"
+                    stroke="var(--splash-ornament)"
                     strokeWidth="1.5"
                     strokeLinecap="round"
                     opacity="0.65"
                   />
-                  <path d="M11 11 L14.5 14.5 L11 18 L7.5 14.5 Z" fill="#A8845A" opacity="0.6" />
                   <path
-                    d="M389 11 L392.5 14.5 L389 18 L385.5 14.5 Z"
-                    fill="#A8845A"
+                    d="M11 11 L14.5 14.5 L11 18 L7.5 14.5 Z"
+                    fill="var(--splash-ornament)"
                     opacity="0.6"
                   />
-                  <path d="M11 289 L14.5 292.5 L11 296 L7.5 292.5 Z" fill="#A8845A" opacity="0.6" />
+                  <path
+                    d="M389 11 L392.5 14.5 L389 18 L385.5 14.5 Z"
+                    fill="var(--splash-ornament)"
+                    opacity="0.6"
+                  />
+                  <path
+                    d="M11 289 L14.5 292.5 L11 296 L7.5 292.5 Z"
+                    fill="var(--splash-ornament)"
+                    opacity="0.6"
+                  />
                   <path
                     d="M389 289 L392.5 292.5 L389 296 L385.5 292.5 Z"
-                    fill="#A8845A"
+                    fill="var(--splash-ornament)"
                     opacity="0.6"
                   />
                   <path
                     d="M200 11 L202.5 13.5 L200 16 L197.5 13.5 Z"
-                    fill="#A8845A"
+                    fill="var(--splash-ornament)"
                     opacity="0.4"
                   />
                   <path
                     d="M200 289 L202.5 291.5 L200 294 L197.5 291.5 Z"
-                    fill="#A8845A"
+                    fill="var(--splash-ornament)"
                     opacity="0.4"
                   />
-                  <path d="M11 150 L13.5 152.5 L11 155 L8.5 152.5 Z" fill="#A8845A" opacity="0.4" />
+                  <path
+                    d="M11 150 L13.5 152.5 L11 155 L8.5 152.5 Z"
+                    fill="var(--splash-ornament)"
+                    opacity="0.4"
+                  />
                   <path
                     d="M389 150 L391.5 152.5 L389 155 L386.5 152.5 Z"
-                    fill="#A8845A"
+                    fill="var(--splash-ornament)"
                     opacity="0.4"
                   />
                 </svg>
               </div>
 
               <motion.div
-                className="absolute flex h-[85%] w-[92%] flex-col items-center justify-center rounded-sm border border-[#E6D5C3] bg-[#FAF6F0] p-6 text-center shadow-md z-20"
+                className="absolute z-20 flex h-[85%] w-[92%] flex-col items-center justify-center rounded-sm border p-6 text-center shadow-md"
+                style={{
+                  left: "4%",
+                  top: "7%",
+                  borderColor: "var(--splash-card-border)",
+                  backgroundColor: "var(--splash-card)",
+                }}
                 initial={{ y: 0, scale: 0.99 }}
                 animate={{ y: LETTER_OPEN_OFFSET, scale: 1 }}
                 transition={{
@@ -176,7 +233,6 @@ export function Splash() {
                     ease: "easeInOut",
                   },
                 }}
-                style={{ left: "4%", top: "7%" }}
               >
                 <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-sm">
                   <svg
@@ -192,74 +248,77 @@ export function Splash() {
                       y="12"
                       width="376"
                       height="254"
-                      stroke="#C4A07A"
+                      stroke="var(--splash-card-accent)"
                       strokeWidth="0.65"
                       opacity="0.32"
                     />
                     <path
                       d="M12 12 C9 8 9 3 12 0 C15 3 15 8 12 12 Z"
-                      fill="#A87848"
+                      fill="var(--splash-ornament)"
                       opacity="0.45"
                     />
                     <path
                       d="M12 12 C7 9 4 5 7 3 C10 5 12 9 12 12 Z"
-                      fill="#A87848"
+                      fill="var(--splash-ornament)"
                       opacity="0.37"
                     />
                     <path
                       d="M12 12 C9 15 5 15 3 12 C5 9 9 9 12 12 Z"
-                      fill="#A87848"
+                      fill="var(--splash-ornament)"
                       opacity="0.30"
                     />
                     <path
                       d="M388 12 C385 8 385 3 388 0 C391 3 391 8 388 12 Z"
-                      fill="#A87848"
+                      fill="var(--splash-ornament)"
                       opacity="0.45"
                     />
                     <path
                       d="M388 12 C391 9 395 5 393 3 C390 5 388 9 388 12 Z"
-                      fill="#A87848"
+                      fill="var(--splash-ornament)"
                       opacity="0.37"
                     />
                     <path
                       d="M388 12 C391 15 395 15 397 12 C395 9 391 9 388 12 Z"
-                      fill="#A87848"
+                      fill="var(--splash-ornament)"
                       opacity="0.30"
                     />
                     <path
                       d="M12 266 C9 270 9 275 12 278 C15 275 15 270 12 266 Z"
-                      fill="#A87848"
+                      fill="var(--splash-ornament)"
                       opacity="0.45"
                     />
                     <path
                       d="M12 266 C7 269 4 273 7 275 C10 273 12 269 12 266 Z"
-                      fill="#A87848"
+                      fill="var(--splash-ornament)"
                       opacity="0.37"
                     />
                     <path
                       d="M12 266 C9 263 5 263 3 266 C5 269 9 269 12 266 Z"
-                      fill="#A87848"
+                      fill="var(--splash-ornament)"
                       opacity="0.30"
                     />
                     <path
                       d="M388 266 C385 270 385 275 388 278 C391 275 391 270 388 266 Z"
-                      fill="#A87848"
+                      fill="var(--splash-ornament)"
                       opacity="0.45"
                     />
                     <path
                       d="M388 266 C391 269 395 273 393 275 C390 273 388 269 388 266 Z"
-                      fill="#A87848"
+                      fill="var(--splash-ornament)"
                       opacity="0.37"
                     />
                     <path
                       d="M388 266 C391 263 395 263 397 266 C395 269 391 269 388 266 Z"
-                      fill="#A87848"
+                      fill="var(--splash-ornament)"
                       opacity="0.30"
                     />
                   </svg>
                 </div>
 
-                <h1 className="heading-serif mb-3 text-3xl text-[#3A3530] md:text-5xl">
+                <h1
+                  className="heading-serif mb-3 text-3xl md:text-5xl"
+                  style={{ color: "var(--splash-card-ink)" }}
+                >
                   {t("title")}
                 </h1>
                 <div className="my-3 flex items-center justify-center">
@@ -268,7 +327,7 @@ export function Splash() {
                       cx="12"
                       cy="9"
                       r="8"
-                      stroke="#C4A07A"
+                      stroke="var(--splash-card-accent)"
                       strokeWidth="1.3"
                       fill="none"
                       opacity="0.58"
@@ -277,21 +336,27 @@ export function Splash() {
                       cx="24"
                       cy="9"
                       r="8"
-                      stroke="#C4A07A"
+                      stroke="var(--splash-card-accent)"
                       strokeWidth="1.3"
                       fill="none"
                       opacity="0.58"
                     />
                   </svg>
                 </div>
-                <p className="heading-serif-italic text-sm text-[#A08875] md:text-base">
+                <p
+                  className="heading-serif-italic text-sm md:text-base"
+                  style={{ color: "var(--splash-card-muted)" }}
+                >
                   {t("subtitle")}
                 </p>
               </motion.div>
 
               <motion.div
-                className="absolute inset-x-0 top-0 h-1/2 bg-[#F6ECE2] pointer-events-none z-[35]"
-                style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)" }}
+                className="pointer-events-none absolute inset-x-0 top-0 z-[35] h-1/2"
+                style={{
+                  backgroundColor: "var(--splash-paper-soft)",
+                  clipPath: "polygon(0 0, 100% 0, 50% 100%)",
+                }}
                 initial={{ opacity: 1 }}
                 animate={{ opacity: 0 }}
                 transition={{ duration: 0.1, delay: 0.9 }}
@@ -308,16 +373,16 @@ export function Splash() {
                 >
                   <defs>
                     <linearGradient id="leftFlap" x1="0" y1="0.5" x2="1" y2="0.5">
-                      <stop offset="0%" stopColor="#EEE0CC" />
-                      <stop offset="100%" stopColor="#E0CEB8" />
+                      <stop offset="0%" stopColor="var(--splash-paper-left-start)" />
+                      <stop offset="100%" stopColor="var(--splash-paper-left-end)" />
                     </linearGradient>
                     <linearGradient id="rightFlap" x1="1" y1="0.5" x2="0" y2="0.5">
-                      <stop offset="0%" stopColor="#ECDdC8" />
-                      <stop offset="100%" stopColor="#DECBB5" />
+                      <stop offset="0%" stopColor="var(--splash-paper-right-start)" />
+                      <stop offset="100%" stopColor="var(--splash-paper-right-end)" />
                     </linearGradient>
                     <linearGradient id="bottomFlap" x1="0.5" y1="1" x2="0.5" y2="0">
-                      <stop offset="0%" stopColor="#E6D8C4" />
-                      <stop offset="100%" stopColor="#DDD0BC" />
+                      <stop offset="0%" stopColor="var(--splash-paper-bottom-start)" />
+                      <stop offset="100%" stopColor="var(--splash-paper-bottom-end)" />
                     </linearGradient>
                   </defs>
                   <path d="M0 0 L200 150 L0 300 Z" fill="url(#leftFlap)" />
@@ -352,8 +417,8 @@ export function Splash() {
                   >
                     <defs>
                       <linearGradient id="topFlapGrad" x1="0.5" y1="0" x2="0.5" y2="1">
-                        <stop offset="0%" stopColor="#F8F0E8" />
-                        <stop offset="100%" stopColor="#EDE2D4" />
+                        <stop offset="0%" stopColor="var(--splash-paper-top-start)" />
+                        <stop offset="100%" stopColor="var(--splash-paper-top-end)" />
                       </linearGradient>
                     </defs>
                     <path
@@ -370,7 +435,7 @@ export function Splash() {
                     backfaceVisibility: "hidden",
                     transform: "rotateX(180deg)",
                     clipPath: "polygon(0% 100%, 50% 48.3%, 100% 100%)",
-                    backgroundColor: "#C8B89E",
+                    backgroundColor: "var(--splash-paper-back)",
                     backgroundImage: [
                       "repeating-linear-gradient(45deg, rgba(255,245,220,0.13) 0px, rgba(255,245,220,0.13) 1px, transparent 1px, transparent 14px)",
                       "repeating-linear-gradient(-45deg, rgba(255,245,220,0.13) 0px, rgba(255,245,220,0.13) 1px, transparent 1px, transparent 14px)",
