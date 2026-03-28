@@ -369,7 +369,11 @@ Use two story types deliberately:
 - local-only browser diagnostics live in `e2e/smoke/`
 - page-level visual baselines live in `e2e/visual.spec.ts`
 - visual baselines are committed under `e2e/visual.spec.ts-snapshots/`
-- visual baselines intentionally omit OS-specific suffixes and the canonical screenshot lane runs on macOS CI to avoid Linux-vs-mac rendering drift
+- visual baselines intentionally omit OS-specific suffixes
+- the canonical screenshot lane runs on pinned `macos-15` CI to avoid cross-version rendering drift
+- global tolerance (`threshold: 0.3`, `maxDiffPixelRatio: 0.002`) is set in `configs/playwright/config.ts`
+- after any UI change that alters page-level appearance, regenerate baselines: `pnpm test:e2e -- --update-snapshots`
+- when upgrading the CI macOS pin, regenerate all baselines and commit them alongside the runner change
 - runtime outputs live in `artifacts/playwright/`
 - local and CI browser lanes both stay on `localhost`, not `127.0.0.1`, to avoid the known Next Intl refresh-loop issue
 - `pnpm smoke:history-restore:dev` is the canonical local-only diagnostic for `next dev` back/forward restore issues and expects an already running `localhost:3000`

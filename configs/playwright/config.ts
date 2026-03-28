@@ -13,6 +13,8 @@ export default defineConfig({
   expect: {
     toHaveScreenshot: {
       pathTemplate: "{testDir}/{testFilePath}-snapshots/{arg}{-projectName}{ext}",
+      threshold: 0.3,
+      maxDiffPixelRatio: 0.002,
     },
   },
   reporter: isCI

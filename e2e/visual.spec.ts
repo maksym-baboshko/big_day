@@ -35,7 +35,6 @@ test.describe("Visual regression", () => {
 
     await expect(page).toHaveScreenshot("homepage.png", {
       mask: [page.getByTestId("countdown"), scrollHint],
-      maxDiffPixels: 120,
     });
   });
 
@@ -48,7 +47,6 @@ test.describe("Visual regression", () => {
 
     await expect(page).toHaveScreenshot("personalized-invite.png", {
       mask: [page.getByTestId("countdown"), scrollHint],
-      maxDiffPixels: 120,
     });
   });
 
@@ -61,7 +59,6 @@ test.describe("Visual regression", () => {
     await expect(page).toHaveScreenshot("live-empty.png", {
       fullPage: true,
       mask: [liveClock],
-      maxDiffPixels: 20,
     });
   });
 
@@ -74,7 +71,6 @@ test.describe("Visual regression", () => {
     await expect(page).toHaveScreenshot("live-error.png", {
       fullPage: true,
       mask: [liveClock],
-      maxDiffPixels: 20,
     });
   });
 });

@@ -128,7 +128,10 @@ jobs:
 
   e2e:
     name: E2E Tests
-    runs-on: macos-latest
+    # Pinned for visual regression stability.
+    # Changing this version requires regenerating all screenshot baselines
+    # in e2e/visual.spec.ts-snapshots/ in the same commit.
+    runs-on: macos-15
     needs: build
     steps:
       - uses: actions/checkout@v4

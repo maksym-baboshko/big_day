@@ -302,7 +302,19 @@ pnpm build-storybook
 - `e2e/visual.spec.ts` owns current page-level screenshot baselines
 - homepage and personalized invite use stabilized above-the-fold screenshots
 - `/live` uses full-screen baselines for empty and error states
-- Playwright screenshot baselines are committed without OS suffixes and the canonical screenshot lane runs on macOS CI to avoid Linux-vs-mac rendering drift
+- Playwright screenshot baselines are committed without OS suffixes
+- the canonical screenshot lane runs on pinned `macos-15` CI to avoid cross-version rendering drift
+- global tolerance (`threshold: 0.3`, `maxDiffPixelRatio: 0.002`) is set in `configs/playwright/config.ts`; individual tests should not override unless they have a documented reason
+
+### Visual baseline maintenance
+
+- after any UI change that alters page-level appearance, regenerate baselines:
+  `pnpm test:e2e -- --update-snapshots`
+- regeneration must happen on the same OS as CI (currently macOS 15); if local OS differs,
+  let CI fail, download actual screenshots from the `playwright-report` artifact, and commit those
+- never raise tolerance thresholds to paper over a real regression; investigate first
+- when upgrading the CI macOS pin (e.g., `macos-15` → `macos-16`), regenerate all baselines
+  and commit them alongside the runner change
 
 ### Chromatic
 
