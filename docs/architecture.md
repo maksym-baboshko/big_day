@@ -30,6 +30,13 @@ Not implemented in the current phase:
 - realtime transport
 - game hub backend
 
+### Locale resolution
+
+- explicit locale in the URL wins
+- `NEXT_LOCALE` cookie wins over first-visit detection
+- first visit without locale or cookie uses `Accept-Language`
+- `uk` and `ru` resolve to `uk`; every other locale resolves to `en`
+
 ---
 
 ## 2. Architectural Style
@@ -308,6 +315,7 @@ pnpm build-storybook
 - CI runs Storybook browser tests in `.github/workflows/ci.yml`
 - Chromatic publishing lives in `.github/workflows/chromatic.yml`
 - required repo secret: `CHROMATIC_PROJECT_TOKEN`
+- local first-publish command: `CHROMATIC_PROJECT_TOKEN=your-token pnpm chromatic`
 - Storybook static output lives in `artifacts/storybook/static`
 
 ### Playwright

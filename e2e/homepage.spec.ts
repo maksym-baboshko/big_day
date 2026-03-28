@@ -100,10 +100,21 @@ test.describe("Homepage — /en locale", () => {
     await expectHeroContentVisible(page);
   });
 
-  test("clean storage still defaults to Ukrainian even for an English browser locale", async ({
+  test("clean storage defaults to English for a non-Slavic browser locale", async ({ browser }) => {
+    const context = await browser.newContext({ locale: "en-US" });
+    const page = await context.newPage();
+
+    await page.goto("/");
+
+    await expect(page).toHaveURL("/en");
+    await expect(page.getByText("Maksym").or(page.getByText("Diana")).first()).toBeVisible();
+    await context.close();
+  });
+
+  test("clean storage still defaults to Ukrainian for a Russian browser locale", async ({
     browser,
   }) => {
-    const context = await browser.newContext({ locale: "en-US" });
+    const context = await browser.newContext({ locale: "ru-RU" });
     const page = await context.newPage();
 
     await page.goto("/");

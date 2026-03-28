@@ -22,6 +22,13 @@ Current phase:
 | `/live` | Live projector, `noindex` |
 | `/live?state=populated|empty|error` | Mock live state switch |
 
+### Locale resolution
+
+- explicit locale in the URL wins
+- `NEXT_LOCALE` cookie wins over first-visit detection
+- first visit without locale or cookie uses `Accept-Language`
+- `uk` and `ru` resolve to `uk`; every other locale resolves to `en`
+
 ## Local setup
 
 ```bash
@@ -69,13 +76,21 @@ pnpm build-storybook
 
 ### Chromatic
 
-Add the repo secret:
+First-time local baseline publish:
+
+```bash
+CHROMATIC_PROJECT_TOKEN=your-token pnpm chromatic
+```
+
+Then add the same token as a repo secret:
 
 ```text
 CHROMATIC_PROJECT_TOKEN
 ```
 
-Then the workflow in `.github/workflows/chromatic.yml` can publish Storybook builds.
+The existing workflow in `.github/workflows/chromatic.yml` will then publish Storybook builds on `main`, `develop`, and pull requests targeting those branches.
+
+Do not commit the raw project token into the repository. Keep it only in your local environment and in GitHub Actions secrets.
 
 ## Current architecture
 

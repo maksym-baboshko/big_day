@@ -127,6 +127,8 @@ app → widgets → features → entities → shared
 - no DB queries, no email sending, no server-only utilities in UI flows
 - `/live` must use typed mock source, not `/api/*`
 - personalized invites must resolve through `entities/guest`
+- locale priority is `URL > NEXT_LOCALE cookie > first-visit Accept-Language`
+- first-visit locale detection resolves `uk` and `ru` to `uk`; every other locale resolves to `en`
 
 ---
 
