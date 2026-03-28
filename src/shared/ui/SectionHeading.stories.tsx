@@ -29,7 +29,12 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
+const stableVisualGlobals = {
+  motion: "reduce",
+} as const;
+
 export const Default: Story = {
+  globals: stableVisualGlobals,
   render: (args) => (
     <StorybookCenteredCanvas widthClassName="w-[min(44rem,92vw)]" paddingClassName="p-8">
       <SectionHeading eyebrow={args.eyebrow} subtitle={args.subtitle}>
@@ -45,5 +50,6 @@ export const WithEyebrow: Story = {
     eyebrow: "Invitation",
     subtitle: "Canonical section intro pattern",
   },
+  globals: stableVisualGlobals,
   render: Default.render,
 };

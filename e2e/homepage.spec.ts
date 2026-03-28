@@ -79,6 +79,14 @@ test.describe("Homepage", () => {
     await expect(page).toHaveURL("/");
     await expectHeroContentVisible(page);
   });
+
+  test("responds with the lightweight security headers", async ({ request }) => {
+    const response = await request.get("/");
+
+    expect(response.headers()["x-content-type-options"]).toBe("nosniff");
+    expect(response.headers()["referrer-policy"]).toBe("strict-origin-when-cross-origin");
+    expect(response.headers()["permissions-policy"]).toContain("camera=()");
+  });
 });
 
 test.describe("Homepage — /en locale", () => {
@@ -121,6 +129,27 @@ test.describe("Homepage — /en locale", () => {
 
     await expect(page).toHaveURL(/\/$/);
     await expect(page.getByText("Максим").or(page.getByText("Діана")).first()).toBeVisible();
+
+    await context.close();
+  });
+
+  test("explicit locale path wins over a conflicting locale cookie", async ({ browser }) => {
+    const context = await browser.newContext({ locale: "ru-RU" });
+
+    await context.addCookies([
+      {
+        name: "NEXT_LOCALE",
+        value: "uk",
+        url: "http://localhost:3100",
+      },
+    ]);
+
+    const page = await context.newPage();
+
+    await page.goto("/en");
+
+    await expect(page).toHaveURL("/en");
+    await expect(page.getByText("Maksym").or(page.getByText("Diana")).first()).toBeVisible();
 
     await context.close();
   });

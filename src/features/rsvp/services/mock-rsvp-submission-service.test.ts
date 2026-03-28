@@ -106,4 +106,73 @@ describe("mockRsvpSubmissionService", () => {
 
     expect(window.localStorage.getItem(RSVP_STORAGE_KEY)).toBeNull();
   });
+
+  it("treats invalid JSON in storage as an empty submission list", async () => {
+    window.localStorage.setItem(RSVP_STORAGE_KEY, "{not-valid-json");
+
+    const submitPromise = mockRsvpSubmissionService.submit(validSubmission);
+
+    await vi.advanceTimersByTimeAsync(850);
+
+    await expect(submitPromise).resolves.toEqual({
+      success: true,
+      requestId: "request-123",
+      mode: "mock",
+    });
+
+    expect(JSON.parse(window.localStorage.getItem(RSVP_STORAGE_KEY) ?? "[]")).toEqual([
+      {
+        ...validSubmission,
+        guestNames: ["Ігор Бабошко", "Марія Бабошко"],
+        message: "До зустрічі!",
+      },
+    ]);
+  });
+
+  it("treats non-array storage payloads as an empty submission list", async () => {
+    window.localStorage.setItem(RSVP_STORAGE_KEY, JSON.stringify({ invalid: true }));
+
+    const submitPromise = mockRsvpSubmissionService.submit(validSubmission);
+
+    await vi.advanceTimersByTimeAsync(850);
+
+    await expect(submitPromise).resolves.toEqual({
+      success: true,
+      requestId: "request-123",
+      mode: "mock",
+    });
+
+    expect(JSON.parse(window.localStorage.getItem(RSVP_STORAGE_KEY) ?? "[]")).toEqual([
+      {
+        ...validSubmission,
+        guestNames: ["Ігор Бабошко", "Марія Бабошко"],
+        message: "До зустрічі!",
+      },
+    ]);
+  });
+
+  it("treats arrays with invalid submission shapes as an empty submission list", async () => {
+    window.localStorage.setItem(
+      RSVP_STORAGE_KEY,
+      JSON.stringify([{ attending: "yes", guestNames: [""], guests: 0 }]),
+    );
+
+    const submitPromise = mockRsvpSubmissionService.submit(validSubmission);
+
+    await vi.advanceTimersByTimeAsync(850);
+
+    await expect(submitPromise).resolves.toEqual({
+      success: true,
+      requestId: "request-123",
+      mode: "mock",
+    });
+
+    expect(JSON.parse(window.localStorage.getItem(RSVP_STORAGE_KEY) ?? "[]")).toEqual([
+      {
+        ...validSubmission,
+        guestNames: ["Ігор Бабошко", "Марія Бабошко"],
+        message: "До зустрічі!",
+      },
+    ]);
+  });
 });

@@ -48,6 +48,12 @@ export default defineConfig({
       reporter: ["text", "html", "json-summary"],
       reportsDirectory: unitCoverageDirectory,
       exclude: ["configs/**", "e2e/**", "src/**/*.stories.tsx", "src/testing/**"],
+      thresholds: {
+        statements: 75,
+        branches: 68,
+        functions: 65,
+        lines: 78,
+      },
     },
     projects: [
       {

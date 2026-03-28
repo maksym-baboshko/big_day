@@ -33,6 +33,7 @@ Current phase:
 
 ```bash
 pnpm install
+pnpm setup:browsers
 pnpm typecheck
 pnpm lint
 pnpm test
@@ -43,11 +44,11 @@ pnpm build
 pnpm build-storybook
 ```
 
-Browser-based lanes use Playwright under the hood. Install Chromium once if your machine does not
-already have it:
+Browser-based lanes use Playwright under the hood. Install Chromium once before running
+`pnpm test:storybook`, `pnpm test:e2e`, or `pnpm smoke:history-restore:dev`:
 
 ```bash
-pnpm exec playwright install chromium
+pnpm setup:browsers
 ```
 
 `pnpm smoke:history-restore:dev` is a local-only diagnostic lane for the known `next dev`
@@ -160,7 +161,7 @@ dependencies stay out of the repo until the backend phase is reintroduced on pur
 - `pnpm test:storybook` runs Storybook-driven browser component tests through the `storybook` Vitest project.
 - `pnpm test:e2e` runs route-level Playwright flows and screenshot baselines from `e2e/`.
 - `pnpm smoke:history-restore:dev` verifies the dev-only browser back/forward restore flow from `e2e/smoke/` against a running `localhost:3000`.
-- `pnpm test:coverage` collects the current unit-test coverage baseline into `artifacts/vitest/coverage/`.
+- `pnpm test:coverage` enforces the current unit coverage thresholds and writes reports into `artifacts/vitest/coverage/`.
 - `src/testing/` is reserved for shared test mocks and helpers only. Tests themselves stay colocated with source files.
 - Storybook stories stay in the default test lane; opt out later with `tags: ["!test"]` only for intentionally decorative or unstable stories.
 

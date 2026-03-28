@@ -101,6 +101,7 @@ Script-driven config entrypoints:
 - `pnpm test:storybook` → `configs/vitest/config.ts`
 - `pnpm test:coverage` → `configs/vitest/config.ts`
 - `pnpm test:e2e` → `configs/playwright/config.ts`
+- `pnpm setup:browsers` → Playwright Chromium install wrapper
 
 ---
 
@@ -317,7 +318,8 @@ pnpm build-storybook
 
 - `unit` is the fast Node lane used by `pnpm test`
 - `storybook` is the browser lane powered by `@storybook/addon-vitest` and Playwright
-- `pnpm test:coverage` currently collects the unit coverage baseline into `artifacts/vitest/coverage/`
+- run `pnpm setup:browsers` once locally before `pnpm test:storybook`, `pnpm test:e2e`, or other Playwright-backed lanes
+- `pnpm test:coverage` enforces the current unit coverage thresholds and writes reports into `artifacts/vitest/coverage/`
 
 ### Storybook / Chromatic
 
@@ -542,10 +544,14 @@ Security headers and CSP are intentionally deferred until the remaining inline-s
 formalized.
 
 Current inline script usage is limited to localized JSON-LD on
-`/Users/boshmax/Home/Coding/Projects/26.03/diandmax.com/src/app/[locale]/page.tsx`.
+`src/app/[locale]/page.tsx`.
 
 Theme bootstrapping no longer depends on an inline script; the root layout derives the initial
 theme from a synced cookie and the client provider keeps `localStorage` and the cookie aligned.
 
 When CSP is introduced, it must account for the JSON-LD script without breaking hydration or the
 Next.js runtime.
+
+Before backend re-entry, the runtime must at minimum keep lightweight security headers in place
+(`nosniff`, `strict-origin-when-cross-origin`, conservative `Permissions-Policy`) and then add a
+separate CSP follow-up once the JSON-LD/inlined-script policy is finalized.

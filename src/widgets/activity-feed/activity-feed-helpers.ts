@@ -13,6 +13,29 @@ export const DESKTOP_FEED_LOAD_MORE_STEP = 10;
 export const SEEN_HERO_IDS_MAX = 200;
 export const EASE = MOTION_EASE;
 
+export function getVisibleFeed<T>(feed: T[], visibleCount: number): T[] {
+  return feed.slice(0, Math.max(0, visibleCount));
+}
+
+export function splitFeedIntoColumns<T>(items: T[]): { left: T[]; right: T[] } {
+  return items.reduce(
+    (columns, item, index) => {
+      if (index % 2 === 0) {
+        columns.left.push(item);
+      } else {
+        columns.right.push(item);
+      }
+
+      return columns;
+    },
+    { left: [] as T[], right: [] as T[] },
+  );
+}
+
+export function hasMoreFeedForViewport(totalCount: number, visibleCount: number): boolean {
+  return totalCount > visibleCount;
+}
+
 export function getAvatarMonogram(avatarKey: string | null, fallbackName: string | null): string {
   if (avatarKey) {
     const parts = avatarKey.split("-").filter(Boolean);

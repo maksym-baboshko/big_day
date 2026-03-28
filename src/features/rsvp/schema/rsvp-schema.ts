@@ -20,4 +20,6 @@ export const rsvpSchema = z.object({
   slug: z.string().optional(),
 });
 
+export const rsvpStoredSubmissionsSchema = z.array(rsvpSchema);
+
 export type RsvpFormData = z.infer<typeof rsvpSchema>;

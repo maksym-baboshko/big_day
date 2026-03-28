@@ -130,6 +130,14 @@ app → widgets → features → entities → shared
 - locale priority is `URL > NEXT_LOCALE cookie > first-visit Accept-Language`
 - first-visit locale detection resolves `uk` and `ru` to `uk`; every other locale resolves to `en`
 
+### React component logic policy
+
+- keep simple local state and straightforward derived values inside the component
+- do not extract custom hooks just to make a component file shorter
+- extract a custom hook only when it clearly reduces cognitive complexity, creates a clean test seam, or isolates a real responsibility such as submission orchestration, focus management, or heavy watcher/effect logic
+- if the logic is local, short, and easier to understand next to the JSX, leave it in the component
+- prefer a few meaningful hooks over many tiny `useSomething` wrappers with no strong ownership
+
 ---
 
 ## Public UI APIs
@@ -252,13 +260,14 @@ pnpm build-storybook
 - `pnpm test` → unit Vitest project
 - `pnpm test:storybook` → Storybook-driven browser tests through `@storybook/addon-vitest`
 - `pnpm test:e2e` → Playwright route flows and screenshot baselines
-- `pnpm test:coverage` → current unit coverage baseline
+- `pnpm test:coverage` → enforced unit coverage thresholds + coverage report output
 
 ### Browser verification policy
 
 - Minor local visual tweaks can stop at quick safety checks during iteration:
   - `pnpm lint`
   - `pnpm typecheck`
+- Run `pnpm setup:browsers` once locally before Playwright-backed browser lanes.
 - Substantial UI/UX changes, or any UI/UX batch before commit, must end with a verification pass.
 - Minimum required full lane for substantial UI/UX work:
   - `pnpm lint`

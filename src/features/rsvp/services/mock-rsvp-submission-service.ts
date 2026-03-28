@@ -1,6 +1,6 @@
 "use client";
 
-import { rsvpSchema } from "../schema/rsvp-schema";
+import { rsvpSchema, rsvpStoredSubmissionsSchema } from "../schema/rsvp-schema";
 import type { RsvpSubmissionInput, RsvpSubmissionService } from "../types";
 
 const RSVP_STORAGE_KEY = "diandmax:rsvp-submissions";
@@ -19,7 +19,9 @@ function readStoredSubmissions(): RsvpSubmissionInput[] {
 
   try {
     const parsed = JSON.parse(stored) as unknown;
-    return Array.isArray(parsed) ? (parsed as RsvpSubmissionInput[]) : [];
+    const decoded = rsvpStoredSubmissionsSchema.safeParse(parsed);
+
+    return decoded.success ? decoded.data : [];
   } catch {
     return [];
   }

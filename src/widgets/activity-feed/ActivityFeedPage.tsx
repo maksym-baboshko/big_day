@@ -20,6 +20,9 @@ import {
   DESKTOP_FEED_LOAD_MORE_STEP,
   MOBILE_FEED_INITIAL_VISIBLE,
   MOBILE_FEED_LOAD_MORE_STEP,
+  getVisibleFeed,
+  hasMoreFeedForViewport,
+  splitFeedIntoColumns,
 } from "./activity-feed-helpers";
 import { useActivityFeedSnapshot } from "./useActivityFeedSnapshot";
 
@@ -68,15 +71,13 @@ export function ActivityFeedPage({ locale, initialState = "populated" }: Activit
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   const visibleCount = isMobile ? mobileVisibleCount : desktopVisibleCount;
-  const hasMoreFeed = (snapshot?.feed.length ?? 0) > visibleCount;
-  const visibleFeed = snapshot?.feed.slice(0, visibleCount) ?? [];
+  const totalFeedCount = snapshot?.feed.length ?? 0;
+  const hasMoreFeed = hasMoreFeedForViewport(totalFeedCount, visibleCount);
+  const visibleFeed = getVisibleFeed(snapshot?.feed ?? [], visibleCount);
   const isLoading = state === "loading";
   const isError = state === "error";
   const isEmpty = state === "empty";
-  const desktopFeedColumns = [
-    { id: "left", events: visibleFeed.filter((_, index) => index % 2 === 0) },
-    { id: "right", events: visibleFeed.filter((_, index) => index % 2 !== 0) },
-  ];
+  const desktopFeedColumns = splitFeedIntoColumns(visibleFeed);
 
   const handleLoadMore = useCallback(() => {
     setMobileVisibleCount((previousCount) => previousCount + MOBILE_FEED_LOAD_MORE_STEP);
@@ -212,7 +213,10 @@ export function ActivityFeedPage({ locale, initialState = "populated" }: Activit
                 </div>
 
                 <div className="hidden gap-3 sm:flex">
-                  {desktopFeedColumns.map((column) => (
+                  {[
+                    { id: "left", events: desktopFeedColumns.left },
+                    { id: "right", events: desktopFeedColumns.right },
+                  ].map((column) => (
                     <div key={column.id} className="flex flex-1 flex-col gap-3">
                       <AnimatePresence mode="popLayout" initial={false}>
                         {column.events.map((event) => (

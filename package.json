@@ -15,6 +15,7 @@
     "test:storybook": "vitest run --config configs/vitest/config.ts --project storybook",
     "test:coverage": "vitest run --config configs/vitest/config.ts --project unit --coverage",
     "test:e2e": "playwright test --config configs/playwright/config.ts",
+    "setup:browsers": "pnpm exec playwright install chromium",
     "smoke:history-restore:dev": "pnpm exec node e2e/smoke/dev-history-restore.mjs",
     "storybook": "HOME=\"$PWD/.cache/storybook/home\" STORYBOOK_DISABLE_TELEMETRY=1 storybook dev -c configs/storybook -p 6006",
     "build-storybook": "HOME=\"$PWD/.cache/storybook/home\" STORYBOOK_DISABLE_TELEMETRY=1 storybook build -c configs/storybook -o artifacts/storybook/static",

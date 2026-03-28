@@ -8,7 +8,10 @@ import {
   getEventPrompt,
   getHeroLabelKey,
   getRealtimeRetryDelay,
+  getVisibleFeed,
+  hasMoreFeedForViewport,
   shouldRetryRealtimeStatus,
+  splitFeedIntoColumns,
   trackSeenHeroEventId,
 } from "./activity-feed-helpers";
 import type { FeedEventSnapshot } from "./types";
@@ -249,5 +252,39 @@ describe("getRealtimeRetryDelay", () => {
 
   it("caps the retry delay", () => {
     expect(getRealtimeRetryDelay(10)).toBe(30000);
+  });
+});
+
+describe("getVisibleFeed", () => {
+  it("returns only the requested number of visible events", () => {
+    expect(getVisibleFeed(["a", "b", "c", "d"], 2)).toEqual(["a", "b"]);
+  });
+
+  it("returns an empty array when visible count is negative", () => {
+    expect(getVisibleFeed(["a", "b"], -1)).toEqual([]);
+  });
+});
+
+describe("splitFeedIntoColumns", () => {
+  it("splits feed items into alternating desktop columns", () => {
+    expect(splitFeedIntoColumns(["a", "b", "c", "d", "e"])).toEqual({
+      left: ["a", "c", "e"],
+      right: ["b", "d"],
+    });
+  });
+
+  it("returns empty columns for an empty feed", () => {
+    expect(splitFeedIntoColumns([])).toEqual({ left: [], right: [] });
+  });
+});
+
+describe("hasMoreFeedForViewport", () => {
+  it("returns true when total feed count exceeds visible count", () => {
+    expect(hasMoreFeedForViewport(12, 8)).toBe(true);
+  });
+
+  it("returns false when all feed items are already visible", () => {
+    expect(hasMoreFeedForViewport(8, 8)).toBe(false);
+    expect(hasMoreFeedForViewport(4, 8)).toBe(false);
   });
 });
