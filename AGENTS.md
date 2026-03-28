@@ -190,6 +190,7 @@ Storybook policy:
 - if a prop is not meaningfully editable in Docs, disable its control instead of letting Storybook infer one
 - prefer shared preview wrappers from `src/testing/storybook/canvas.tsx` over ad-hoc wrapper `div`s in individual stories
 - keep time-based and stateful stories deterministic; prefer fixed story setup over `chromatic.disableSnapshot`
+- motion-heavy composition stories must set a stable Storybook/Chromatic baseline, usually via `globals: { motion: "reduce" }`, unless motion itself is the thing being reviewed
 - add interaction tests only where a component has real behavior
 - stories that mutate `document`, cookies, storage, theme, or locale state must reset cleanly between renders
 
@@ -199,6 +200,7 @@ Storybook checklist for new stories:
 - make API stories respond to the props shown in Docs
 - disable controls for non-serializable or render-only props
 - reuse canonical canvas helpers when possible
+- decide whether the visual baseline should run with reduced motion before leaving a composition story on the default motion global
 - keep the sidebar compact; do not add page-scale showcase stories unless the surface is truly canonical
 
 ---

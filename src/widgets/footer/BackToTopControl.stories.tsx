@@ -1,3 +1,4 @@
+import { StorybookCenteredCanvas } from "@/testing/storybook/canvas";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { BackToTopControl } from "./BackToTopControl";
 
@@ -17,9 +18,12 @@ export const Default: Story = {
   args: {
     label: "Наверх",
   },
+  globals: {
+    motion: "reduce",
+  },
   render: (args) => (
-    <div className="bg-bg-secondary p-8">
+    <StorybookCenteredCanvas widthClassName="w-auto" tone="secondary" paddingClassName="p-8">
       <BackToTopControl {...args} />
-    </div>
+    </StorybookCenteredCanvas>
   ),
 };

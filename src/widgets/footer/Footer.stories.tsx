@@ -1,3 +1,4 @@
+import { StorybookFullscreenCanvas } from "@/testing/storybook/canvas";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Footer } from "./Footer";
 
@@ -14,8 +15,11 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
+  globals: {
+    motion: "reduce",
+  },
   render: () => (
-    <div className="bg-bg-primary pt-24">
+    <StorybookFullscreenCanvas className="pt-24">
       <main id="main-content">
         <section id="our-story" />
         <section id="timeline" />
@@ -25,6 +29,6 @@ export const Default: Story = {
         <section id="rsvp" />
       </main>
       <Footer />
-    </div>
+    </StorybookFullscreenCanvas>
   ),
 };

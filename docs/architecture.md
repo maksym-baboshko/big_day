@@ -221,6 +221,17 @@ The mock adapter validates with the real schema and writes accepted submissions 
 
 ---
 
+## Storybook Catalog Rules
+
+- treat Storybook as a reusable UI catalog, not as a page gallery
+- separate API stories from composition stories
+- keep controls limited to safe, serializable props
+- prefer shared wrappers from `src/testing/storybook/canvas.tsx`
+- keep time-based/stateful stories deterministic
+- for motion-heavy composition stories, set a stable visual baseline for Chromatic, usually through `globals: { motion: "reduce" }`, unless motion itself is the subject of review
+
+---
+
 ## 6. Runtime Data Flow
 
 ### Homepage

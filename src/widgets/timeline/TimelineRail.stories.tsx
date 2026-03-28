@@ -1,3 +1,4 @@
+import { StorybookFullscreenCanvas } from "@/testing/storybook/canvas";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { TimelineRail, type TimelineRailEvent } from "./TimelineRail";
 
@@ -56,9 +57,12 @@ export const Default: Story = {
   args: {
     events: TIMELINE_EVENTS,
   },
+  globals: {
+    motion: "reduce",
+  },
   render: (args) => (
-    <div className="min-h-screen bg-bg-primary px-4 py-16">
+    <StorybookFullscreenCanvas className="px-4 py-16">
       <TimelineRail {...args} />
-    </div>
+    </StorybookFullscreenCanvas>
   ),
 };
