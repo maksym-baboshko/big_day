@@ -3,6 +3,7 @@ import enMessages from "@/shared/i18n/translations/en.json";
 import ukMessages from "@/shared/i18n/translations/uk.json";
 import { cinzel, inter, playfair, vibes } from "@/shared/lib";
 import type { Preview } from "@storybook/nextjs-vite";
+import { MotionConfig } from "motion/react";
 import "@/app/globals.css";
 import { NextIntlClientProvider } from "next-intl";
 import { type ReactNode, useEffect } from "react";
@@ -17,6 +18,9 @@ const messagesByLocale = {
 
 type StorybookLocale = keyof typeof messagesByLocale;
 type StorybookTheme = "light" | "dark";
+type StorybookMotion = "default" | "reduce";
+
+let originalMatchMedia: typeof window.matchMedia | null = null;
 
 function createMediaQueryList(query: string, matches: boolean): MediaQueryList {
   return {
@@ -34,44 +38,57 @@ function createMediaQueryList(query: string, matches: boolean): MediaQueryList {
 interface StorybookShellProps {
   children: ReactNode;
   locale: StorybookLocale;
-  motion: "default" | "reduce";
+  motion: StorybookMotion;
   theme: StorybookTheme;
 }
 
-function StorybookShell({ children, locale, motion, theme }: StorybookShellProps) {
-  useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
+function applyStorybookEnvironment(
+  locale: StorybookLocale,
+  motion: StorybookMotion,
+  theme: StorybookTheme,
+): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  originalMatchMedia ??= window.matchMedia.bind(window);
+
+  document.documentElement.lang = locale;
+  document.documentElement.classList.toggle("dark", theme === "dark");
+  document.documentElement.dataset.scrollBehavior = motion === "reduce" ? "auto" : "smooth";
+  window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+
+  window.matchMedia = (query: string) => {
+    if (query === "(prefers-color-scheme: dark)") {
+      return createMediaQueryList(query, theme === "dark");
     }
 
-    const originalMatchMedia = window.matchMedia.bind(window);
-    document.documentElement.lang = locale;
-    document.documentElement.classList.toggle("dark", theme === "dark");
-    document.documentElement.dataset.scrollBehavior = motion === "reduce" ? "auto" : "smooth";
-    window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+    if (query === "(prefers-reduced-motion: reduce)") {
+      return createMediaQueryList(query, motion === "reduce");
+    }
 
-    window.matchMedia = (query: string) => {
-      if (query === "(prefers-color-scheme: dark)") {
-        return createMediaQueryList(query, theme === "dark");
-      }
+    return (originalMatchMedia ?? window.matchMedia)(query);
+  };
+}
 
-      if (query === "(prefers-reduced-motion: reduce)") {
-        return createMediaQueryList(query, motion === "reduce");
-      }
+function StorybookShell({ children, locale, motion, theme }: StorybookShellProps) {
+  applyStorybookEnvironment(locale, motion, theme);
 
-      return originalMatchMedia(query);
-    };
-
+  useEffect(() => {
     return () => {
-      window.matchMedia = originalMatchMedia;
+      if (originalMatchMedia && typeof window !== "undefined") {
+        window.matchMedia = originalMatchMedia;
+      }
     };
-  }, [locale, motion, theme]);
+  }, []);
 
   return (
     <NextIntlClientProvider locale={locale} messages={messagesByLocale[locale]}>
-      <ThemeProvider>
-        <div className={fontClassName}>{children}</div>
-      </ThemeProvider>
+      <MotionConfig reducedMotion={motion === "reduce" ? "always" : "never"}>
+        <ThemeProvider>
+          <div className={fontClassName}>{children}</div>
+        </ThemeProvider>
+      </MotionConfig>
     </NextIntlClientProvider>
   );
 }

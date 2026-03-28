@@ -1,7 +1,7 @@
 "use client";
 
 import { MOTION_EASE, cn } from "@/shared/lib";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 
 interface RsvpActionRowProps {
   disabled: boolean;
@@ -25,6 +25,9 @@ export function RsvpActionRow({
   statusMessage,
   errorMessage,
 }: RsvpActionRowProps) {
+  const reduceMotion = useReducedMotion();
+  const shouldAnimate = !disabled && !isSubmitting && !liteMotion && !reduceMotion;
+
   return (
     <div className="pt-1">
       {errorMessage ? (
@@ -39,8 +42,8 @@ export function RsvpActionRow({
       <motion.button
         type="submit"
         disabled={disabled || isSubmitting}
-        whileHover={!disabled && !isSubmitting ? { scale: 1.01 } : undefined}
-        whileTap={!disabled && !isSubmitting ? { scale: 0.99 } : undefined}
+        whileHover={shouldAnimate ? { scale: 1.01 } : undefined}
+        whileTap={shouldAnimate ? { scale: 0.99 } : undefined}
         className={cn(
           "relative w-full overflow-hidden rounded-2xl py-4 text-base font-medium tracking-wide transition-all duration-500 md:py-5 md:text-lg",
           focusRingClass,
@@ -53,18 +56,22 @@ export function RsvpActionRow({
           <span>{isSubmitting ? loadingLabel : submitLabel}</span>
           {!isSubmitting ? (
             <motion.span
-              animate={!disabled ? { x: [0, 5, 0] } : undefined}
-              transition={{
-                duration: 1.8,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "easeInOut",
-              }}
+              animate={shouldAnimate ? { x: [0, 5, 0] } : undefined}
+              transition={
+                shouldAnimate
+                  ? {
+                      duration: 1.8,
+                      repeat: Number.POSITIVE_INFINITY,
+                      ease: "easeInOut",
+                    }
+                  : undefined
+              }
             >
               →
             </motion.span>
           ) : null}
         </span>
-        {!disabled && !isSubmitting && !liteMotion ? (
+        {shouldAnimate ? (
           <motion.div
             initial={{ x: "-110%" }}
             whileHover={{ x: "110%" }}

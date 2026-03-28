@@ -73,10 +73,54 @@ function HeroMetaContent() {
   );
 }
 
-export function InvitationHeroIntro() {
+interface InvitationHeroIntroProps {
+  countdownNowMs?: number;
+}
+
+export function InvitationHeroIntro({ countdownNowMs }: InvitationHeroIntroProps) {
   const t = useTranslations("Hero");
   const liteMotion = useLiteMotion();
   const reduceMotion = useReducedMotion();
+
+  if (reduceMotion) {
+    return (
+      <div className="relative z-10 flex w-full max-w-6xl flex-1 flex-col items-center px-6 sm:px-4">
+        <div className="flex w-full flex-1 flex-col items-center justify-center">
+          <h1
+            className={`heading-serif ${heroSectionGapClass} text-center text-[clamp(3.375rem,13.8vw,4.4rem)] leading-[0.88] text-text-primary sm:text-7xl md:text-7xl lg:text-8xl xl:text-[100px]`}
+          >
+            <span className="hidden whitespace-nowrap md:inline-block">
+              {t("groom_name")} <span className="text-accent italic">&</span> {t("bride_name")}
+            </span>
+            <span className="grid justify-items-center gap-[clamp(0.45rem,1.8vh,0.9rem)] leading-[0.88] md:hidden">
+              <span>{t("groom_name")}</span>
+              <span className="flex items-end justify-center gap-[clamp(0.75rem,4vw,1.35rem)]">
+                <span className="shrink-0 translate-y-[0.06em] text-[clamp(3rem,12.9vw,3.9rem)] leading-none text-accent">
+                  &
+                </span>
+                <span>{t("bride_name")}</span>
+              </span>
+            </span>
+          </h1>
+
+          <HeroMetaContent />
+
+          <div className="origin-top scale-[0.84] sm:scale-100">
+            <Countdown nowMs={countdownNowMs} />
+          </div>
+        </div>
+
+        <div className="relative z-10 w-full flex-none">
+          <div className="flex flex-col items-center gap-[clamp(0.5rem,1.5vh,1rem)]">
+            <span className="text-xs font-medium uppercase tracking-widest text-text-secondary/90">
+              {t("scroll_down")}
+            </span>
+            <div className="h-[clamp(2.25rem,7vh,4rem)] w-px bg-linear-to-b from-accent/50 to-transparent" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (liteMotion) {
     return (
@@ -119,7 +163,7 @@ export function InvitationHeroIntro() {
             className="origin-top scale-[0.84] sm:scale-100"
             style={{ willChange: "transform, opacity" }}
           >
-            <Countdown />
+            <Countdown nowMs={countdownNowMs} />
           </motion.div>
         </motion.div>
 
@@ -200,7 +244,7 @@ export function InvitationHeroIntro() {
 
         <PageEnterReveal direction="up" delay={0.4}>
           <div className="origin-top scale-[0.84] sm:scale-100">
-            <Countdown />
+            <Countdown nowMs={countdownNowMs} />
           </div>
         </PageEnterReveal>
       </div>

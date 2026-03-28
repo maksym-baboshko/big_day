@@ -1,3 +1,4 @@
+import { StorybookCenteredCanvas } from "@/testing/storybook/canvas";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { RsvpActionRow } from "./RsvpActionRow";
 
@@ -22,15 +23,18 @@ export const Ready: Story = {
   args: {
     disabled: false,
     isSubmitting: false,
-    liteMotion: false,
+    liteMotion: true,
     submitLabel: "Підтвердити",
     loadingLabel: "Надсилаємо...",
     statusMessage: "Ваша відповідь буде збережена локально в mock-first фазі.",
   },
+  globals: {
+    motion: "reduce",
+  },
   render: (args) => (
-    <div className="w-[min(28rem,92vw)] bg-bg-primary p-6">
+    <StorybookCenteredCanvas widthClassName="w-[min(28rem,92vw)]">
       <RsvpActionRow {...args} />
-    </div>
+    </StorybookCenteredCanvas>
   ),
 };
 
@@ -38,7 +42,7 @@ export const Disabled: Story = {
   args: {
     disabled: true,
     isSubmitting: false,
-    liteMotion: false,
+    liteMotion: true,
     submitLabel: "Підтвердити",
     loadingLabel: "Надсилаємо...",
     statusMessage: "Спочатку оберіть, чи будете ви присутні.",

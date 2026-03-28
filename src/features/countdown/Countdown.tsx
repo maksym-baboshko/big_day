@@ -2,9 +2,9 @@
 
 import { WEDDING_DATE } from "@/shared/config";
 import { cn } from "@/shared/lib";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { useTranslations } from "next-intl";
-import { useSyncExternalStore } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 
 interface TimeLeft {
   days: number;
@@ -15,17 +15,18 @@ interface TimeLeft {
 
 interface CountdownProps {
   className?: string;
+  nowMs?: number;
 }
 
 const TARGET_MS = WEDDING_DATE.getTime();
 const SERVER_SNAPSHOT: TimeLeft = { days: 0, hours: 0, minutes: 0, seconds: 0 };
 
-let globalStore = calculateTimeLeft();
+let globalStore = calculateTimeLeft(Date.now());
 const listeners = new Set<() => void>();
 let countdownIntervalStarted = false;
 
-function calculateTimeLeft(): TimeLeft {
-  const diff = TARGET_MS - Date.now();
+function calculateTimeLeft(nowMs: number): TimeLeft {
+  const diff = TARGET_MS - nowMs;
 
   if (diff <= 0) {
     return { days: 0, hours: 0, minutes: 0, seconds: 0 };
@@ -39,6 +40,10 @@ function calculateTimeLeft(): TimeLeft {
   };
 }
 
+function subscribeStatic(): () => void {
+  return () => undefined;
+}
+
 function ensureCountdownInterval(): void {
   if (typeof window === "undefined" || countdownIntervalStarted) {
     return;
@@ -46,7 +51,7 @@ function ensureCountdownInterval(): void {
 
   countdownIntervalStarted = true;
   window.setInterval(() => {
-    globalStore = calculateTimeLeft();
+    globalStore = calculateTimeLeft(Date.now());
     for (const callback of listeners) {
       callback();
     }
@@ -68,14 +73,24 @@ function getServerSnapshot(): TimeLeft {
   return SERVER_SNAPSHOT;
 }
 
-export function Countdown({ className }: CountdownProps) {
+export function Countdown({ className, nowMs }: CountdownProps) {
   const t = useTranslations("Countdown");
-  const mounted = useSyncExternalStore(
+  const reduceMotion = useReducedMotion();
+  const mountedStore = useSyncExternalStore(
     () => () => {},
     () => true,
     () => false,
   );
-  const timeLeft = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const fixedTimeLeft = useMemo(
+    () => (typeof nowMs === "number" ? calculateTimeLeft(nowMs) : null),
+    [nowMs],
+  );
+  const mounted = typeof nowMs === "number" ? true : mountedStore;
+  const timeLeft = useSyncExternalStore(
+    typeof nowMs === "number" ? subscribeStatic : subscribe,
+    typeof nowMs === "number" ? () => fixedTimeLeft ?? SERVER_SNAPSHOT : getSnapshot,
+    typeof nowMs === "number" ? () => fixedTimeLeft ?? SERVER_SNAPSHOT : getServerSnapshot,
+  );
 
   if (!mounted) {
     return (
@@ -107,9 +122,13 @@ export function Countdown({ className }: CountdownProps) {
       {entries.map((item, index) => (
         <div key={item.label} className="flex items-start">
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 + index * 0.1, ease: "easeOut" }}
+            initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+            animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+            transition={
+              reduceMotion
+                ? undefined
+                : { duration: 0.8, delay: 0.2 + index * 0.1, ease: "easeOut" }
+            }
             className="flex min-w-16 flex-col items-center px-2 md:min-w-20 md:px-4"
           >
             <span className="mb-3 font-cinzel text-[2.625rem] leading-none font-medium tabular-nums tracking-widest text-text-primary md:text-5xl">
@@ -121,9 +140,9 @@ export function Countdown({ className }: CountdownProps) {
           </motion.div>
           {index < entries.length - 1 ? (
             <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.3 + index * 0.1 }}
+              initial={reduceMotion ? false : { opacity: 0 }}
+              animate={reduceMotion ? undefined : { opacity: 1 }}
+              transition={reduceMotion ? undefined : { duration: 0.8, delay: 0.3 + index * 0.1 }}
               className="mt-1 select-none font-cinzel text-[1.75rem] text-accent/45 md:text-[2.1rem]"
             >
               ·
