@@ -106,6 +106,7 @@ Do not commit the raw project token into the repository. Keep it only in your lo
 - Contribution policy: [`CONTRIBUTING.md`](./CONTRIBUTING.md)
 - Architecture decisions (ADR): [`docs/adr/README.md`](./docs/adr/README.md)
 - Architecture contract: [`docs/architecture.md`](./docs/architecture.md)
+- Technical audit and implementation roadmap: [`docs/audit-roadmap.md`](./docs/audit-roadmap.md)
 
 ## Current architecture
 
