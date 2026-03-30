@@ -60,6 +60,7 @@ with the rest of the browser checks under `e2e/smoke/`.
 - `configs/<tool>/` is the canonical home for real config content.
 - root keeps only machine entrypoints and high-signal docs.
 - `docs/architecture.md` is the deeper architecture reference.
+- `docs/deep-technical-audit-prompt.md` is the reusable repo-specific prompt for a deep engineering audit.
 - `.cache/` stores private local/build state.
 - `artifacts/` stores readable generated outputs and reports.
 - `components.json` stays in root as the shadcn project manifest.
@@ -98,6 +99,13 @@ CHROMATIC_PROJECT_TOKEN
 The existing workflow in `.github/workflows/chromatic.yml` will then publish Storybook builds on `main`, `develop`, and pull requests targeting those branches.
 
 Do not commit the raw project token into the repository. Keep it only in your local environment and in GitHub Actions secrets.
+
+
+## Engineering governance
+
+- Contribution policy: [`CONTRIBUTING.md`](./CONTRIBUTING.md)
+- Architecture decisions (ADR): [`docs/adr/README.md`](./docs/adr/README.md)
+- Architecture contract: [`docs/architecture.md`](./docs/architecture.md)
 
 ## Current architecture
 
@@ -170,3 +178,9 @@ dependencies stay out of the repo until the backend phase is reintroduced on pur
 - `pre-commit` runs `lint-staged` only.
 - `pre-push` runs `pnpm typecheck` and `pnpm test`.
 - CI is layered into `quality`, `unit`, `build`, `storybook-build`, `storybook-tests`, `e2e`, and the separate `chromatic` workflow.
+
+## Audit prompt
+
+For a repo-specific deep technical audit prompt in Ukrainian, see:
+
+- `docs/deep-technical-audit-prompt.md`

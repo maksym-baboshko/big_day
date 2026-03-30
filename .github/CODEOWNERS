@@ -1,0 +1,35 @@
+# diandmax CODEOWNERS
+# Keep ownership focused on architectural seams and quality-critical lanes.
+
+# Platform and CI
+/.github/workflows/** @diandmax/platform
+/configs/** @diandmax/platform
+
+# Architecture and contributor contracts
+/AGENTS.md @diandmax/architecture
+/CLAUDE.md @diandmax/architecture
+/docs/architecture.md @diandmax/architecture
+/docs/adr/** @diandmax/architecture
+/CONTRIBUTING.md @diandmax/architecture
+
+# App routing and locale resolution
+/src/app/** @diandmax/frontend-core
+/src/proxy.ts @diandmax/frontend-core
+/src/shared/i18n/** @diandmax/frontend-core
+
+# Domain contracts
+/src/entities/** @diandmax/domain
+/src/features/rsvp/types.ts @diandmax/domain
+/src/features/rsvp/schema/** @diandmax/domain
+/src/features/rsvp/services/** @diandmax/domain
+
+# Reusable UI and design-system surfaces
+/src/shared/ui/** @diandmax/design-system
+/src/widgets/** @diandmax/design-system
+/src/features/language-switcher/** @diandmax/design-system
+/src/features/theme-switcher/** @diandmax/design-system
+/src/features/countdown/** @diandmax/design-system
+
+# Visual and browser quality lanes
+/e2e/** @diandmax/qa
+/src/**/*.stories.tsx @diandmax/qa
