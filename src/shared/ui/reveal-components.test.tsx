@@ -86,6 +86,16 @@ class ControlledIntersectionObserver implements IntersectionObserver {
   }
 }
 
+function getObserver(): ControlledIntersectionObserver {
+  const observer = ControlledIntersectionObserver.instances[0];
+
+  if (!observer) {
+    throw new Error("Expected an IntersectionObserver instance to exist.");
+  }
+
+  return observer;
+}
+
 describe("reveal components", () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -114,10 +124,9 @@ describe("reveal components", () => {
     );
 
     const wrapper = screen.getByTestId("in-view-child").parentElement;
-    const observer = ControlledIntersectionObserver.instances[0];
+    const observer = getObserver();
 
     expect(wrapper).not.toBeNull();
-    expect(observer).toBeDefined();
     expect(wrapper?.style.opacity).toBe("0.001");
     expect(wrapper?.style.transform).toBe("translate3d(12px, 20px, 0)");
 
@@ -145,7 +154,7 @@ describe("reveal components", () => {
       </InViewReveal>,
     );
 
-    const observer = ControlledIntersectionObserver.instances[0];
+    const observer = getObserver();
 
     act(() => {
       vi.advanceTimersByTime(16);
@@ -167,7 +176,7 @@ describe("reveal components", () => {
     );
 
     const wrapper = screen.getByTestId("history-child").parentElement;
-    const observer = ControlledIntersectionObserver.instances[0];
+    const observer = getObserver();
 
     expect(wrapper?.style.opacity).toBe("1");
 
