@@ -38,13 +38,11 @@ export default async function ActivityFeedRoute({ params, searchParams }: Activi
   const { locale } = await params;
   const typedLocale = resolveLocale(locale);
   const resolvedSearchParams = await searchParams;
-  const search = resolvedSearchParams?.state ? `?state=${resolvedSearchParams.state}` : "";
-  const route = `${typedLocale === "en" ? "/en" : ""}/live${search}`;
   setRequestLocale(typedLocale);
 
   return (
     <>
-      <VisitedRouteScript route={route} />
+      <VisitedRouteScript />
       <ActivityFeedPage
         locale={typedLocale}
         initialState={resolveLiveFeedState(resolvedSearchParams?.state)}

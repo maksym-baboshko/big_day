@@ -62,18 +62,16 @@ export async function generateMetadata({ params }: InvitePageProps): Promise<Met
 }
 
 export default async function InvitePage({ params }: InvitePageProps) {
-  const { slug, locale } = await params;
+  const { slug } = await params;
   const guest = getGuestBySlug(slug);
 
   if (!guest) {
     notFound();
   }
 
-  const route = `${resolveLocale(locale) === "en" ? "/en" : ""}/invite/${slug}`;
-
   return (
     <>
-      <VisitedRouteScript route={route} />
+      <VisitedRouteScript />
       <PersonalInvitationPage guest={guest} />
     </>
   );

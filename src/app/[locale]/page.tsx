@@ -11,11 +11,10 @@ export default async function HomePage({
   const { locale } = await params;
   const typedLocale = resolveLocale(locale);
   const structuredDataJson = getStructuredDataJson(typedLocale);
-  const route = typedLocale === "en" ? "/en" : "/";
 
   return (
     <>
-      <VisitedRouteScript route={route} />
+      <VisitedRouteScript />
       <script id={`structured-data-${locale}`} type="application/ld+json">
         {structuredDataJson}
       </script>
